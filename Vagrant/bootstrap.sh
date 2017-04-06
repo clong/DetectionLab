@@ -14,8 +14,8 @@ else
   /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index sysmon -auth 'admin:changeme'
-  /opt/splunk/bin/splunk install app /vagrant/resources/windows_ta.tgz -auth 'admin:changeme'
-  /opt/splunk/bin/splunk install app /vagrant/resources/sysmon_ta.tgz -auth 'admin:changeme'
+  /opt/splunk/bin/splunk install app /vagrant/resources/splunk-add-on-for-microsoft-windows_483.tgz -auth 'admin:changeme'
+  /opt/splunk/bin/splunk install app /vagrant/resources/add-on-for-microsoft-sysmon_600.tgz -auth 'admin:changeme'
   # Add a Splunk TCP input on port 9997
   echo -e "[splunktcp://9997]\nconnection_host = ip" > /opt/splunk/etc/apps/search/local/inputs.conf
   /opt/splunk/bin/splunk restart
