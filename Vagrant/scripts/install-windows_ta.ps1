@@ -16,6 +16,15 @@ if ($j.State -eq "Completed") {
 Write-Host "Error"
 }
 Remove-Job -force $j
+# Create local directory
+$inputsPath = "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_windows\local\inputs.conf"
+New-Item -ItemType Directory -Force -Path "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_windows\local"
+Copy-Item c:\vagrant\resources\windows_inputs.conf $inputsPath
 
-# Add check here to make sure it installed correctly
-Write-Host "Windows TA installed successfully"
+# Add a check here to make sure everything was installed correctly
+If(!(test-path $inputsPath)) {
+  Write-Host "Windows TA installed successfully."
+} Else {
+  Write-Host "Something went wrong during installation."
+  exit 1
+}
