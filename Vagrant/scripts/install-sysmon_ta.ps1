@@ -23,8 +23,8 @@ Copy-Item c:\vagrant\resources\sysmon_inputs.conf $inputsPath
 
 # Add a check here to make sure everything was installed correctly
 If(!(test-path $inputsPath)) {
-  Write-Host "Sysmon TA installed successfully."
-} Else {
   Write-Host "Something went wrong during installation."
   exit 1
+} Else {
+  Write-Host "Sysmon TA installed successfully."
 }

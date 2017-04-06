@@ -38,6 +38,6 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
 
   Write-Host 'Provisioning after joining domain'
 
-  $script = "c:\vagrant\scripts\provision-" + $box + ".ps1"
-  . $script
+  # $script = "c:\vagrant\scripts\provision-" + $box + ".ps1"
+  # . $script
 }
