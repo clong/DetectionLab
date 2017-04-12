@@ -23,7 +23,7 @@
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
       "winrm_timeout" : "4h",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "shutdown_command": "a:/PackerShutdown.bat",
       "ram_size": 2048,
       "cpu": 2,
       "switch_name":"{{user `hyperv_switchname`}}",
@@ -40,7 +40,8 @@
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
       "winrm_timeout": "6h",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "shutdown_timeout": "1h",
+      "shutdown_command": "a:/PackerShutdown.bat",
       "guest_os_type": "windows8srv-64",
       "disk_size": 61440,
       "vnc_port_min": 5900,
@@ -134,6 +135,11 @@
         "./scripts/uac-enable.bat",
         "./scripts/compact.bat"
       ]
+    },
+    {
+      "type": "file",
+      "source": "./answer_files/2016/Autounattend_sysprep.xml",
+      "destination": "c:/Windows/Temp/Autounattend_sysprep.xml"
     }
   ],
   "post-processors": [
