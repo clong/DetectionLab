@@ -3,14 +3,14 @@ $sysmonDir = "C:\ProgramData\Sysmon"
 If(!(test-path $sysinternalsDir)) {
   New-Item -ItemType Directory -Force -Path $sysinternalsDir
 } Else {
-  Write-Host "Tools directory exists. Moving on."
+  Write-Host "Tools directory exists. Exiting."
   exit
 }
 
 If(!(test-path $sysmonDir)) {
   New-Item -ItemType Directory -Force -Path $sysmonDir
 } Else {
-  Write-Host "Sysmon directory exists. Moving on."
+  Write-Host "Sysmon directory exists. Exiting."
   exit
 }
 
@@ -27,6 +27,8 @@ Invoke-WebRequest -Uri "https://live.sysinternals.com/PsExec64.exe" -OutFile $ps
 Invoke-WebRequest -Uri "https://live.sysinternals.com/procexp64.exe" -OutFile $procexpPath
 Invoke-WebRequest -Uri "https://live.sysinternals.com/Sysmon64.exe" -Outfile $sysmonPath
 Copy-Item $sysmonPath $sysmonDir
+
+# Download SwiftOnSecurity's Sysmon config
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml" -Outfile "$sysmonDir\sysmonConfig.xml"
 
 # Startup Sysmon

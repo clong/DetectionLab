@@ -1,6 +1,6 @@
 # Install the GPO that specifies the WEF collector
 Write-Host "Importing the GPO to specify the WEF collector"
-Import-GPO -BackupGpoName 'Windows Event Forwarding Server' -Path "c:\vagrant\resources" -TargetName 'Windows Event Forwarding Server' -CreateIfNeeded
+Import-GPO -BackupGpoName 'Windows Event Forwarding Server' -Path "c:\vagrant\resources\GPO\wef_configuration" -TargetName 'Windows Event Forwarding Server' -CreateIfNeeded
 New-GPLink -Name 'Windows Event Forwarding Server' -Target "dc=windomain,dc=local" -Enforced yes
 New-GPLink -Name 'Windows Event Forwarding Server' -Target "ou=Domain Controllers,dc=windomain,dc=local" -Enforced yes
 gpupdate /force
