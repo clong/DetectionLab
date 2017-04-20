@@ -1,0 +1,38 @@
+Machine Name,Policy Target,Subcategory,Subcategory GUID,Inclusion Setting,Exclusion Setting,Setting Value
+,System,Audit Credential Validation,{0cce923f-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Kerberos Authentication Service,{0cce9242-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Kerberos Service Ticket Operations,{0cce9240-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Other Account Logon Events,{0cce9241-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Computer Account Management,{0cce9236-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Distribution Group Management,{0cce9238-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Other Account Management Events,{0cce923a-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Security Group Management,{0cce9237-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit User Account Management,{0cce9235-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit DPAPI Activity,{0cce922d-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit PNP Activity,{0cce9248-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Process Creation,{0cce922b-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Process Termination,{0cce922c-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Detailed Directory Service Replication,{0cce923e-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Directory Service Access,{0cce923b-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Directory Service Changes,{0cce923c-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Directory Service Replication,{0cce923d-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Account Lockout,{0cce9217-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit User / Device Claims,{0cce9247-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Group Membership,{0cce9249-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Logoff,{0cce9216-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Logon,{0cce9215-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Other Logon/Logoff Events,{0cce921c-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Special Logon,{0cce921b-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Detailed File Share,{0cce9244-69ae-11d9-bed3-505054503030},Failure,,2
+,System,Audit File Share,{0cce9224-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit File System,{0cce921d-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Filtering Platform Connection,{0cce9226-69ae-11d9-bed3-505054503030},Failure,,2
+,System,Audit Kernel Object,{0cce921f-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Removable Storage,{0cce9245-69ae-11d9-bed3-505054503030},Success,,1
+,System,Audit Audit Policy Change,{0cce922f-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Authentication Policy Change,{0cce9230-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit MPSSVC Rule-Level Policy Change,{0cce9232-69ae-11d9-bed3-505054503030},Success,,1
+,System,Audit IPsec Driver,{0cce9213-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Security State Change,{0cce9210-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Security System Extension,{0cce9211-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit System Integrity,{0cce9212-69ae-11d9-bed3-505054503030},Success and Failure,,3
