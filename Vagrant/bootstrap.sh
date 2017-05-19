@@ -7,6 +7,12 @@ apt-get install -y jq whois build-essential git
 if [ -f "/opt/splunk/bin/splunk" ]
   then echo "Splunk is already installed"
 else
+  ## For some reason the DNS resolution in the wget command below fails without
+  ## the sleep or nslookup command. Not sure which one fixes it. TODO.
+  echo 'nameserver 8.8.8.8' > /etc/resolvconf/resolv.conf/head
+  resolvconf -u
+  nslookup splunk.com
+  sleep 10
   # Download Splunk
   wget --progress=bar:force -O /root/splunk-6.5.3-36937ad027d4-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=6.5.3&product=splunk&filename=splunk-6.5.3-36937ad027d4-linux-2.6-amd64.deb&wget=true'
   dpkg -i /root/splunk-6.5.3-36937ad027d4-linux-2.6-amd64.deb
