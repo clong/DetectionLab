@@ -19,6 +19,7 @@ $procmonPath = "C:\Tools\Sysinternals\Procmon.exe"
 $psexecPath = "C:\Tools\Sysinternals\PsExec64.exe"
 $procexpPath = "C:\Tools\Sysinternals\procexp64.exe"
 $sysmonPath = "C:\Tools\Sysinternals\Sysmon64.exe"
+$tcpviewPath = "C:\Tools\Sysinternals\Tcpview.exe"
 $sysmonConfigPath = "$sysmonDir\sysmonConfig.xml"
 
 Invoke-WebRequest -Uri "https://live.sysinternals.com/Autoruns64.exe" -OutFile $autorunsPath
@@ -26,6 +27,7 @@ Invoke-WebRequest -Uri "https://live.sysinternals.com/Procmon.exe" -OutFile $pro
 Invoke-WebRequest -Uri "https://live.sysinternals.com/PsExec64.exe" -OutFile $psexecPath
 Invoke-WebRequest -Uri "https://live.sysinternals.com/procexp64.exe" -OutFile $procexpPath
 Invoke-WebRequest -Uri "https://live.sysinternals.com/Sysmon64.exe" -Outfile $sysmonPath
+Invoke-WebRequest -Uri "https://live.sysinternals.com/Tcpview.exe" -Outfile $tcpviewPath
 Copy-Item $sysmonPath $sysmonDir
 
 # Download SwiftOnSecurity's Sysmon config

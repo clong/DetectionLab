@@ -7,6 +7,7 @@ If (-not ($service)) {
   Start-Process -FilePath "c:\programdata\osquery\osqueryd\osqueryd.exe" -ArgumentList "--install" -Wait
   # Copy over the config
   Copy-Item c:\vagrant\resources\osquery\osquery.conf c:\programdata\osquery\osquery.conf
+  Copy-Item c:\vagrant\resources\osquery\osquery.flags c:\programdata\osquery\osquery.flags
   #TODO: Fix up autoruns.conf
   # Create the query packs directory
   #New-Item -ItemType Directory -Force -Path $packsDir
