@@ -7,15 +7,14 @@ apt-get install -y jq whois build-essential git
 if [ -f "/opt/splunk/bin/splunk" ]
   then echo "Splunk is already installed"
 else
-  ## For some reason the DNS resolution in the wget command below fails without
-  ## the sleep or nslookup command. Not sure which one fixes it. TODO.
-  echo 'nameserver 8.8.8.8' > /etc/resolvconf/resolv.conf/head
-  resolvconf -u
-  nslookup splunk.com
-  sleep 10
   # Download Splunk
-  wget --progress=bar:force -O /root/splunk-6.5.3-36937ad027d4-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=6.5.3&product=splunk&filename=splunk-6.5.3-36937ad027d4-linux-2.6-amd64.deb&wget=true'
-  dpkg -i /root/splunk-6.5.3-36937ad027d4-linux-2.6-amd64.deb
+  wget --progress=bar:force -O splunk-6.6.2-4b804538c686-linux-2.6-amd64.deb  'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=6.6.2&product=splunk&filename=splunk-6.6.2-4b804538c686-linux-2.6-amd64.deb&wget=true'
+  # Sometimes DNS resolution of splunk.com fails and I have no idea why. Ensure the file exists before continuing.
+  if [ ! -e splunk-6.6.2-4b804538c686-linux-2.6-amd64.deb ]; then
+    # Retry the download.
+    wget --progress=bar:force -O splunk-6.6.2-4b804538c686-linux-2.6-amd64.deb  'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=6.6.2&product=splunk&filename=splunk-6.6.2-4b804538c686-linux-2.6-amd64.deb&wget=true'
+  fi
+  dpkg -i splunk-6.6.2-4b804538c686-linux-2.6-amd64.deb
   /opt/splunk/bin/splunk start --accept-license
   /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
@@ -31,4 +30,5 @@ else
   cp /vagrant/resources/splunk_server/transforms.conf /opt/splunk/etc/apps/search/local/
   # Reboot Splunk to make changes take effect
   /opt/splunk/bin/splunk restart
+  /opt/splunk/bin/splunk enable boot-start
 fi

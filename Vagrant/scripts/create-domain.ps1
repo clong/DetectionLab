@@ -47,4 +47,7 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
     Write-Host Setting DNS
     $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}
   }
+  Write-Host "Setting timezone to UTC"
+  c:\windows\system32\tzutil.exe /s "UTC"
+  Write-Host "Excluding NAT interface from DNS"
 }

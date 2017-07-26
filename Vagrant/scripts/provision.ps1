@@ -1,6 +1,9 @@
 $box = Get-ItemProperty -Path HKLM:SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName -Name "ComputerName"
 $box = $box.ComputerName.ToString().ToLower()
 
+Write-Host "Setting timezone to UTC"
+c:\windows\system32\tzutil.exe /s "UTC"
+
 if ($env:COMPUTERNAME -imatch 'vagrant') {
 
   Write-Host 'Hostname is still the original one, skip provisioning for reboot'
@@ -12,7 +15,7 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
 
 } elseif ((gwmi win32_computersystem).partofdomain -eq $false) {
 
-  Write-Host -fore red "Ooops, workgroup!"
+  Write-Host -fore red "Current domain is set to 'workgroup'. Time to join the domain!"
 
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
     Write-Host 'Install bginfo'

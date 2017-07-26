@@ -1,7 +1,9 @@
 # This script sets up the Server and Workstations OUs
 Write-Host "Sleeping for 30 seconds, then creating Server and Workstation OUs"
 Start-Sleep 30
+Write-Host "Creating Servers OU"
 New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
+Write-Host "Creating Workstations OU"
 New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
 
 # Sysprep breaks auto-login. Let's restore it here:
