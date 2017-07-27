@@ -28,6 +28,8 @@ else
   # Add props.conf and transforms.conf
   cp /vagrant/resources/splunk_server/props.conf /opt/splunk/etc/apps/search/local/
   cp /vagrant/resources/splunk_server/transforms.conf /opt/splunk/etc/apps/search/local/
+  # Skip Splunk Tour and Change Password Dialog
+  touch /opt/splunk/etc/.ui_login
   # Reboot Splunk to make changes take effect
   /opt/splunk/bin/splunk restart
   /opt/splunk/bin/splunk enable boot-start
