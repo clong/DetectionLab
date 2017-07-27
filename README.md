@@ -37,12 +37,13 @@ OSX 12.12.5 | 1.9.3 | 1.0.0 | VMWare Fusion (8.5.8)
 1. Determine which Vagrant provider you want to use. Note: Virtualbox is free, the [VMWare vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80 per seat.
 2. Open the Packer directory and build the Windows 10 and Windows Server 2016 boxes:
 
-  ```packer build --only=<vmware|virtualbox>-iso windows_10.json
-packer build --only=<vmware|virtualbox>-iso windows_2016.json```
+  `packer build --only=<vmware|virtualbox>-iso windows_10.json`
+
+  `packer build --only=<vmware|virtualbox>-iso windows_2016.json`
 
 3. Move the resulting boxes (.box files) in the Packer folder to the Boxes folder:
 
-  ```mv *.box ../Boxes```
+  `mv *.box ../Boxes`
 
 4. Navigate to http://127.0.0.1:8000 in a browser to access the Splunk instance on logger. Default credentials are admin:changeme (you will have the option to change them on the next screen)
 
