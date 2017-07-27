@@ -9,12 +9,6 @@ New-GPLink -Name 'Custom Event Channel Permissions' -Target "dc=windomain,dc=loc
 New-GPLink -Name 'Custom Event Channel Permissions' -Target "ou=Domain Controllers,dc=windomain,dc=local" -Enforced yes
 New-GPLink -Name 'Custom Event Channel Permissions' -Target "ou=Servers,dc=windomain,dc=local" -Enforced yes
 New-GPLink -Name 'Custom Event Channel Permissions' -Target "ou=Workstations,dc=windomain,dc=local" -Enforced yes
-Write-Host "Importing the GPO to add NETWORK SERVICE to the Event Log Viewers group"
-Import-GPO -BackupGPOName 'Network Service in Event Log Readers' -Path "c:\vagrant\resources\GPO\wef_configuration" -TargetName 'Network Service in Event Log Readers' -CreateIfNeeded
-New-GPLink -Name 'Network Service in Event Log Readers' -Target "dc=windomain,dc=local" -Enforced yes
-New-GPLink -Name 'Network Service in Event Log Readers' -Target "ou=Domain Controllers,dc=windomain,dc=local" -Enforced yes
-New-GPLink -Name 'Network Service in Event Log Readers' -Target "ou=Servers,dc=windomain,dc=local" -Enforced yes
-New-GPLink -Name 'Network Service in Event Log Readers' -Target "ou=Workstations,dc=windomain,dc=local" -Enforced yes
 gpupdate /force
 # Enable WinRM
 Write-Host "Enabling WinRM"
