@@ -30,6 +30,9 @@ else
   cp /vagrant/resources/splunk_server/transforms.conf /opt/splunk/etc/apps/search/local/
   # Skip Splunk Tour and Change Password Dialog
   touch /opt/splunk/etc/.ui_login
+  # Enable SSL Login for Splunk
+  echo '[settings]
+  enableSplunkWebSSL = true' > /opt/splunk/etc/system/local/web.conf
   # Reboot Splunk to make changes take effect
   /opt/splunk/bin/splunk restart
   /opt/splunk/bin/splunk enable boot-start

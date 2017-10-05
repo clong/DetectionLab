@@ -1,10 +1,8 @@
 Write-Host "Installing WEF Subscriptions"
-Expand-Archive c:\vagrant\resources\wef-subscriptions-master.zip -DestinationPath c:\Tools
-Expand-Archive c:\vagrant\resources\windows-event-channels-master.zip -DestinationPath c:\Tools
 
 Write-Host "Copying Custom Event Channels DLL"
-Copy-Item c:\Tools\windows-event-channels-master\CustomEventChannels.dll c:\windows\system32
-Copy-Item c:\Tools\windows-event-channels-master\CustomEventChannels.man c:\windows\system32
+Copy-Item c:\vagrant\resources\windows-event-forwarding-master\windows-event-channels\CustomEventChannels.dll c:\windows\system32
+Copy-Item c:\vagrant\resources\windows-event-forwarding-master\windows-event-channels\CustomEventChannels.man c:\windows\system32
 
 Write-Host "Installing Custom Event Channels Manifest"
 wevtutil im "c:\windows\system32\CustomEventChannels.man"
@@ -16,7 +14,7 @@ Write-Host "Starting the Windows Event Collector Service"
 net start wecsvc
 
 Write-Host "Creating custom event subscriptions"
-cd c:\Tools\wef-subscriptions-master
+cd c:\vagrant\resources\windows-event-forwarding-master\wef-subscriptions
 cmd /c "for /r %i in (*.xml) do wecutil cs %i"
 
 Write-Host "Enabling custom event subscriptions"
