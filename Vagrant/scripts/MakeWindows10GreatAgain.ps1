@@ -18,6 +18,3 @@ c:\Windows\SysWOW64\OneDriveSetup.exe /uninstall
 # Disable SMBv1
 Set-SmbServerConfiguration -EnableSMB1Protocol $false -Confirm:$false
 
-# Install Linux Subsystem
-Write-Host "Installing the Linux Subsystem..."
-Enable-WindowsOptionalFeature -Online -FeatureName "Microsoft-Windows-Subsystem-Linux"

@@ -96,8 +96,7 @@
     {
       "type": "powershell",
       "scripts": [
-        "./scripts/debloat-windows.ps1",
-        "./scripts/MakeWindows10GreatAgain.ps1"
+        "./scripts/debloat-windows.ps1"
       ]
     },
     {
