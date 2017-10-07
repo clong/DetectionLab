@@ -7,6 +7,8 @@ apt-get install -y jq whois build-essential git
 if [ -f "/opt/splunk/bin/splunk" ]
   then echo "Splunk is already installed"
 else
+  # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
+  dig @8.8.8.8 splunk.com
   # Download Splunk
   wget --progress=bar:force -O splunk-6.6.2-4b804538c686-linux-2.6-amd64.deb  'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=6.6.2&product=splunk&filename=splunk-6.6.2-4b804538c686-linux-2.6-amd64.deb&wget=true'
   # Sometimes DNS resolution of splunk.com fails and I have no idea why. Ensure the file exists before continuing.

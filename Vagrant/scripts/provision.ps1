@@ -27,7 +27,8 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
   } else {
     . c:\vagrant\scripts\join-domain.ps1
   }
-
+  # Reset the eval expiration
+  slmgr.vbs /rearm
   Write-Host -fore red 'Hint: vagrant reload' $box '--provision'
 
 } else {
