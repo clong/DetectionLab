@@ -12,7 +12,10 @@ regedit /s c:\vagrant\resources\MakeWindows10GreatAgain.reg
 Update-Help
 
 # Remove OneDrive from the System
-taskkill /f /im OneDrive.exe
+$onedrive = Get-Process onedrive -ErrorAction SilentlyContinue
+if ($onedrive) {
+  taskkill /f /im OneDrive.exe
+}
 c:\Windows\SysWOW64\OneDriveSetup.exe /uninstall
 
 # Disable SMBv1
