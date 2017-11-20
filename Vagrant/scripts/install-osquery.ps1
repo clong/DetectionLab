@@ -5,14 +5,26 @@ $service = Get-WmiObject -Class Win32_Service -Filter "Name='osqueryd'"
 If (-not ($service)) {
   Write-Host "Setting osquery to run as a service"
   Start-Process -FilePath "c:\programdata\osquery\osqueryd\osqueryd.exe" -ArgumentList "--install" -Wait
-  # Copy over the config
-  Copy-Item c:\vagrant\resources\osquery\osquery.conf c:\programdata\osquery\osquery.conf
-  Copy-Item c:\vagrant\resources\osquery\osquery.flags c:\programdata\osquery\osquery.flags
-  #TODO: Fix up autoruns.conf
-  # Create the query packs directory
-  #New-Item -ItemType Directory -Force -Path $packsDir
-  # Copy over custom pack
-  #Copy-Item c:\vagrant\resources\autoruns.conf $packsDir
+  # Copy over the config and packs from the Palantir repo
+  Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Endpoints\Windows\*" "c:\ProgramData\osquery"
+  Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Endpoints\packs" -Path "c:\ProgramData\osquery"
+  ## Use the TLS config by default. Un-comment the line below to use the local configuration and avoid connecting to Fleet.
+  # Copy-Item "c:\ProgramData\osquery\osquery_no_tls.flags" -Path "c:\ProgramData\osquery\osquery.flags" -Force
+  ###  --- TLS CONFIG BEGINS ---
+  ### COMMENT ALL LINES BELOW UNTIL "TLS CONFIG ENDS" if using local configuration
+  ## Add entry to hosts file for Kolide for SSL validation
+  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.5    kolide"
+  ## Add kolide secret and avoid BOM
+  $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+  [System.IO.File]::WriteAllLines("c:\ProgramData\osquery\kolide_secret.txt", "enrollmentsecret", $Utf8NoBomEncoding)
+  ## Change TLS server hostname
+  (Get-Content c:\ProgramData\osquery\osquery.flags) -replace 'tls.endpoint.server.com', 'kolide:8412' | Set-Content c:\ProgramData\osquery\osquery.flags
+  ## Change path to secrets
+  (Get-Content c:\ProgramData\osquery\osquery.flags) -replace 'path\\to\\file\\containing\\secret.txt', 'ProgramData\osquery\kolide_secret.txt' | Set-Content c:\ProgramData\osquery\osquery.flags
+  ## Add certfile.crt
+  Copy-Item "c:\vagrant\resources\fleet\server.crt" "c:\ProgramData\osquery\certfile.crt"
+  ### --- TLS CONFIG ENDS ---
+
   Stop-service osqueryd
   Start-Sleep -s 5
   Start-Service osqueryd

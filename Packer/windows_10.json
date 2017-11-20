@@ -1,6 +1,38 @@
 {
   "builders": [
     {
+      "type": "hyperv-iso",
+      "vm_name":"windows_10",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "boot_wait": "6m",
+      "communicator":"winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout" : "4h",
+      "ram_size": "2048",
+      "cpu": "2",
+      "switch_name": "{{user `switch_name`}}",
+      "guest_additions_mode": "none",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "disk_size": "{{user `disk_size`}}",
+      "floppy_files": [
+        "{{user `autounattend`}}",
+        "./floppy/WindowsPowershell.lnk",
+        "./floppy/PinTo10.exe",
+        "./scripts/fixnetwork.ps1",
+        "./scripts/MakeWindows10GreatAgain.ps1",
+        "./scripts/MakeWindows10GreatAgain.reg",
+        "./scripts/rearm-windows.ps1",
+        "./scripts/disable-screensaver.ps1",
+        "./scripts/disable-winrm.ps1",
+        "./scripts/enable-winrm.ps1",
+        "./scripts/microsoft-updates.bat",
+        "./scripts/win-updates.ps1"
+      ]
+    },
+    {
       "type": "vmware-iso",
       "vm_name":"windows_10",
       "communicator": "winrm",
@@ -14,7 +46,7 @@
       "winrm_password": "vagrant",
       "winrm_timeout": "2h",
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
-      "guest_os_type": "windows8srv-64",
+      "guest_os_type": "windows9-64",
       "disk_size": "{{user `disk_size`}}",
       "vnc_port_min": 5900,
       "vnc_port_max": 5980,
@@ -24,6 +56,9 @@
         "./floppy/WindowsPowershell.lnk",
         "./floppy/PinTo10.exe",
         "./scripts/fixnetwork.ps1",
+        "./scripts/MakeWindows10GreatAgain.ps1",
+        "./scripts/MakeWindows10GreatAgain.reg",
+        "./scripts/rearm-windows.ps1",
         "./scripts/disable-screensaver.ps1",
         "./scripts/disable-winrm.ps1",
         "./scripts/enable-winrm.ps1",
@@ -60,6 +95,9 @@
         "./floppy/WindowsPowershell.lnk",
         "./floppy/PinTo10.exe",
         "./scripts/fixnetwork.ps1",
+        "./scripts/MakeWindows10GreatAgain.ps1",
+        "./scripts/MakeWindows10GreatAgain.reg",
+        "./scripts/rearm-windows.ps1",
         "./scripts/disable-screensaver.ps1",
         "./scripts/disable-winrm.ps1",
         "./scripts/enable-winrm.ps1",
@@ -96,7 +134,9 @@
     {
       "type": "powershell",
       "scripts": [
-        "./scripts/debloat-windows.ps1"
+        "./scripts/debloat-windows.ps1",
+        "./scripts/MakeWindows10GreatAgain.ps1",
+        "./scripts/rearm-windows.ps1"
       ]
     },
     {
@@ -130,9 +170,9 @@
     }
   ],
   "variables": {
-    "iso_url": "http://care.dlservice.microsoft.com/dl/download/2/5/4/254230E8-AEA5-43C5-94F6-88CE222A5846/14393.0.160715-1616.RS1_RELEASE_CLIENTENTERPRISEEVAL_OEMRET_X64FRE_EN-US.ISO",
+    "iso_url": "http://care.dlservice.microsoft.com/dl/download/B/8/B/B8B452EC-DD2D-4A8F-A88C-D2180C177624/15063.0.170317-1834.RS2_RELEASE_CLIENTENTERPRISEEVAL_OEMRET_X64FRE_EN-US.ISO",
     "iso_checksum_type": "sha1",
-    "iso_checksum": "a86ae3d664553cd0ee9a6bcd83a5dbe92e3dc41a",
+    "iso_checksum": "6c60f91bf0ad7b20f469ab8f80863035c517f34f",
     "autounattend": "./answer_files/10/Autounattend.xml",
     "disk_size": "61440"
   }

@@ -1,17 +1,14 @@
-# Check to see if Anniversary Update is installed
-if ([System.Environment]::OSVersion.Version.Build -lt 14393) {
-  Write-Host "Anniversary Update is required and not installed. Exiting."
-  Exit
-}
-
 # Import the registry keys
+Write-Host "Making Windows 10 Great again"
 Write-Host "Importing registry keys..."
-regedit /s c:\vagrant\resources\MakeWindows10GreatAgain.reg
+regedit /s a:\MakeWindows10GreatAgain.reg
 
 # Install Powershell Help items
+Write-Host "Updating Powershell Help Library..."
 Update-Help
 
 # Remove OneDrive from the System
+Write-Host "Removing OneDrive..."
 $onedrive = Get-Process onedrive -ErrorAction SilentlyContinue
 if ($onedrive) {
   taskkill /f /im OneDrive.exe
@@ -19,5 +16,6 @@ if ($onedrive) {
 c:\Windows\SysWOW64\OneDriveSetup.exe /uninstall
 
 # Disable SMBv1
+Write-Host "Disabling SMBv1"
 Set-SmbServerConfiguration -EnableSMB1Protocol $false -Confirm:$false
 

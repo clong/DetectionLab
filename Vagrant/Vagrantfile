@@ -1,4 +1,28 @@
 Vagrant.configure("2") do |config|
+
+  config.vm.define "logger" do |cfg|
+    cfg.vm.box = "bento/ubuntu-16.04"
+    cfg.vm.hostname = "logger"
+    config.vm.provision :shell, path: "bootstrap.sh"
+    cfg.vm.network :private_network, ip: "192.168.38.5", gateway: "192.168.38.1", dns: "8.8.8.8"
+    config.vm.network :forwarded_port, guest: 8000, host: 8000
+
+    cfg.vm.provider "vmware_fusion" do |v, override|
+      v.memory = 2048
+      v.cpus = 1
+      v.gui = true
+    end
+
+    cfg.vm.provider "virtualbox" do |vb, override|
+      vb.gui = true
+      vb.customize ["modifyvm", :id, "--memory", 768]
+      vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+    end
+  end
+
   config.vm.define "dc" do |cfg|
     cfg.vm.box = "../Boxes/windows_2016_virtualbox.box"
     cfg.vm.hostname = "dc"
@@ -21,6 +45,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: true
+    cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-inputsconf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-chocolatey.ps1", privileged: false
@@ -65,6 +90,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: true
+    cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-wefsubscriptions.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-windows_ta.ps1", privileged: true
@@ -104,12 +130,11 @@ Vagrant.configure("2") do |config|
     cfg.vm.network :private_network, ip: "192.168.38.4", gateway: "192.168.38.1", dns: "192.168.38.2"
 
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.4 -dns 192.168.38.2"
-    cfg.vm.provision "shell", path: "scripts/rearm-windows.ps1", privileged: true
-    cfg.vm.provision "shell", path: "scripts/MakeWindows10GreatAgain.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: true
+    cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-windows_ta.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-chocolatey.ps1", privileged: true
@@ -120,29 +145,9 @@ Vagrant.configure("2") do |config|
 
     cfg.vm.provider "vmware_fusion" do |v, override|
       override.vm.box = "../Boxes/windows_10_vmware.box"
-      v.memory = 2048
-      v.cpus = 1
-      v.gui = true
-    end
-
-    cfg.vm.provider "virtualbox" do |vb, override|
-      vb.gui = true
-      vb.customize ["modifyvm", :id, "--memory", 768]
-      vb.customize ["modifyvm", :id, "--cpus", 1]
-      vb.customize ["modifyvm", :id, "--vram", "32"]
-      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-    end
-  end
-
-  config.vm.define "logger" do |cfg|
-    cfg.vm.box = "bento/ubuntu-16.04"
-    cfg.vm.hostname = "logger"
-    config.vm.provision :shell, path: "bootstrap.sh"
-    cfg.vm.network :private_network, ip: "192.168.38.5", gateway: "192.168.38.1", dns: "8.8.8.8"
-    config.vm.network :forwarded_port, guest: 8000, host: 8000
-
-    cfg.vm.provider "vmware_fusion" do |v, override|
+      v.vmx["gui.fullscreenatpoweron"] = "FALSE"
+      v.vmx["gui.viewModeAtPowerOn"] = "windowed"
+      v.vmx["gui.fitguestusingnativedisplayresolution"] = "FALSE"
       v.memory = 2048
       v.cpus = 1
       v.gui = true

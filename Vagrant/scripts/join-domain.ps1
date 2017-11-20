@@ -19,13 +19,11 @@ $DomainCred = New-Object System.Management.Automation.PSCredential $user, $pass
 If ($hostname -eq "wef") {
   Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Servers,dc=windomain,dc=local" -PassThru
 } ElseIf ($hostname -eq "win10") {
-  Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Workstations,dc=windomain,dc=local" -PassThru
+  Write-Host "Adding Win10 to the domain. Sometimes this step times out. If that happens, just run 'vagrant reload win10 --provision'" #debug
+  Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Workstations,dc=windomain,dc=local" 
 } Else {
   Add-Computer -DomainName "windomain.local" -credential $DomainCred -PassThru
 }
-
-Write-Host "Setting timezone to UTC"
-c:\windows\system32\tzutil.exe /s "UTC"
 
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name AutoAdminLogon -Value 1
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name DefaultUserName -Value "vagrant"
