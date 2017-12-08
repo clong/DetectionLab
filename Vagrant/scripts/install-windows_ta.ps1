@@ -17,8 +17,8 @@ New-Item -ItemType Directory -Force -Path "C:\Program Files\SplunkUniversalForwa
 Copy-Item c:\vagrant\resources\splunk_forwarder\wef_inputs.conf $inputsPath
 
 # Add a check here to make sure the TA was installed correctly
-Write-Host "Sleeping for 5 seconds"
-start-sleep -s 5
+Write-Host "Sleeping for 15 seconds"
+start-sleep -s 15
 If (test-path "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_windows\default") {
   Write-Host "Windows TA installed successfully."
 } Else {
