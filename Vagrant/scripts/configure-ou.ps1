@@ -1,4 +1,4 @@
-# This script sets up the Server and Workstations OUs
+# Purpose: Sets up the Server and Workstations OUs
 Write-Host "Sleeping for 30 seconds, then creating Server and Workstation OUs"
 Start-Sleep 30
 Write-Host "Creating Servers OU"

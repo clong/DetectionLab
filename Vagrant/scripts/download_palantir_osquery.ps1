@@ -1,4 +1,4 @@
-# Downloads and unzips a copy of the Palantir WEF Github Repo
+# Purpose: Downloads and unzips a copy of the Palantir osquery Github Repo. These configs are added to the Fleet server in bootstrap.sh.
 Write-Host "Downloading and unzipping the Palantir osquery Repo from Github..."
 
 $osqueryRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\osquery-Master.zip'

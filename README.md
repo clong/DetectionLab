@@ -1,6 +1,6 @@
 # Detection Lab
 
-# Purpose
+## Purpose
 This lab has been designed with defenders and sysadmins in mind. Its primary purpose is to allow the user to quickly build a Windows domain that comes pre-loaded with security tooling and some best practices when it comes to system logging configurations. It can easily be modified to fit most needs or expanded to include additional hosts.
 
 Potential use cases:
@@ -11,7 +11,7 @@ Potential use cases:
 
 NOTE: This lab has not been hardened in any way and runs with default vagrant credentials. Please do not connect or bridge it to any networks you care about. This lab is deliberately designed to be insecure; the primary purpose of it is to provide visibility and introspection into each host.
 
-# Primary Lab Features:
+## Primary Lab Features:
 * Splunk forwarders are pre-installed and all indexes are pre-created. Technology add-ons for Windows are also preconfigured.
 * Enhanced auditing policies have been enabled on the hosts
 * Windows Event Forwarding has been pre-configured using the WEF host as the subscription manager. The WEF configs are sourced from [palantir/windows-event-forwarding](http://github.com/palantir/windows-event-forwarding)
@@ -20,7 +20,7 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * A handful of endpoint monitoring and security tools have been pre-installed including osquery and Sysmon
 * [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog) kicks off Autorunsc.exe every day at 11am and logs the results to Windows Event Log
 
-# Requirements
+## Requirements
 * 50GB+ of free disk space
 * Packer 1.0.0 or newer
 * Vagrant 1.9.2 or newer
@@ -31,11 +31,14 @@ This lab has been successfully tested on:
 OS | Vagrant | Packer | Provider
 ---|---------|--------|-----------
 OSX 10.12.4 | 1.9.3 | 1.0.0 | Virtualbox (5.1.14)
+OSX 10.12.6 | 2.0.1 | 1.1.2 | Virtualbox (5.1.30)
 OSX 10.12.4 | 1.9.2 | 1.0.0 | VMWare Fusion (8.5.6)
 OSX 10.12.5 | 1.9.3 | 1.0.0 | VMWare Fusion (8.5.8)
 OSX 10.12.6 | 2.0.1 | 1.1.2 | VMWare Fusion (8.5.9)
 
-# Quickstart
+---
+
+## Quickstart
 1. Determine which Vagrant provider you want to use. Note: Virtualbox is free, the [VMWare vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80.
 2. Open the Packer directory and build the Windows 10 and Windows Server 2016 boxes. As far as I know, you can only build one box at a time.
 
@@ -155,12 +158,11 @@ $ docker-compose up -d
 
 ---
 
-# Contributing
-Please do all of your development in a feature branch, on your own fork of detectionlab.
+## Contributing
+Please do all of your development in a feature branch on your own fork of detectionlab.
+Requests for tools and features will be reviewed on a case by case basis, but I will always accept fixes and improvements.
 
-Tools and features will be reviewed on a case by case basis, but I will always accept fixes/improvements.
-
-# Credits/Resources
+## Credits/Resources
 * A huge percentage of this code was borrowed from [Stefan Scherer](https://twitter.com/stefscherer)'s [packer-windows](https://github.com/StefanScherer/packer-windows) and [adfs2](https://github.com/StefanScherer/adfs2) Github repos. A huge thanks to him for building the framework that allowed me to design this lab environment.
 
 # Acknowledgements

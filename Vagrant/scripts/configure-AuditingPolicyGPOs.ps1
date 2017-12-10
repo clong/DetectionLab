@@ -1,3 +1,4 @@
+# Purpose: Installs the GPOs for the custom WinEventLog auditing policy.
 Write-Host "Configuring auditing policy GPOS..."
 Write-Host "Importing Domain Controller Enhanced Auditing Policy..."
 Import-GPO -BackupGpoName 'Domain Controllers Enhanced Auditing Policy' -Path "c:\vagrant\resources\GPO\Domain_Controllers_Enhanced_Auditing_Policy" -TargetName 'Domain Controllers Enhanced Auditing Policy' -CreateIfNeeded

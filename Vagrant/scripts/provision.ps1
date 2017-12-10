@@ -1,3 +1,6 @@
+# Purpose: Sets timezone to UTC, sets hostname, creates/joins domain.
+# Source: https://github.com/StefanScherer/adfs2
+
 $box = Get-ItemProperty -Path HKLM:SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName -Name "ComputerName"
 $box = $box.ComputerName.ToString().ToLower()
 

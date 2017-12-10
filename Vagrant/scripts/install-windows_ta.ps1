@@ -1,4 +1,6 @@
-# This only needs to be installed on the WEF server
+# Purpose: Installs the Windows Splunk Technial Add-On
+# Note: This only needs to be installed on the WEF server
+
 Write-Host "Installing the Windows TA for Splunk"
 
 If (test-path "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_windows\default") {

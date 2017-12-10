@@ -1,3 +1,5 @@
+# Purpose: Creates the "windomain.local" domain
+# Source: https://github.com/StefanScherer/adfs2
 param ([String] $ip)
 
 $subnet = $ip -replace "\.\d+$", ""

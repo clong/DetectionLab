@@ -1,3 +1,4 @@
+# Purpose: Configure an SMB share for Powershell transcription logs to be written to
 # Source: https://blogs.msdn.microsoft.com/powershell/2015/06/09/powershell-the-blue-team/
 Write-Host "Configuring the Powershell Transcripts Share"
 md c:\pslogs

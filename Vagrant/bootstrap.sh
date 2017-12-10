@@ -69,7 +69,7 @@ docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u k
 echo "Updated enrollment secret"
 cd /home/vagrant
 
-# Import Palantir osquery configs
+# Import Palantir osquery configs into Fleet
 echo "Downloading Palantir configs"
 git clone https://github.com/palantir/osquery-configuration.git
 git clone https://github.com/kolide/configimporter.git

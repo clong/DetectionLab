@@ -1,0 +1,4 @@
+Vagrant/.vagrant/*
+Packer/packer_cache/*
+Boxes/*
+.DS_Store

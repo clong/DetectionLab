@@ -1,3 +1,4 @@
+# Source: https://github.com/StefanScherer/adfs2
 param ([String] $ip, [String] $dns)
 
 if (Test-Path C:\Users\vagrant\enable-winrm-after-customization.bat) {

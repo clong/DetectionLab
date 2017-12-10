@@ -1,3 +1,5 @@
+# Purpose: Installs a handful of SysInternals tools on the host into c:\Tools\Sysinternals
+
 $sysinternalsDir = "C:\Tools\Sysinternals"
 $sysmonDir = "C:\ProgramData\Sysmon"
 If(!(test-path $sysinternalsDir)) {

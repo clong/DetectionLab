@@ -1,3 +1,4 @@
+# Source: https://github.com/StefanScherer/adfs2
 Import-Module ActiveDirectory
 Try {
   NEW-ADOrganizationalUnit -name "IT-Services"
@@ -39,4 +40,3 @@ If (Test-Path c:\vagrant\resources\$identity.keytab) {
 } else {
   Write-Host -fore red "Keytab not created"
 }
-

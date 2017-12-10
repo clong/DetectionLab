@@ -1,3 +1,6 @@
+# Purpose: Imports the custom Windows Event Channel and XML subscriptions on the WEF host
+# Note: This only needs to be installed on the WEF server
+
 Write-Host "Installing WEF Subscriptions"
 
 Write-Host "Copying Custom Event Channels DLL"

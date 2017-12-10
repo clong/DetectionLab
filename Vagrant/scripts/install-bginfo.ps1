@@ -1,3 +1,5 @@
+# Installs BGInfo on the host for easy identification
+# Source: https://github.com/StefanScherer/adfs2
 if (!(Test-Path 'c:\Program Files\sysinternals')) {
   New-Item -Path 'c:\Program Files\sysinternals' -type directory -Force -ErrorAction SilentlyContinue
 }
@@ -16,4 +18,3 @@ $vbsScript | Out-File 'c:\Program Files\sysinternals\bginfo.vbs'
 Copy-Item "C:\vagrant\scripts\bginfo.bgi" 'c:\Program Files\sysinternals\bginfo.bgi'
 
 Set-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name bginfo -Value 'wscript "c:\Program Files\sysinternals\bginfo.vbs"'
-

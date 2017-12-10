@@ -1,3 +1,7 @@
+# Purpose: Installs osquery on the host
+# Note: by default, osquery will be configured to connect to the Fleet server on the "logger" host via TLS.
+# If you would like to have osquery run without TLS & Fleet, uncomment line 15 and comment lines 21-30.
+
 Write-Host "Installing osquery"
 $packsDir = "c:\programdata\osquery\packs"
 choco install -y osquery | Out-String  # Apparently Out-String makes the process wait
@@ -8,8 +12,10 @@ If (-not ($service)) {
   # Copy over the config and packs from the Palantir repo
   Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Endpoints\Windows\*" "c:\ProgramData\osquery"
   Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Endpoints\packs" -Path "c:\ProgramData\osquery"
+
   ## Use the TLS config by default. Un-comment the line below to use the local configuration and avoid connecting to Fleet.
   # Copy-Item "c:\ProgramData\osquery\osquery_no_tls.flags" -Path "c:\ProgramData\osquery\osquery.flags" -Force
+
   ###  --- TLS CONFIG BEGINS ---
   ### COMMENT ALL LINES BELOW UNTIL "TLS CONFIG ENDS" if using local configuration
   ## Add entry to hosts file for Kolide for SSL validation

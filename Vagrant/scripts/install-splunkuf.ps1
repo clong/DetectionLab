@@ -1,3 +1,5 @@
+# Purpose: Installs a Splunk Universal Forwader on the host
+
 If (-not (Test-Path "C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe")) {
   Write-Host "Downloading Splunk"
   $msiFile = $env:Temp + "\splunkforwarder-6.5.2-67571ef4b87d-x64-release.msi"
