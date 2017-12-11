@@ -136,14 +136,14 @@ wineventlog | Windows Event Logs
   * Mimikatz
 
 ## Applied GPOs
-* [Custom Event Channel Permissions](http://htmlpreview.github.io/?https://github.com/clong/detectionlab/blob/master/Vagrant/resources/GPO/reports/Custom Event Channel Permissions.htm)
-* [Default Domain Controllers Policy](http://htmlpreview.github.io/?https://github.com/clong/detectionlab/blob/master/Vagrant/resources/GPO/reports/Default Domain Controllers Policy.htm)
-* [Default Domain Policy](http://htmlpreview.github.io/?https://github.com/clong/detectionlab/blob/master/Vagrant/resources/GPO/reports/Default Domain Policy.htm)
-* [Domain Controllers Enhanced Auditing Policy](http://htmlpreview.github.io/?https://github.com/clong/detectionlab/blob/master/Vagrant/resources/GPO/reports/Domain Controllers Enhanced Auditing Policy.htm)
-* [Powershell Logging](http://htmlpreview.github.io/?https://github.com/clong/detectionlab/blob/master/Vagrant/resources/GPO/reports/Powershell Logging.htm)
-* [Servers Enhanced Auditing Policy](http://htmlpreview.github.io/?https://github.com/clong/detectionlab/blob/master/Vagrant/resources/GPO/reports/Servers Enhanced Auditing Policy.htm)
-* [Windows Event Forwarding Server](http://htmlpreview.github.io/?https://github.com/clong/detectionlab/blob/master/Vagrant/resources/GPO/reports/Windows Event Forwarding Server.htm)
-* [Workstations Enhanced Auditing Policy](http://htmlpreview.github.io/?https://github.com/clong/detectionlab/blob/master/Vagrant/resources/GPO/reports/Workstations Enhanced Auditing Policy.htm)
+* [Custom Event Channel Permissions](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Custom%20Event%20Channel%20Permissions.htm)
+* [Default Domain Controllers Policy](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Default%20Domain%20Controllers%20Policy.htm)
+* [Default Domain Policy](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Default%20Domain%20Policy.htm)
+* [Domain Controllers Enhanced Auditing Policy](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Domain%20Controllers%20Enhanced%20Auditing%20Policy.htm)
+* [Powershell Logging](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Powershell%20Logging.htm)
+* [Servers Enhanced Auditing Policy](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Servers%20Enhanced%20Auditing%20Policy.htm)
+* [Windows Event Forwarding Server](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Windows%20Event%20Forwarding%20Server.htm)
+* [Workstations Enhanced Auditing Policy](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Workstations%20Enhanced%20Auditing%20Policy.htm)
 
 ## Known Issues and Workarounds
 
