@@ -1,0 +1,3 @@
+--config_path=c:\programdata\osquery\osquery.conf
+--disable_events=true
+--disable_tables=windows_events

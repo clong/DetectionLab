@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RegistrySettings clsid="{A3CCFC41-DFDB-43a5-8D26-0FE8B954DA51}"><Registry clsid="{9CD4B2F4-923D-47f5-A062-E897DD1DAD50}" name="RestrictRemoteSamEventThrottlingWindow" status="RestrictRemoteSamEventThrottlingWindow" image="12" changed="2017-03-28 20:28:29" uid="{7E71B8A5-03A7-456C-9CC9-941C1045C0E1}"><Properties action="U" displayDecimal="0" default="0" hive="HKEY_LOCAL_MACHINE" key="SYSTEM\CurrentControlSet\Control\Lsa" name="RestrictRemoteSamEventThrottlingWindow" type="REG_DWORD" value="00000000"/></Registry>
+</RegistrySettings>
