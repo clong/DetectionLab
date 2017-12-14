@@ -134,7 +134,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
-
+    cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: true
