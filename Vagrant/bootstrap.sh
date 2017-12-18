@@ -61,6 +61,8 @@ sed -i 's/ -it//g' demo.sh
 ./demo.sh up simple
 # Set the enrollment secret to match what we deploy to Windows hosts
 docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u kolide --password=kolide -e 'update app_configs set osquery_enroll_secret = "enrollmentsecret" where id=1;' --batch kolide
+# Set snapshot events to be split into multiple events
+docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u kolide --password=kolide -e 'insert into options (name, type, value) values ("logger_snapshot_event_type", 2, "true");' --batch kolide
 echo "Updated enrollment secret"
 cd /home/vagrant
 
