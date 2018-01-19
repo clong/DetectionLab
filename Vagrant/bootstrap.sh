@@ -1,8 +1,12 @@
 #! /bin/bash
 
+# Install key and apt source for MongoDB
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+
 # Install prerequisites and useful tools
 apt-get update
-apt-get install -y jq whois build-essential git docker docker-compose unzip
+apt-get install -y jq whois build-essential git docker docker-compose unzip python3-dev python3-pip mongodb-org
 
 # Install Golang v1.8
 wget https://storage.googleapis.com/golang/go1.8.linux-amd64.tar.gz
@@ -111,3 +115,27 @@ curl 'https://192.168.38.5:8412/api/v1/kolide/packs/5' -X PATCH -H 'origin: http
 # Add Splunk monitors for Fleet
 /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
 /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
+
+# Install Mitre's Caldera
+cd /home/vagrant
+git clone https://github.com/mitre/caldera.git
+cd /home/vagrant/caldera/caldera
+pip3 install -r requirements.txt
+pip3 install aiohttp==2.3.8 # See https://github.com/mitre/caldera/pull/13
+# Patch sslproto https://github.com/mitre/caldera/issues/14#issuecomment-358190888
+cd /usr/lib/python3.5/asyncio
+cp /vagrant/resources/caldera/sslproto.patch .
+patch < sslproto.patch
+# Add a Systemd service for MongoDB
+# https://www.howtoforge.com/tutorial/install-mongodb-on-ubuntu-16.04/
+cp /vagrant/resources/caldera/mongod.service /lib/systemd/system/mongod.service
+# Create Systemd service for Caldera
+cp /vagrant/resources/caldera/caldera.service /lib/systemd/system/caldera.service
+# Enable replication
+echo 'replication:
+   replSetName: caldera' >> /etc/mongod.conf
+service mongod start
+cd /home/vagrant/caldera
+mkdir -p dep/crater/crater
+wget https://github.com/mitre/caldera-crater/releases/download/v0.1.0/CraterMainWin8up.exe -O /home/vagrant/caldera/dep/crater/crater/CraterMain.exe
+service caldera start
