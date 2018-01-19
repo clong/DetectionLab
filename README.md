@@ -14,6 +14,7 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * Powershell transcript logging is enabled. All logs are saved to `\\wef\pslogs`
 * osquery comes installed on each host and is pre-configured to connect to a [Fleet](https://kolide.co/fleet) server via TLS. Fleet is preconfigured with the configuration from [Palantir's osquery Configuration](https://github.com/palantir/osquery-configuration)
 * Sysmon is installed and configured using SwiftOnSecurity’s open-sourced configuration
+* Mitre's [Caldera](https://github.com/mitre/caldera) server is built on the logger host and the Caldera agent gets pre-installed on all Windows hosts
 * All autostart items are logged to Windows Event Logs via [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog)
 * SMBv1 Auditing is enabled
 
@@ -84,8 +85,9 @@ Vagrant commands must be run from the "Vagrant" folder.
 ## Lab Information
 * Domain Name: windomain.local
 * Admininstrator login: vagrant:vagrant
-* Fleet login: admin:admin123#
-* Splunk login: admin:changeme
+* Fleet login: https://192.168.38.5:8412 - admin:admin123#
+* Splunk login: https://192.168.38.5:8000 - admin:changeme
+* Caldera login: https://192.168.38.5:8888 - admin:caldera
 
 ## Lab Hosts
 * DC - Windows 2016 Domain Controller
@@ -113,6 +115,7 @@ Vagrant commands must be run from the "Vagrant" folder.
 * Logger - Ubuntu 16.04
   * Splunk Enterprise
   * Fleet osquery Manager
+  * Mitre's Caldera Server
 
 ## Splunk Indexes
 Index Name | Description
@@ -127,6 +130,7 @@ wineventlog | Windows Event Logs
   * Sysmon
   * osquery
   * AutorunsToWinEventLog
+  * Caldera Agent
   * Process Monitor
   * Process Explorer
   * PsExec
@@ -193,6 +197,7 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)
 * [Fleet](https://kolide.co/fleet)
+* [Caldera](https://github.com/mitre/caldera)
 * [Windows Event Forwarding for Network Defense](https://medium.com/@palantir/windows-event-forwarding-for-network-defense-cb208d5ff86f)
 * [palantir/windows-event-forwarding](http://github.com/palantir/windows-event-forwarding)
 * [osquery Across the Enterprise](https://medium.com/@palantir/osquery-across-the-enterprise-3c3c9d13ec55)
