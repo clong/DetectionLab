@@ -38,6 +38,9 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/SwiftOnSecurity/sysmon
 # Convert Sysmon config schema from 3.30 to 4.0 per GitHub Issue #38
 (Get-Content $sysmonConfigPath) -replace 'schemaversion="3.30"', 'schemaversion="4.00"' | Set-Content $sysmonConfigPath
 
+# Convert Schema from 3.30 to 4.0 per GitHub Issue #38
+(Get-Content $sysmonConfigPath) -replace 'schemaversion="3.30"', 'schemaversion="4.00"' | Set-Content $sysmonConfigPath
+
 # Startup Sysmon
 Write-Host "Starting Sysmon..."
 Start-Process -FilePath "$sysmonDir\Sysmon64.exe" -ArgumentList "-accepteula -i $sysmonConfigPath"
