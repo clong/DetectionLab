@@ -40,7 +40,7 @@ else
   /opt/splunk/bin/splunk add index sysmon -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index powershell -auth 'admin:changeme'
   /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_483.tgz -auth 'admin:changeme'
-  /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_605.tgz -auth 'admin:changeme'
+  /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_607.tgz -auth 'admin:changeme'
   # Add a Splunk TCP input on port 9997
   echo -e "[splunktcp://9997]\nconnection_host = ip" > /opt/splunk/etc/apps/search/local/inputs.conf
   # Add props.conf and transforms.conf
