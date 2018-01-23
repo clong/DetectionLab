@@ -34,6 +34,7 @@ OSX 10.12.6 | 2.0.1 | 1.1.2 | Virtualbox (5.1.30)
 OSX 10.12.4 | 1.9.2 | 1.0.0 | VMWare Fusion (8.5.6)
 OSX 10.12.5 | 1.9.3 | 1.0.0 | VMWare Fusion (8.5.8)
 OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.9)
+OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.10)
 
 **Known Bad Versions:**
 * Packer 1.1.2 will fail to build VMWare-ISOs correctly due to [this issue](https://github.com/hashicorp/packer/issues/5622).
@@ -65,6 +66,7 @@ $ packer build --only=[vmware|virtualbox]-iso windows_2016.json
 
 7. Navigate to https://192.168.38.5:8000 in a browser to access the Splunk instance on logger. Default credentials are admin:changeme (you will have the option to change them on the next screen)
 8. Navigate to https://192.168.38.5:8412 in a browser to access the Fleet server on logger. Default credentials are admin:admin123#. Query packs are pre-configured with queries from [palantir/osquery-configuration](https://github.com/palantir/osquery-configuration).
+9. Navigate to https://192.168.38.5:8888 in a browser to access the Caldera server on logger. Default credentials are admin:caldera.
 
 ## Basic Vagrant Usage
 Vagrant commands must be run from the "Vagrant" folder.
@@ -183,6 +185,12 @@ $ service docker restart
 $ cd /home/vagrant/kolide-quickstart
 $ docker-compose up -d
 ```
+
+---
+
+**Issue:** Your primary hard drive doesn't have enough space for DetectionLab
+
+**Workaround:** Documented in [#48](https://github.com/clong/detectionlab/issues/48). You can change the default location for Vagrant by using the [VAGRANT_HOME](https://www.vagrantup.com/docs/other/environmental-variables.html#vagrant_home) environment variable.
 
 ---
 
