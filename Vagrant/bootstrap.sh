@@ -6,9 +6,18 @@ echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.
 
 # Install prerequisites and useful tools
 apt-get update
-apt-get install -y jq whois build-essential git docker docker-compose unzip python3-dev python3-pip mongodb-org
+apt-get install -y jq whois build-essential git docker docker-compose unzip mongodb-org
+
+# Install Python 3.6.4
+echo "Installing Python v3.6.4..."
+wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
+tar -xvf Python-3.6.4.tgz
+cd Python-3.6.4
+./configure && make && make install
+cd /home/vagrant
 
 # Install Golang v1.8
+echo "Installing GoLang v1.8..."
 wget https://storage.googleapis.com/golang/go1.8.linux-amd64.tar.gz
 tar -xvf go1.8.linux-amd64.tar.gz
 mv go /usr/local
@@ -28,6 +37,7 @@ sudo update-alternatives --set go /usr/local/go/bin/go
 if [ -f "/opt/splunk/bin/splunk" ]
   then echo "Splunk is already installed"
 else
+  echo "Installing Splunk..."
   # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
   dig @8.8.8.8 splunk.com
   # Download Splunk
@@ -57,6 +67,7 @@ else
 fi
 
 # Install Fleet
+echo "Installing Fleet..."
 echo -e "\n127.0.0.1       kolide" >> /etc/hosts
 git clone https://github.com/kolide/kolide-quickstart.git
 cd kolide-quickstart
@@ -71,7 +82,7 @@ echo "Updated enrollment secret"
 cd /home/vagrant
 
 # Import Palantir osquery configs into Fleet
-echo "Downloading Palantir configs"
+echo "Downloading Palantir configs..."
 git clone https://github.com/palantir/osquery-configuration.git
 git clone https://github.com/kolide/configimporter.git
 cd configimporter
@@ -117,15 +128,12 @@ curl 'https://192.168.38.5:8412/api/v1/kolide/packs/5' -X PATCH -H 'origin: http
 /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
 
 # Install Mitre's Caldera
+echo "Installing Caldera..."
 cd /home/vagrant
 git clone https://github.com/mitre/caldera.git
 cd /home/vagrant/caldera/caldera
-pip3 install -r requirements.txt
-pip3 install aiohttp==2.3.8 # See https://github.com/mitre/caldera/pull/13
-# Patch sslproto https://github.com/mitre/caldera/issues/14#issuecomment-358190888
-cd /usr/lib/python3.5/asyncio
-cp /vagrant/resources/caldera/sslproto.patch .
-patch < sslproto.patch
+pip3.6 install -r requirements.txt
+
 # Add a Systemd service for MongoDB
 # https://www.howtoforge.com/tutorial/install-mongodb-on-ubuntu-16.04/
 cp /vagrant/resources/caldera/mongod.service /lib/systemd/system/mongod.service
