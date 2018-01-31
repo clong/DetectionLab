@@ -19,7 +19,13 @@ apm install language-powershell
 apm install language-batch
 apm install language-docker
 
-# Purpose: Downloads and unzips a copy of the Palantir osquery Github Repo. These configs are added to the Fleet server in bootstrap.sh.
-$mimikatzRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\osquery-Master.zip'
-Invoke-WebRequest -Uri "https://github.com/gentilkiwi/mimikatz/releases/download/2.1.1-20171203/mimikatz_trunk.zip" -OutFile $mimikatzRepoPath
+# Disable Windows Defender realtime scanning before downloading Mimikatz
+set-MpPreference -DisableRealtimeMonitoring $true
+
+# Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
+Write-Host Determining latest release of Mimikatz...
+$tag = (Invoke-WebRequest "https://api.github.com/repos/gentilkiwi/mimikatz/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
+$mimikatzDownloadUrl = "https://github.com/gentilkiwi/mimikatz/releases/download/$tag/mimikatz_trunk.zip"
+$mimikatzRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\mimikatz_trunk.zip'
+Invoke-WebRequest -Uri "$mimikatzDownloadUrl" -OutFile $mimikatzRepoPath
 Expand-Archive -path "$mimikatzRepoPath" -destinationpath 'c:\Tools\Mimikatz' -Force
