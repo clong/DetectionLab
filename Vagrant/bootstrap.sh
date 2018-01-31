@@ -143,7 +143,9 @@ cp /vagrant/resources/caldera/caldera.service /lib/systemd/system/caldera.servic
 echo 'replication:
    replSetName: caldera' >> /etc/mongod.conf
 service mongod start
+systemctl enable mongod.service
 cd /home/vagrant/caldera
 mkdir -p dep/crater/crater
 wget https://github.com/mitre/caldera-crater/releases/download/v0.1.0/CraterMainWin8up.exe -O /home/vagrant/caldera/dep/crater/crater/CraterMain.exe
 service caldera start
+systemctl enable caldera.service

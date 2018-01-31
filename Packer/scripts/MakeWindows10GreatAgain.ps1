@@ -14,8 +14,3 @@ if ($onedrive) {
   taskkill /f /im OneDrive.exe
 }
 c:\Windows\SysWOW64\OneDriveSetup.exe /uninstall
-
-# Disable SMBv1
-Write-Host "Disabling SMBv1"
-Set-SmbServerConfiguration -EnableSMB1Protocol $false -Confirm:$false
-
