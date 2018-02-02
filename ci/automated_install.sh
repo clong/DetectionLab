@@ -49,8 +49,7 @@ done
 cd /opt/DetectionLab/Vagrant
 sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
 
-# Download the build script from Github
-wget https://gist.githubusercontent.com/clong/4d0865cf022f0fbc63caf900d91852fa/raw/479d6dbb18fdfc2e5d610613683752da3d4140fa/build.sh -O /opt/DetectionLab/build.sh ## Change this once we move to the actual DL repo.
+# Ensure the script is executable
 chmod +x /opt/DetectionLab/build.sh
 cd /opt/DetectionLab
 

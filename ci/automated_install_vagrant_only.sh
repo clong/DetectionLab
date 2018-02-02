@@ -36,8 +36,7 @@ git clone https://github.com/clong/DetectionLab.git
 cd /opt/DetectionLab/Vagrant
 sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
 
-# Download the build script from Github
-wget https://gist.githubusercontent.com/clong/5ee211b8533f7d33eaa31d6b83231d5e/raw/08fc4a3e8cc806c5f6278226607e4a36aa7e03fc/build_vagrant_only.sh -O /opt/DetectionLab/build_vagrant_only.sh # Change to repo path once we go to prod
+# Ensure the script is executable
 chmod +x /opt/DetectionLab/build_vagrant_only.sh
 cd /opt/DetectionLab
 
