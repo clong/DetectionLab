@@ -20,10 +20,12 @@ apm install language-batch
 apm install language-docker
 
 # Disable Windows Defender realtime scanning before downloading Mimikatz
-set-MpPreference -DisableRealtimeMonitoring $true
+If ($hostname -eq "win10") {
+  set-MpPreference -DisableRealtimeMonitoring $true
+}
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
-Write-Host Determining latest release of Mimikatz...
+Write-Host "Determining latest release of Mimikatz..."
 $tag = (Invoke-WebRequest "https://api.github.com/repos/gentilkiwi/mimikatz/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $mimikatzDownloadUrl = "https://github.com/gentilkiwi/mimikatz/releases/download/$tag/mimikatz_trunk.zip"
 $mimikatzRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\mimikatz_trunk.zip'

@@ -1,0 +1,70 @@
+version: 2
+
+jobs:
+  build:
+    machine: true
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: Delete stale Packet servers
+          command: |
+            export DELETE_DEVICE_ID=$(curl -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."devices[0].id" | tr -d '"')
+            curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DELETE_DEVICE_ID"
+      - run:
+          name: Provisioning a baremetal Packet.net server
+          command: |
+           curl -X POST --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "sjc1", "plan": "baremetal_1", "hostname": "detectionlab", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys": ["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' > /tmp/device
+      - run: cat /tmp/device | jq ."id" | tr -d '"' > /tmp/device_id
+      - run: sleep 300
+      - run: echo "Sleeping 5 more minutes while Packet server is provisioned"
+      - run: sleep 300
+      - run:
+          name: Recording the IP address of the Packet server
+          command: |
+           export DEVICE_ID=$(cat /tmp/device_id);
+           curl -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" "https://api.packet.net/devices/$DEVICE_ID/ips" > /tmp/ip_info;
+      - run: cat /tmp/ip_info | jq ."ip_addresses[0].address" | tr -d '"' > /tmp/ip_address
+      - run: cd ~/repo
+      - run:
+          name: Copying install script to Packet server
+          command: |
+            export IP_ADDRESS=$(cat /tmp/ip_address);
+            scp -i ~/.ssh/id_rsa ./ci/automated_install_vagrant_only.sh root@"$IP_ADDRESS":/root
+      - run:
+          name: Running install script on Packet server
+          command: |
+            export IP_ADDRESS=$(cat /tmp/ip_address)
+            ssh -i ~/.ssh/id_rsa root@"$IP_ADDRESS" 'chmod +x /root/automated_install_vagrant_only.sh; /bin/bash -c /root/automated_install_vagrant_only.sh'
+
+      - run:
+          name: Waiting for Packet server to post build results
+          shell: /bin/bash
+          command: |
+            export IP_ADDRESS=$(cat /tmp/ip_address)
+            while true
+            do
+            export STATUS=$(curl $IP_ADDRESS)
+            if [ "$STATUS" == "building" ]; then
+            echo "$STATUS"
+            sleep 300
+            else
+            echo "$STATUS" > /tmp/status
+            break
+            fi
+            done
+      - run:
+          name: Recording build results
+          shell: /bin/bash
+          command: |
+            export DEVICE_ID=$(cat /tmp/device_id)
+            export STATUS=$(cat /tmp/status)
+            echo $STATUS
+            if [ "$STATUS" != "success" ]; then
+            curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+            exit 1
+            fi
+            curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+            exit 0
