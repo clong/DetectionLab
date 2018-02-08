@@ -119,6 +119,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.hostname = "win10"
 
     cfg.vm.communicator = "winrm"
+    cfg.vm.provision "shell", inline: "Set-MpPreference -ExclusionPath C:\\commander.exe, C:\\Tools"
     cfg.vm.network :private_network, ip: "192.168.38.4", gateway: "192.168.38.1", dns: "192.168.38.2"
 
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.4 -dns 192.168.38.2"
