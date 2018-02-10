@@ -145,11 +145,11 @@ download_boxes() {
   PROVIDER="$2"
 
   if [ "$PROVIDER" == "virtualbox" ]; then
-    wget "https://s3-us-west-1.amazonaws.com/detectionlab/windows_2016_virtualbox.box" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
-    wget "https://s3-us-west-1.amazonaws.com/detectionlab/windows_10_virtualbox.box" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
+    wget "https://www.dropbox.com/s/u2hbtv0ynf1pei8/windows_2016_virtualbox.box?dl=1" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
+    wget "https://www.dropbox.com/s/zt30zod4e0etug7/windows_10_virtualbox.box?dl=1" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
   elif [ "$PROVIDER" == "vmware_fusion" ]; then
-    wget "https://s3-us-west-1.amazonaws.com/detectionlab/windows_2016_vmware.box" -O "$DL_DIR"/Boxes/windows_2016_vmware.box
-    wget "https://s3-us-west-1.amazonaws.com/detectionlab/windows_10_vmware.box" -O "$DL_DIR"/Boxes/windows_10_vmware.box
+    wget "https://www.dropbox.com/s/tvtl2r71amngnjs/windows_2016_vmware.box?dl=1" -O "$DL_DIR"/Boxes/windows_2016_vmware.box
+    wget "https://www.dropbox.com/s/9zqxn6lrryzow4v/windows_10_vmware.box?dl=1" -O "$DL_DIR"/Boxes/windows_10_vmware.box
   fi
 
   # Hacky workaround
