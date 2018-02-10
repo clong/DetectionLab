@@ -44,17 +44,23 @@ jobs:
           shell: /bin/bash
           command: |
             export IP_ADDRESS=$(cat /tmp/ip_address)
-            while true
+            MINUTES_PAST=0
+            while [ "$MINUTES_PAST" -lt 120 ]
             do
             export STATUS=$(curl $IP_ADDRESS)
             if [ "$STATUS" == "building" ]; then
             echo "$STATUS"
             sleep 300
+            ((MINUTES_PAST+=5))
             else
             echo "$STATUS" > /tmp/status
             break
             fi
             done
+            if [ "$MINUTES_PAST" -gt 120 ]; then
+            curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+            exit 1
+            fi
       - run:
           name: Recording build results
           shell: /bin/bash

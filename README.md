@@ -60,10 +60,10 @@ There are two build scripts:
 
 Provider | Box  | URL | MD5 | Size
 ------------|-----|-----|----|----
-Virtualbox |Windows 2016 | https://s3-us-west-1.amazonaws.com/detectionlab/windows_2016_virtualbox.box | 614f984c82b51471b5bb753940b59d38 | 6.4GB
-Virtualbox | Windows 10 | https://s3-us-west-1.amazonaws.com/detectionlab/windows_10_virtualbox.box | 30b06e30b36b02ccf1dc5c04017654aa | 5.8GB
-VMware | Windows 2016 | https://s3-us-west-1.amazonaws.com/detectionlab/windows_2016_vmware.box | 1511b9dc942c69c2cc5a8dc471fa8865 | 6.7GB
-VMware | Windows 10 | https://s3-us-west-1.amazonaws.com/detectionlab/windows_10_vmware.box | 174ad0f0fd2089ff74a880c6dadac74c | 6.0GB
+Virtualbox |Windows 2016 | https://www.dropbox.com/s/u2hbtv0ynf1pei8/windows_2016_virtualbox.box?dl=1 | 614f984c82b51471b5bb753940b59d38 | 6.4GB
+Virtualbox | Windows 10 | https://www.dropbox.com/s/zt30zod4e0etug7/windows_10_virtualbox.box?dl=1 | 30b06e30b36b02ccf1dc5c04017654aa | 5.8GB
+VMware | Windows 2016 | https://www.dropbox.com/s/tvtl2r71amngnjs/windows_2016_vmware.box?dl=1 | 1511b9dc942c69c2cc5a8dc471fa8865 | 6.7GB
+VMware | Windows 10 | https://www.dropbox.com/s/9zqxn6lrryzow4v/windows_10_vmware.box?dl=1 | 174ad0f0fd2089ff74a880c6dadac74c | 6.0GB
 
 If you choose to download the boxes, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
 
