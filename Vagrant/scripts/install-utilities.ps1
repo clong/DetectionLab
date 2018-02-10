@@ -20,8 +20,9 @@ apm install language-batch
 apm install language-docker
 
 # Disable Windows Defender realtime scanning before downloading Mimikatz
-If ($hostname -eq "win10") {
+If ($env:computername -eq "WIN10") {
   set-MpPreference -DisableRealtimeMonitoring $true
+  Set-MpPreference -ExclusionPath C:\commander.exe, C:\Tools
 }
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
