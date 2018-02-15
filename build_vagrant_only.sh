@@ -15,12 +15,16 @@ print_usage() {
 }
 
 check_vagrant() {
-  # Check for existence of Vagrant and Packer in PATH
+  # Check for existence of Vagrant in PATH
   which vagrant > /dev/null
   if [ "$?" -ne 0 ]; then
-    echo "Vagrant was not found in your PATH."
-    echo "Please correct this before continuing. Quitting."
+    (>&2 echo "Vagrant was not found in your PATH.")
+    (>&2 echo "Please correct this before continuing. Quitting.")
     exit 1
+  fi
+  # Ensure Vagrant >= 2.0.0
+  if [ "$(vagrant --version | grep -o "[0-9]" | head -1)" -lt 2 ]; then
+    (>&2 echo "WARNING: It is highly recommended to use Vagrant 2.0.0 or above before continuing")
   fi
 }
 
@@ -110,8 +114,7 @@ preflight_checks() {
   # Check to see if boxes exist already
   BOXES_BUILT=$(ls -al "$DL_DIR"/Boxes/*.box 2> /dev/null | wc -l)
   if [ $BOXES_BUILT -gt 0 ]; then
-    (>&2 echo "You appear to have already built at least one box using Packer. This script automatically downloads them for you. Please either delete the existing boxes or follow the build steps in the README to continue.")
-    exit 1
+    (>&2 echo "WARNING: You seem to have boxes present in the Boxes/ directory already. If you would like fresh boxes downloaded, please remove all files from the Boxes/ directory and re-run this script.")
   fi
   # Check to see if any Vagrant instances exist already
   cd "$DL_DIR"/Vagrant/
@@ -139,17 +142,17 @@ preflight_checks() {
   fi
 }
 
-# Downloads pre-build Packer boxes from S3 to save time during CI builds
+# Downloads pre-built Packer boxes from detectionlab.network to save time during CI builds
 download_boxes() {
   DL_DIR="$1"
   PROVIDER="$2"
 
   if [ "$PROVIDER" == "virtualbox" ]; then
-    wget "https://www.dropbox.com/s/u2hbtv0ynf1pei8/windows_2016_virtualbox.box?dl=1" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
-    wget "https://www.dropbox.com/s/zt30zod4e0etug7/windows_10_virtualbox.box?dl=1" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
+    wget "https://www.detectionlab.network/windows_2016_virtualbox.box" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
+    wget "https://www.detectionlab.network/windows_10_virtualbox.box" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
   elif [ "$PROVIDER" == "vmware_fusion" ]; then
-    wget "https://www.dropbox.com/s/tvtl2r71amngnjs/windows_2016_vmware.box?dl=1" -O "$DL_DIR"/Boxes/windows_2016_vmware.box
-    wget "https://www.dropbox.com/s/9zqxn6lrryzow4v/windows_10_vmware.box?dl=1" -O "$DL_DIR"/Boxes/windows_10_vmware.box
+    wget "https://www.detectionlab.network/windows_2016_vmware.box" -O "$DL_DIR"/Boxes/windows_2016_vmware.box
+    wget "https://www.detectionlab.network/windows_10_vmware.box" -O "$DL_DIR"/Boxes/windows_10_vmware.box
   fi
 
   # Hacky workaround

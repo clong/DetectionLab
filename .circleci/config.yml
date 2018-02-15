@@ -29,6 +29,11 @@ jobs:
       - run: cat /tmp/ip_info | jq ."ip_addresses[0].address" | tr -d '"' > /tmp/ip_address
       - run: cd ~/repo
       - run:
+         name: Copying DetectionLab repo to Packet server
+         command: |
+           export IP_ADDRESS=$(cat /tmp/ip_address);
+           scp -i ~/.ssh/id_rsa -r ~/repo root@"$IP_ADDRESS":/opt/DetectionLab
+      - run:
           name: Copying install script to Packet server
           command: |
             export IP_ADDRESS=$(cat /tmp/ip_address);
