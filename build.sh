@@ -15,18 +15,23 @@ print_usage() {
 }
 
 check_packer_and_vagrant() {
-  # Check for existence of Vagrant and Packer in PATH
+  # Check for existence of Vagrant in PATH
   which vagrant > /dev/null
   if [ "$?" -ne 0 ]; then
-    echo "Vagrant was not found in your PATH."
-    echo "Please correct this before continuing. Quitting."
+    (>&2 echo "Vagrant was not found in your PATH.")
+    (>&2 echo "Please correct this before continuing. Quitting.")
     exit 1
   fi
+  # Ensure Vagrant >= 2.0.0
+  if [ "$(vagrant --version | grep -o "[0-9]" | head -1)" -lt 2 ]; then
+    (>&2 echo "WARNING: It is highly recommended to use Vagrant 2.0.0 or above before continuing")
+  fi
+  # Check for existence of Packer in PATH
   which packer > /dev/null
   if [ "$?" -ne 0 ]; then
-    echo "Packer was not found in your PATH."
-    echo "Please correct this before continuing. Quitting."
-    echo "Hint: sudo cp ./packer /usr/local/bin/packer; sudo chmod +x /usr/local/bin/packer"
+    (>&2 echo "Packer was not found in your PATH.")
+    (>&2 echo "Please correct this before continuing. Quitting.")
+    (>&2 echo "Hint: sudo cp ./packer /usr/local/bin/packer; sudo chmod +x /usr/local/bin/packer")
     exit 1
   fi
 }
@@ -129,7 +134,7 @@ preflight_checks() {
     (>&2 echo "")
   fi
   # Check Packer version against known bad
-  if [ $(packer --version) == '1.1.2' ]; then
+  if [ "$(packer --version)" == '1.1.2' ]; then
     (>&2 echo "Packer 1.1.2 is not supported. Please upgrade to a newer version and see https://github.com/hashicorp/packer/issues/5622 for more information.")
     exit 1
   fi
