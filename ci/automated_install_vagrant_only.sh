@@ -28,10 +28,6 @@ wget https://releases.hashicorp.com/vagrant/2.0.1/vagrant_2.0.1_x86_64.deb
 dpkg -i vagrant_2.0.1_x86_64.deb
 vagrant plugin install vagrant-reload
 
-# Clone DetectionLab
-cd /opt
-git clone https://github.com/clong/DetectionLab.git
-
 # Make the Vagrant instances headless
 cd /opt/DetectionLab/Vagrant
 sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
