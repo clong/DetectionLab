@@ -32,7 +32,7 @@ jobs:
          name: Copying DetectionLab repo to Packet server
          command: |
            export IP_ADDRESS=$(cat /tmp/ip_address);
-           scp -ir ~/.ssh/id_rsa ~/repo root@"$IP_ADDRESS":/opt/DetectionLab
+           scp -i ~/.ssh/id_rsa -r ~/repo root@"$IP_ADDRESS":/opt/DetectionLab
       - run:
           name: Copying install script to Packet server
           command: |
