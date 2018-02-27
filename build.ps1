@@ -1,3 +1,5 @@
+#Requires -Version 4.0
+
 <#
 .Synopsis
    This script is used to deploy a fresh install of DetectionLab
@@ -24,7 +26,8 @@ Param(
   # Vagrant provider to use.
   [ValidateSet('virtualbox', 'vmware_workstation')]
   [string]$ProviderName,
-  [string]$PackerPath = 'C:\Hashicorp\packer.exe'
+  [string]$PackerPath = 'C:\Hashicorp\packer.exe',
+  [swtich]$VagrantOnly
 )
 
 
@@ -55,7 +58,17 @@ function install_checker {
   return $false
 }
 
-function check_packer_and_vagrant {
+function check_packer {
+  #Check for packer at $PackerPath
+  if (!(Get-Item $PackerPath)) {
+    Write-Error "Packer not found at $PackerPath"
+    Write-Output 'Re-run the script setting the PackerPath parameter to the location of packer'
+    Write-Output "Example: build.ps1 -PackerPath 'C:\packer.exe'"
+    Write-Output 'Exiting..'
+    break
+  }
+}
+function check_vagrant {
   # Check if vagrant is in path
   try {
     Get-Command vagrant.exe -ErrorAction Stop
@@ -72,18 +85,9 @@ function check_packer_and_vagrant {
   if ($vagrant_version -lt $version_comparison) {
     Write-Warning 'It is highly recommended to use Vagrant 2.0.0 or above before continuing'
   }
-
-  #Check for packer at $PackerPath
-  if (!(Get-Item $PackerPath)) {
-    Write-Error "Packer not found at $PackerPath"
-    Write-Output 'Re-run the script setting the PackerPath parameter to the location of packer'
-    Write-Output "Example: build.ps1 -PackerPath 'C:\packer.exe'"
-    Write-Output 'Exiting..'
-    break
-  }
 }
 
-# Returns 0 if not installed or 1 if installed
+# Returns false if not installed or true if installed
 function check_virtualbox_installed {
   Write-Verbose '[check_virtualbox_installed] Running..'
   if (install_checker -Name "VirtualBox") {
@@ -107,28 +111,32 @@ function check_vmware_workstation_installed {
   }
 } 
 
-#TODO: Verify that the plugin is called 'vagrant-vmware-workstation'
 function check_vmware_vagrant_plugin_installed {
   Write-Verbose '[check_vmware_vagrant_plugin_installed] Running..'
-  if (!(vagrant plugin list | Select-String 'vagrant-vmware-workstation')) {
-    Write-Output 'VMWare Workstation is installed, but the Vagrant plugin is not.'
-    Write-Output 'Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase and install it'
-    Write-Output 'VMWare Workstation will not be listed as a provider until the Vagrant plugin has been installed.'  
-    return $false
-  }
-  else {
+  if (vagrant plugin list | Select-String 'vagrant-vmware-workstation') {
     Write-Verbose '[check_vmware_vagrant_plugin_installed] VMware vagrant plugin found.'
     return $true
+  }
+  else {
+    Write-Host 'VMWare Workstation is installed, but the Vagrant plugin is not.'
+    Write-Host 'Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase and install it'
+    Write-Host 'VMWare Workstation will not be listed as a provider until the Vagrant plugin has been installed.'  
+    return $false
   }
 }
 
 function list_providers {
+  [cmdletbinding()]
+  param()
+
   Write-Output 'Available Providers: '
   if (check_virtualbox_installed) {
     Write-Output '[*] virtualbox'
   }
   if (check_vmware_workstation_installed) {
-    Write-Output '[*] vmware_workstation'
+    if (check_vmware_vagrant_plugin_installed) {
+      Write-Output '[*] vmware_workstation' 
+    }
   }
   if ((-Not (check_virtualbox_installed)) -and (-Not (check_vmware_workstation_installed))) {
     Write-Error 'You need to install a provider such as VirtualBox or VMware Workstation to continue.'
@@ -142,9 +150,62 @@ function list_providers {
   return $ProviderName
 }
 
+function download_boxes {
+  Write-Verbose '[download_boxes] Running..'
+  if ($ProviderName -eq 'virtualbox') {
+    $win10Filename = 'windows_10_virtualbox.box'
+    $win2016Filename = 'windows_2016_virtualbox.box'
+    $win10Hash = '30b06e30b36b02ccf1dc5c04017654aa'
+    $win2016Hash = '614f984c82b51471b5bb753940b59d38'
+  }
+  if ($ProviderName -eq 'vmware') {
+    $win10Filename = 'windows_10_vmware.box'
+    $win2016Filename = 'windows_2016_vmware.box'
+    $win10Hash = '174ad0f0fd2089ff74a880c6dadac74c'
+    $win2016Hash = '1511b9dc942c69c2cc5a8dc471fa8865'
+  }
+  
+  $wc = New-Object System.Net.WebClient
+  Write-Verbose "[download_boxes] Downloading $win10Filename"
+  $wc.DownloadFile("https://www.detectionlab.network/$win10Filename", "$DL_DIR\Boxes\$win10Filename")
+  Write-Verbose "[download_boxes] Downloading $win2016Filename"
+  $wc.DownloadFile("https://www.detectionlab.network/$win2016Filename", "$DL_DIR\Boxes\$win2016Filename")
+  $wc.Dispose()
+
+  if (-Not (Test-Path "$DL_DIR\Boxes\$win2016Filename")) {
+    Write-Error 'Windows 2016 box is missing from the Boxes directory. Qutting.'
+    break
+  }
+  if (-Not (Test-Path "$DL_DIR\Boxes\$win10Filename")) {
+    Write-Error 'Windows 10 box is missing from the Boxes directory. Qutting.'
+    break
+  }
+
+  Write-Verbose "[download_boxes] Getting filehash for: $win10Filename"
+  $win10Filehash = Get-FileHash -Path "$DL_DIR\Boxes\$win10Filename" -Algorithm MD5
+  Write-Verbose "[download_boxes] Getting filehash for: $win2016Filename"
+  $win2016Filehash = Get-FileHash -Path "$DL_DIR\Boxes\$win2016Filename" -Algorithm MD5
+
+  Write-Verbose '[download_boxes] Checking Filehashes..'
+  if ($win10hash -ne $win10Filehash) {
+    Write-Error 'Hash mismatch on windows_10_virtualbox.box'
+  }
+  if ($win2016hash -ne $win2016Filehash) {
+    Write-Error 'Hash mismatch on windows_2016_virtualbox.box'
+  }
+  Write-Verbose '[download_boxes] Finished.'
+}
+
 function preflight_checks {
   Write-Verbose '[preflight_checks] Running..'
   # Check to see that no boxes exist
+  if (-Not ($VagrantOnly)) {
+    Write-Verbose '[preflight_checks] Checking if packer is installed'
+    check_packer
+  }
+  Write-Verbose '[preflight_checks] Checking if vagrant is installed'
+  check_vagrant
+  
   Write-Verbose '[preflight_checks] Checking for pre-existing boxes..'
   if ((Get-ChildItem "$DL_DIR\Boxes\*.box").Count -gt 0) {
     Write-Error 'You appear to have already built at least one box using Packer. This script does not support pre-built boxes. Please either delete the existing boxes or follow the build steps in the README to continue.'
@@ -318,17 +379,22 @@ if ($ProviderName -eq $Null) {
 preflight_checks
 
 # Build Packer Boxes
-packer_build_box -Box 'windows_2016'
-packer_build_box -Box 'windows_10'
-
-# Move Packer Boxes
-move_boxes
+if ($VagrantOnly) {
+  download_boxes
+}
+else {
+  packer_build_box -Box 'windows_2016'
+  packer_build_box -Box 'windows_10'
+  # Move Packer Boxes
+  move_boxes
+}
 
 # Vagrant up each box and attempt to reload one time if it fails
 forEach ($VAGRANT_HOST in $LAB_HOSTS) {
   Write-Verbose "[main] Running vagrant_up_host for: $VAGRANT_HOST"
   $result = vagrant_up_host -VagrantHost $VAGRANT_HOST
-  if ($result -eq 0) {
+  Write-Verbose "[main] vagrant_up_host finished. Exitcode: $result"
+  if ($result -eq '0') {
     Write-Output "Good news! $VAGRANT_HOST was built successfully!"
   }
   else {
