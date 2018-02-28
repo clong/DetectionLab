@@ -7,11 +7,11 @@
 # the text "building". Once the test is completed, the text will be replaced
 # with "success" or "failed".
 
-# Install Virtualbox 5.1
+# Install Virtualbox 5.2
 echo "deb http://download.virtualbox.org/virtualbox/debian xenial contrib" >> /etc/apt/sources.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
 apt-get update
-apt-get install -y virtualbox-5.1 build-essential unzip git ufw apache2
+apt-get install -y virtualbox-5.2 build-essential unzip git ufw apache2
 
 echo "building" > /var/www/html/index.html
 
