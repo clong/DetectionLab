@@ -16,30 +16,27 @@ print_usage() {
 
 check_packer_and_vagrant() {
   # Check for existence of Vagrant in PATH
-  which vagrant > /dev/null
-  if [ "$?" -ne 0 ]; then
-    (>&2 echo "Vagrant was not found in your PATH.")
-    (>&2 echo "Please correct this before continuing. Quitting.")
+  if ! which vagrant >/dev/null; then
+    (echo >&2 "Vagrant was not found in your PATH.")
+    (echo >&2 "Please correct this before continuing. Quitting.")
     exit 1
   fi
   # Ensure Vagrant >= 2.0.0
   if [ "$(vagrant --version | grep -o "[0-9]" | head -1)" -lt 2 ]; then
-    (>&2 echo "WARNING: It is highly recommended to use Vagrant 2.0.0 or above before continuing")
+    (echo >&2 "WARNING: It is highly recommended to use Vagrant 2.0.0 or above before continuing")
   fi
   # Check for existence of Packer in PATH
-  which packer > /dev/null
-  if [ "$?" -ne 0 ]; then
-    (>&2 echo "Packer was not found in your PATH.")
-    (>&2 echo "Please correct this before continuing. Quitting.")
-    (>&2 echo "Hint: sudo cp ./packer /usr/local/bin/packer; sudo chmod +x /usr/local/bin/packer")
+  if ! which packer >/dev/null; then
+    (echo >&2 "Packer was not found in your PATH.")
+    (echo >&2 "Please correct this before continuing. Quitting.")
+    (echo >&2 "Hint: sudo cp ./packer /usr/local/bin/packer; sudo chmod +x /usr/local/bin/packer")
     exit 1
   fi
 }
 
 # Returns 0 if not installed or 1 if installed
 check_virtualbox_installed() {
-  which VBoxManage > /dev/null
-  if [ "$?" -eq 0 ]; then
+  if which VBoxManage >/dev/null; then
     echo "1"
   else
     echo "0"
@@ -48,19 +45,23 @@ check_virtualbox_installed() {
 
 # Returns 0 if not installed or 1 if installed
 check_vmware_fusion_installed() {
-  echo "$(ls /Applications | grep -ci 'VMware Fusion.app')"
+  if [ -e "/Applications/VMware Fusion.app" ]; then
+    echo "1"
+  else
+    echo "0"
+  fi
 }
 
 # Returns 0 if not installed or 1 if installed
 check_vmware_vagrant_plugin_installed() {
-  VAGRANT_VMWARE_PLUGIN_PRESENT=$(vagrant plugin list | grep -c 'vagrant-vmware-fusion')
-  if [ $VAGRANT_VMWARE_PLUGIN_PRESENT -eq 0 ]; then
-    (>&2 echo "VMWare Fusion is installed, but the Vagrant plugin is not.")
-    (>&2 echo "Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase and install it")
-    (>&2 echo "VMWare Fusion will not be listed as a provider until the Vagrant plugin has been installed.")
+  VAGRANT_VMWARE_PLUGIN_PRESENT="$(vagrant plugin list | grep -c 'vagrant-vmware-fusion')"
+  if [ "$VAGRANT_VMWARE_PLUGIN_PRESENT" -eq 0 ]; then
+    (echo >&2 "VMWare Fusion is installed, but the Vagrant plugin is not.")
+    (echo >&2 "Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase and install it")
+    (echo >&2 "VMWare Fusion will not be listed as a provider until the Vagrant plugin has been installed.")
     echo "0"
   else
-    echo $VAGRANT_VMWARE_PLUGIN_PRESENT
+    echo "$VAGRANT_VMWARE_PLUGIN_PRESENT"
   fi
 }
 
@@ -69,7 +70,7 @@ list_providers() {
   VBOX_PRESENT=0
   VMWARE_FUSION_PRESENT=0
 
-  if [ $(uname) == "Darwin" ]; then
+  if [ "$(uname)" == "Darwin" ]; then
     # Detect Providers on OSX
     VBOX_PRESENT=$(check_virtualbox_installed)
     VMWARE_FUSION_PRESENT=$(check_vmware_fusion_installed)
@@ -79,28 +80,25 @@ list_providers() {
     VBOX_PRESENT=$(check_virtualbox_installed)
   fi
 
-  (>&2 echo "Available Providers:")
+  (echo >&2 "Available Providers:")
   if [ "$VBOX_PRESENT" == "1" ]; then
-    (>&2 echo "virtualbox";)
+    (echo >&2 "virtualbox")
   fi
-  if [[ $VMWARE_FUSION_PRESENT -eq 1 ]] && [[ $VAGRANT_VMWARE_PLUGIN_PRESENT -eq 1 ]]
-  then
-    (>&2 echo "vmware_fusion";)
+  if [[ $VMWARE_FUSION_PRESENT -eq 1 ]] && [[ $VAGRANT_VMWARE_PLUGIN_PRESENT -eq 1 ]]; then
+    (echo >&2 "vmware_fusion")
   fi
-  if [[ $VBOX_PRESENT -eq 0 ]] && [[ $VMWARE_FUSION_PRESENT -eq 0 ]]
-  then
-    (>&2 echo "You need to install a provider such as VirtualBox or VMware Fusion to continue.")
+  if [[ $VBOX_PRESENT -eq 0 ]] && [[ $VMWARE_FUSION_PRESENT -eq 0 ]]; then
+    (echo >&2 "You need to install a provider such as VirtualBox or VMware Fusion to continue.")
     exit 1
   fi
-  (>&2 echo -e "\nWhich provider would you like to use?")
-  read PROVIDER
+  (echo >&2 -e "\\nWhich provider would you like to use?")
+  read -r PROVIDER
   # Sanity check
-  if [[ "$PROVIDER" != "virtualbox" ]] && [[ "$PROVIDER" != "vmware_fusion" ]]
-  then
-    (>&2 echo "Please choose a valid provider. \"$PROVIDER\" is not a valid option")
+  if [[ "$PROVIDER" != "virtualbox" ]] && [[ "$PROVIDER" != "vmware_fusion" ]]; then
+    (echo >&2 "Please choose a valid provider. \"$PROVIDER\" is not a valid option")
     exit 1
   fi
-  echo $PROVIDER
+  echo "$PROVIDER"
 }
 
 # A series of checks to identify potential issues before starting the build
@@ -108,43 +106,42 @@ preflight_checks() {
   DL_DIR="$1"
 
   # Check to see if curl is in PATH
-  which curl > /dev/null
-  if [ "$?" -ne 0 ]; then
-    (>&2 echo "Please install curl and make sure it is in your PATH.")
+  if ! which curl >/dev/null; then
+    (echo >&2 "Please install curl and make sure it is in your PATH.")
     exit 1
   fi
   # Check to see if boxes exist already
-  BOXES_BUILT=$(ls -al "$DL_DIR"/Boxes/*.box 2> /dev/null | wc -l)
-  if [ $BOXES_BUILT -gt 0 ]; then
-    (>&2 echo "You appear to have already built at least one box using Packer. This script does not support pre-built boxes. Please either delete the existing boxes or follow the build steps in the README to continue.")
+  BOXES_BUILT=$(find "$DL_DIR"/Boxes -name "*.box" | wc -l)
+  if [ "$BOXES_BUILT" -gt 0 ]; then
+    (echo >&2 "You appear to have already built at least one box using Packer. This script does not support pre-built boxes. Please either delete the existing boxes or follow the build steps in the README to continue.")
     exit 1
   fi
   # Check to see if any Vagrant instances exist already
   cd "$DL_DIR"/Vagrant/
-  VAGRANT_BUILT=$(vagrant status | grep -c 'not created')
-  if [ $VAGRANT_BUILT -ne 4 ]; then
-    (>&2 echo "You appear to have already created at least one Vagrant instance. This script does not support already created instances. Please either destroy the existing instances or follow the build steps in the README to continue.")
+  # Vagrant status has the potential to return a non-zero error code, so we work around it with "|| true"
+  VAGRANT_BUILT=$(vagrant status | grep -c 'not created') || true
+  if [ "$VAGRANT_BUILT" -ne 4 ]; then
+    (echo >&2 "You appear to have already created at least one Vagrant instance. This script does not support pre-created instances. Please either destroy the existing instances or follow the build steps in the README to continue.")
     exit 1
   fi
   # Check available disk space. Recommend 80GB free, warn if less.
-  FREE_DISK_SPACE=$(df -m $HOME | tr -s ' '  | grep '/' | cut -d ' ' -f 4)
-  if [ $FREE_DISK_SPACE -lt 80000 ]; then
-    (>&2 echo -e "Warning: You appear to have less than 80GB of HDD space free on your primary partition. If you are using a separate parition, you may ignore this warning.\n")
-    (>&2 df -m $HOME)
-    (>&2 echo "")
+  FREE_DISK_SPACE=$(df -m "$HOME" | tr -s ' ' | grep '/' | cut -d ' ' -f 4)
+  if [ "$FREE_DISK_SPACE" -lt 80000 ]; then
+    (echo >&2 -e "Warning: You appear to have less than 80GB of HDD space free on your primary partition. If you are using a separate parition, you may ignore this warning.\\n")
+    (df >&2 -m "$HOME")
+    (echo >&2 "")
   fi
   # Check Packer version against known bad
   if [ "$(packer --version)" == '1.1.2' ]; then
-    (>&2 echo "Packer 1.1.2 is not supported. Please upgrade to a newer version and see https://github.com/hashicorp/packer/issues/5622 for more information.")
+    (echo >&2 "Packer 1.1.2 is not supported. Please upgrade to a newer version and see https://github.com/hashicorp/packer/issues/5622 for more information.")
     exit 1
   fi
   # Ensure the vagrant-reload plugin is installed
   VAGRANT_RELOAD_PLUGIN_INSTALLED=$(vagrant plugin list | grep -c 'vagrant-reload')
   if [ "$VAGRANT_RELOAD_PLUGIN_INSTALLED" != "1" ]; then
-    (>&2 echo "The vagrant-reload plugin is required and not currently installed. This script will attempt to install it now.")
-    $(which vagrant) plugin install "vagrant-reload"
-    if [ "$?" -ne 0 ]; then
-      (>&2 echo "Unable to install the vagrant-reload plugin. Please try to do so manually and re-run this script.")
+    (echo >&2 "The vagrant-reload plugin is required and not currently installed. This script will attempt to install it now.")
+    if ! $(which vagrant) plugin install "vagrant-reload"; then
+      (echo >&2 "Unable to install the vagrant-reload plugin. Please try to do so manually and re-run this script.")
       exit 1
     fi
   fi
@@ -159,11 +156,10 @@ packer_build_box() {
     PROVIDER="vmware"
   fi
   cd "$DL_DIR/Packer"
-  (>&2 echo "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware.")
-  $(which packer) build --only="$PROVIDER-iso" $BOX.json
-  if [ "$?" -ne 0 ]; then
-    (>&2 echo "Something went wrong while attempting to build the $BOX box.")
-    (>&2 echo "To file an issue, please visit https://github.com/clong/DetectionLab/issues/")
+  (echo >&2 "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware.")
+  if ! $(which packer) build --only="$PROVIDER-iso" "$BOX".json; then
+    (echo >&2 "Something went wrong while attempting to build the $BOX box.")
+    (echo >&2 "To file an issue, please visit https://github.com/clong/DetectionLab/issues/")
   fi
 }
 
@@ -178,12 +174,12 @@ move_boxes() {
   mv "$DL_DIR"/Packer/*.box "$DL_DIR"/Boxes
   # Ensure Windows 10 box exists
   if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PROVIDER".box ]; then
-    (>&2 echo "Windows 10 box is missing from the Boxes directory. Qutting.")
+    (echo >&2 "Windows 10 box is missing from the Boxes directory. Qutting.")
     exit 1
   fi
   # Ensure Windows 2016 box exists
   if [ ! -f "$DL_DIR"/Boxes/windows_2016_"$PROVIDER".box ]; then
-    (>&2 echo "Windows 2016 box is missing from the Boxes directory. Qutting.")
+    (echo >&2 "Windows 2016 box is missing from the Boxes directory. Qutting.")
     exit 1
   fi
 }
@@ -193,9 +189,9 @@ vagrant_up_host() {
   PROVIDER="$1"
   HOST="$2"
   DL_DIR="$3"
-  (>&2 echo "Attempting to bring up the $HOST host using Vagrant")
+  (echo >&2 "Attempting to bring up the $HOST host using Vagrant")
   cd "$DL_DIR"/Vagrant
-  $(which vagrant) up $HOST --provider="$PROVIDER" 1>&2
+  $(which vagrant) up "$HOST" --provider="$PROVIDER" 1>&2
   echo "$?"
 }
 
@@ -205,7 +201,7 @@ vagrant_reload_host() {
   DL_DIR="$2"
   cd "$DL_DIR"/Vagrant
   # Attempt to reload the host if the vagrant up command didn't exit cleanly
-  $(which vagrant) reload $HOST --provision 1>&2
+  $(which vagrant) reload "$HOST" --provision 1>&2
   echo "$?"
 }
 
@@ -221,22 +217,21 @@ post_build_checks() {
   # Associative arrays are only supported in bash 4 and up
   if [ "$BASH_MAJOR_VERSION" -ge 4 ]; then
     declare -A SERVICES
-    SERVICES=( ["caldera"]="$CALDERA_CHECK" ["splunk"]="$SPLUNK_CHECK" ["fleet"]="$FLEET_CHECK")
-    for SERVICE in "${!SERVICES[@]}"
-    do
+    SERVICES=(["caldera"]="$CALDERA_CHECK" ["splunk"]="$SPLUNK_CHECK" ["fleet"]="$FLEET_CHECK")
+    for SERVICE in "${!SERVICES[@]}"; do
       if [ "${SERVICES[$SERVICE]}" -lt 1 ]; then
-        (>&2 echo "Warning: $SERVICE failed post-build tests and may not be functioning correctly.")
+        (echo >&2 "Warning: $SERVICE failed post-build tests and may not be functioning correctly.")
       fi
     done
   else
     if [ "$CALDERA_CHECK" -lt 1 ]; then
-      (>&2 echo "Warning: Caldera failed post-build tests and may not be functioning correctly.")
+      (echo >&2 "Warning: Caldera failed post-build tests and may not be functioning correctly.")
     fi
     if [ "$SPLUNK_CHECK" -lt 1 ]; then
-      (>&2 echo "Warning: Splunk failed post-build tests and may not be functioning correctly.")
+      (echo >&2 "Warning: Splunk failed post-build tests and may not be functioning correctly.")
     fi
     if [ "$FLEET_CHECK" -lt 1 ]; then
-      (>&2 echo "Warning: Fleet failed post-build tests and may not be functioning correctly.")
+      (echo >&2 "Warning: Fleet failed post-build tests and may not be functioning correctly.")
     fi
   fi
 }
@@ -244,7 +239,7 @@ post_build_checks() {
 main() {
   # Get location of build.sh
   # https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
-  DL_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  DL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   PROVIDER=""
   LAB_HOSTS=("logger" "dc" "wef" "win10")
   # If no argument was supplied, list available providers
@@ -261,22 +256,22 @@ main() {
     # TODO: Check to make sure they actually have their provider installed
     case "$1" in
       virtualbox)
-      PROVIDER="$1"
-      ;;
+        PROVIDER="$1"
+        ;;
       vmware_fusion)
-      PROVIDER="$1"
-      ;;
+        PROVIDER="$1"
+        ;;
       *)
-      echo "\"$1\" is not a valid provider. Listing available providers:"
-      PROVIDER=$(list_providers)
-      ;;
+        echo "\"$1\" is not a valid provider. Listing available providers:"
+        PROVIDER=$(list_providers)
+        ;;
     esac
   fi
 
-  preflight_checks $DL_DIR
-  packer_build_box $PROVIDER "windows_2016" $DL_DIR
-  packer_build_box $PROVIDER "windows_10" $DL_DIR
-  move_boxes $PROVIDER $DL_DIR
+  preflight_checks "$DL_DIR"
+  packer_build_box "$PROVIDER" "windows_2016" "$DL_DIR"
+  packer_build_box "$PROVIDER" "windows_10" "$DL_DIR"
+  move_boxes "$PROVIDER" "$DL_DIR"
 
   # Change provider back to original selection if using vmware_fusion
   if [ "$PROVIDER" == "vmware" ]; then
@@ -284,19 +279,18 @@ main() {
   fi
 
   # Vagrant up each box and attempt to reload one time if it fails
-  for VAGRANT_HOST in "${LAB_HOSTS[@]}"
-  do
-    RET=$(vagrant_up_host $PROVIDER $VAGRANT_HOST $DL_DIR)
+  for VAGRANT_HOST in "${LAB_HOSTS[@]}"; do
+    RET=$(vagrant_up_host "$PROVIDER" "$VAGRANT_HOST" "$DL_DIR")
     if [ "$RET" -eq 0 ]; then
-      (>&2 echo "Good news! $VAGRANT_HOST was built successfully!")
+      (echo >&2 "Good news! $VAGRANT_HOST was built successfully!")
     fi
     # Attempt to recover if the intial "vagrant up" fails
     if [ "$RET" -ne 0 ]; then
-      (>&2 echo "Something went wrong while attempting to build the $VAGRANT_HOST box.")
-      (>&2 echo "Attempting to reload and reprovision the host...")
-      RETRY_STATUS=$(vagrant_reload_host $VAGRANT_HOST $DL_DIR)
+      (echo >&2 "Something went wrong while attempting to build the $VAGRANT_HOST box.")
+      (echo >&2 "Attempting to reload and reprovision the host...")
+      RETRY_STATUS=$(vagrant_reload_host "$VAGRANT_HOST" "$DL_DIR")
       if [ "$RETRY_STATUS" -ne 0 ]; then
-        (>&2 echo "Failed to bring up $VAGRANT_HOST after a reload. Exiting.")
+        (echo >&2 "Failed to bring up $VAGRANT_HOST after a reload. Exiting.")
         exit 1
       fi
     fi
@@ -305,5 +299,5 @@ main() {
   post_build_checks
 }
 
-main $@
+main "$@"
 exit 0
