@@ -14,6 +14,8 @@ If (-not (Test-Path "C:\Program Files\cagent\cagent.exe")) {
   Write-Host "Downloading Caldera Agent (cagent.exe)"
   $cagentPath = "C:\Program Files\cagent\cagent.exe"
   $cagentConfPath = "C:\Program Files\cagent\conf.yml"
+  # GitHub requires TLS 1.2 as of 2/1/2018
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   (New-Object System.Net.WebClient).DownloadFile('https://github.com/mitre/caldera-agent/releases/download/v0.1.0/cagent.exe', $cagentPath)
   # Ignore SSL warning for conf file download
   # https://stackoverflow.com/questions/34331206/ignore-ssl-warning-with-powershell-downloadstring
