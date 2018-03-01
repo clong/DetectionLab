@@ -24,8 +24,8 @@ ufw --force enable
 # Install Vagrant
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget https://releases.hashicorp.com/vagrant/2.0.1/vagrant_2.0.1_x86_64.deb
-dpkg -i vagrant_2.0.1_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.0.2/vagrant_2.0.2_x86_64.deb
+dpkg -i vagrant_2.0.2_x86_64.deb
 vagrant plugin install vagrant-reload
 
 # Install Packer
@@ -51,4 +51,4 @@ cd /opt/DetectionLab || exit 1
 # Start the build in a tmux session
 sn=tmuxsession
 tmux new-session -s "$sn" -d
-tmux send-keys -t "$sn:0" './build.sh virtualbox && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html' Enter
+tmux send-keys -t "$sn:0" './build.sh virtualbox | tee -a /opt/DetectionLab/Vagrant/vagrant.log && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html' Enter
