@@ -29,7 +29,7 @@ check_vagrant() {
 
 # Returns 0 if not installed or 1 if installed
 check_virtualbox_installed() {
-  if ! which VBoxManage >/dev/null; then
+  if which VBoxManage >/dev/null; then
     echo "1"
   else
     echo "0"
