@@ -63,6 +63,9 @@ jobs:
             fi
             done
             if [ "$MINUTES_PAST" -gt 120 ]; then
+            export IP_ADDRESS=$(cat /tmp/ip_address);
+            scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant.log .
+            cat vagrant.log
             curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
             exit 1
             fi
@@ -74,6 +77,9 @@ jobs:
             export STATUS=$(cat /tmp/status)
             echo $STATUS
             if [ "$STATUS" != "success" ]; then
+            export IP_ADDRESS=$(cat /tmp/ip_address);
+            scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant.log .
+            cat vagrant.log
             curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
             exit 1
             fi
