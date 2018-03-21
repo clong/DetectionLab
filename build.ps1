@@ -3,6 +3,7 @@
 <#
 .Synopsis
    This script is used to deploy a fresh install of DetectionLab
+
 .DESCRIPTION
    This scripts runs a series of tests before running through the
    DetectionLab deployment. It checks:
@@ -13,21 +14,42 @@
    * Various aspects of system health
   
    Post deployment it also verifies that services are installed and
-   running. 
+   running.
+
+   If you encounter issues, feel free to open an issue at
+   https://github.com/clong/DetectionLab/issues
+
+.PARAMETER ProviderName
+  The Hypervisor you're using for the lab. Valid options are 'virtualbox' or 'vmware_workstation'
+
+.PARAMETER PackerPath
+  The full path to the packer executable. Default is C:\Hashicorp\packer.exe
+
+.PARAMETER VagrantOnly
+  This switch skips building packer boxes and instead downloads from www.deploymentlab.network
 
 .EXAMPLE
-   ./build.ps1 -ProviderName virtualbox -PackerPath 'C:\packer.exe'
+  build.ps1 -ProviderName virtualbox   
+
+  This builds the DeploymentLab using virtualbox and the default path for packer (C:\Hashicorp\packer.exe)
 .EXAMPLE
-   ./build.ps1 -ProviderName vmware_workstation -PackerPath 'C:\packer.exe'
+  build.ps1 -ProviderName vmware_workstation -PackerPath 'C:\packer.exe'
+  
+  This builds the DeploymentLab using Vmware and sets the packer path to 'C:\packer.exe'  
+.EXAMPLE
+  build.ps1 -ProviderName vmware_workstation -VagrantOnly
+
+  This command builds the DeploymentLab using vmware and skips the packer process, downloading the boxes instead.
 #>
 
 [cmdletbinding()]
 Param(
   # Vagrant provider to use.
+  [Parameter(Mandatory=$true)]
   [ValidateSet('virtualbox', 'vmware_workstation')]
   [string]$ProviderName,
   [string]$PackerPath = 'C:\Hashicorp\packer.exe',
-  [swtich]$VagrantOnly
+  [switch]$VagrantOnly
 )
 
 
@@ -71,7 +93,7 @@ function check_packer {
 function check_vagrant {
   # Check if vagrant is in path
   try {
-    Get-Command vagrant.exe -ErrorAction Stop
+    Get-Command vagrant.exe -ErrorAction Stop | Out-Null
   }
   catch {
     Write-Error 'Vagrant was not found. Please correct this before continuing.'
@@ -189,9 +211,11 @@ function download_boxes {
   Write-Verbose '[download_boxes] Checking Filehashes..'
   if ($win10hash -ne $win10Filehash) {
     Write-Error 'Hash mismatch on windows_10_virtualbox.box'
+    break
   }
   if ($win2016hash -ne $win2016Filehash) {
     Write-Error 'Hash mismatch on windows_2016_virtualbox.box'
+    break
   }
   Write-Verbose '[download_boxes] Finished.'
 }
@@ -331,6 +355,7 @@ function download {
     [string]$PatternToMatch
   )
   Write-Verbose "[download] Running for $URL, looking for $PatternToMatch"
+  [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
   [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
   
   $wc = New-Object System.Net.WebClient
