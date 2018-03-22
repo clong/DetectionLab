@@ -9,79 +9,67 @@ jobs:
       - checkout
 
       - run:
-          name: Delete stale Packet servers
+          name: Choose which test suite to run based on which files were modified
           command: |
-            export DELETE_DEVICE_ID=$(curl -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."devices[0].id" | tr -d '"')
-            curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DELETE_DEVICE_ID"
-      - run:
-          name: Provisioning a baremetal Packet.net server
-          command: |
-           curl -X POST --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "sjc1", "plan": "baremetal_1", "hostname": "detectionlab", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys": ["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' > /tmp/device
-      - run: cat /tmp/device | jq ."id" | tr -d '"' > /tmp/device_id
-      - run: sleep 300
-      - run: echo "Sleeping 5 more minutes while Packet server is provisioned"
-      - run: sleep 300
-      - run:
-          name: Recording the IP address of the Packet server
-          command: |
-           export DEVICE_ID=$(cat /tmp/device_id);
-           curl -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" "https://api.packet.net/devices/$DEVICE_ID/ips" > /tmp/ip_info;
-      - run: cat /tmp/ip_info | jq ."ip_addresses[0].address" | tr -d '"' > /tmp/ip_address
-      - run: cd ~/repo
-      - run:
-         name: Copying DetectionLab repo to Packet server
-         command: |
-           export IP_ADDRESS=$(cat /tmp/ip_address);
-           scp -i ~/.ssh/id_rsa -r ~/repo root@"$IP_ADDRESS":/opt/DetectionLab
-      - run:
-          name: Copying install script to Packet server
-          command: |
-            export IP_ADDRESS=$(cat /tmp/ip_address);
-            scp -i ~/.ssh/id_rsa ./ci/automated_install_vagrant_only.sh root@"$IP_ADDRESS":/root
-      - run:
-          name: Running install script on Packet server
-          command: |
-            export IP_ADDRESS=$(cat /tmp/ip_address)
-            ssh -i ~/.ssh/id_rsa root@"$IP_ADDRESS" 'chmod +x /root/automated_install_vagrant_only.sh; /bin/bash -c /root/automated_install_vagrant_only.sh'
-
-      - run:
-          name: Waiting for Packet server to post build results
-          shell: /bin/bash
-          command: |
-            export IP_ADDRESS=$(cat /tmp/ip_address)
-            MINUTES_PAST=0
-            while [ "$MINUTES_PAST" -lt 120 ]
-            do
-            export STATUS=$(curl $IP_ADDRESS)
-            if [ "$STATUS" == "building" ]; then
-            echo "$STATUS"
-            sleep 300
-            ((MINUTES_PAST+=5))
+            ## Checking commits for changes to Packer files
+            ## This handles the cases where there are multiple commits
+            if echo "$CIRCLE_COMPARE_URL" | grep '\.\.'; then
+              if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) $(echo $CIRCLE_COMPARE_URL | cut -d '.' -f 5) | grep -c ^Packer/)" -gt 0 ]; then
+                export PACKER_MODIFIED=1
+              else
+                export PACKER_MODIFIED=0
+              fi
             else
-            echo "$STATUS" > /tmp/status
-            break
+              ## This handles the cases where there is only a single commit
+              export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
+              if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c ^Packer/)" -gt 0 ]; then
+                export PACKER_MODIFIED=1
+              else
+                export PACKER_MODIFIED=0
+              fi
             fi
-            done
-            if [ "$MINUTES_PAST" -gt 120 ]; then
-            export IP_ADDRESS=$(cat /tmp/ip_address);
-            scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant.log .
-            cat vagrant.log
-            curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
-            exit 1
+            ## Checking commits for changes to Vagrant files
+            if echo "$CIRCLE_COMPARE_URL" | grep '\.\.'; then
+              if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) $(echo $CIRCLE_COMPARE_URL | cut -d '.' -f 5) | grep -c ^Vagrant/)" -gt 0 ]; then
+                export VAGRANT_MODIFIED=1
+              else
+                export VAGRANT_MODIFIED=0
+              fi
+            else
+              export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
+              if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c \"^Vagrant/\")" -gt 0 ]; then
+                export VAGRANT_MODIFIED=1
+              else
+                export VAGRANT_MODIFIED=0
+              fi
             fi
-      - run:
-          name: Recording build results
-          shell: /bin/bash
-          command: |
-            export DEVICE_ID=$(cat /tmp/device_id)
-            export STATUS=$(cat /tmp/status)
-            echo $STATUS
-            if [ "$STATUS" != "success" ]; then
-            export IP_ADDRESS=$(cat /tmp/ip_address);
-            scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant.log .
-            cat vagrant.log
-            curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
-            exit 1
+            echo "VAGRANT_MODIFIED=$VAGRANT_MODIFIED"
+            echo "PACKER_MODIFIED=$PACKER_MODIFIED"
+            ## Choosing which test suite to run based on the files that were changed
+            if [[ "$PACKER_MODIFIED" -eq 1 ]] && [[ "$VAGRANT_MODIFIED" -eq 1 ]]; then
+              echo "Running the test suite for Packer and Vagrant changes"
+              chmod +x ci/circle_workflows/packer_and_vagrant_changes.sh
+              ci/circle_workflows/packer_and_vagrant_changes.sh
+              exit 0
             fi
-            curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
-            exit 0
+            if [[ "$PACKER_MODIFIED" -eq 1 ]] && [[ "$VAGRANT_MODIFIED" -eq 1 ]]; then
+              echo "Running the default test suite (Vagrant-only)"
+              chmod +x ci/circle_workflows/vagrant_changes.sh
+              ci/circle_workflows/vagrant_changes.sh
+              exit 0
+            fi
+            if [ "$PACKER_MODIFIED" -eq 1 ]; then
+              echo "Running the test suite for Packer-only changes"
+              chmod +x ci/circle_workflows/packer_changes.sh
+              ci/circle_workflows/packer_changes.sh
+              exit 0
+            fi
+            if [ "$VAGRANT_MODIFIED" -eq 1 ]; then
+              echo "Running the test suite for Vagrant-only changes"
+              chmod +x ci/circle_workflows/vagrant_changes.sh
+              ci/circle_workflows/vagrant_changes.sh
+              exit 0
+            fi
+
+      - store_artifacts:
+          path: /tmp/artifacts

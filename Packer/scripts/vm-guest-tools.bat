@@ -15,7 +15,7 @@ if exist "C:\Users\vagrant\windows.iso" (
 )
 
 if not exist "C:\Windows\Temp\windows.iso" (
-    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://softwareupdate.vmware.com/cds/vmw-desktop/ws/12.5.7/5813279/windows/packages/tools-windows.tar', 'C:\Windows\Temp\vmware-tools.tar')" <NUL
+    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://softwareupdate.vmware.com/cds/vmw-desktop/ws/14.1.1/7528167/windows/packages/tools-windows.tar', 'C:\Windows\Temp\vmware-tools.tar')" <NUL
     cmd /c ""C:\Program Files\7-Zip\7z.exe" x C:\Windows\Temp\vmware-tools.tar -oC:\Windows\Temp"
     FOR /r "C:\Windows\Temp" %%a in (VMware-tools-windows-*.iso) DO REN "%%~a" "windows.iso"
     rd /S /Q "C:\Program Files (x86)\VMWare"
@@ -31,16 +31,12 @@ goto :done
 
 :virtualbox
 
-:: There needs to be Oracle CA (Certificate Authority) certificates installed in order
-:: to prevent user intervention popups which will undermine a silent installation.
-cmd /c certutil -addstore -f "TrustedPublisher" A:\oracle-cert.cer
-
 if exist "C:\Users\vagrant\VBoxGuestAdditions.iso" (
     move /Y C:\Users\vagrant\VBoxGuestAdditions.iso C:\Windows\Temp
 )
 
 if not exist "C:\Windows\Temp\VBoxGuestAdditions.iso" (
-    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://download.virtualbox.org/virtualbox/5.1.28/VBoxGuestAdditions_5.1.28.iso', 'C:\Windows\Temp\VBoxGuestAdditions.iso')" <NUL
+    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://download.virtualbox.org/virtualbox/5.2.4/VBoxGuestAdditions_5.2.4.iso', 'C:\Windows\Temp\VBoxGuestAdditions.iso')" <NUL
 )
 
 cmd /c ""C:\Program Files\7-Zip\7z.exe" x C:\Windows\Temp\VBoxGuestAdditions.iso -oC:\Windows\Temp\virtualbox"
