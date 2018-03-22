@@ -90,7 +90,7 @@ go build
 cd /home/vagrant
 
 # Modify the config to work with config importer
-cat /home/vagrant/osquery-configuration/Endpoints/Windows/osquery.conf  | sed 's#packs/#../packs/#g' | grep -v unwanted-chrome-extensions | grep -v security-tooling-checks | grep -v performance-metrics > /home/vagrant/osquery-configuration/Endpoints/Windows/osquery_to_import.conf
+cat /home/vagrant/osquery-configuration/Endpoints/Windows/osquery.conf  | sed 's#packs/#../packs/#g' | grep -v unwanted-chrome-extensions | grep -v security-tooling-checks | grep -v performance-metrics | grep -v logger_snapshot_event_type > /home/vagrant/osquery-configuration/Endpoints/Windows/osquery_to_import.conf
 # Install configimporter
 echo "Installing configimporter"
 echo "Sleeping for 5"

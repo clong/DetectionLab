@@ -24,8 +24,8 @@ ufw --force enable
 # Install Vagrant
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget https://releases.hashicorp.com/vagrant/2.0.2/vagrant_2.0.2_x86_64.deb
-dpkg -i vagrant_2.0.2_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.deb
+dpkg -i vagrant_2.0.3_x86_64.deb
 vagrant plugin install vagrant-reload
 
 # Make the Vagrant instances headless
