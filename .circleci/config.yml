@@ -11,6 +11,7 @@ jobs:
       - run:
           name: Check if Packer files were modified
           command: |
+            export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
             if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c \"^Packer/\")" -gt 0 ]; then
               export PACKER_MODIFIED=1
             else
@@ -20,6 +21,7 @@ jobs:
       - run:
           name: Check if Vagrant files were modified
           command: |
+            export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
             if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c \"^Vagrant/\")" -gt 0 ]; then
               export VAGRANT_MODIFIED=1
             else
