@@ -11,43 +11,67 @@ jobs:
       - run:
           name: Check if Packer files were modified
           command: |
-            export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
-            if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c \"^Packer/\")" -gt 0 ]; then
-              export PACKER_MODIFIED=1
+            ## This handles the cases where there are multiple commits
+            if echo "$CIRCLE_COMPARE_URL" | grep '\.\.'; then
+              if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) $(echo $CIRCLE_COMPARE_URL | cut -d '.' -f 5) | grep -c ^Packer/)" -gt 0 ]; then
+                export PACKER_MODIFIED=1
+              else
+                export PACKER_MODIFIED=0
+              fi
             else
-              export PACKER_MODIFIED=0
+              ## This handles the cases where there is only a single commit
+              export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
+              if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c ^Packer/)" -gt 0 ]; then
+                export PACKER_MODIFIED=1
+              else
+                export PACKER_MODIFIED=0
+              fi
             fi
+            echo "PACKER_MODIFIED=$PACKER_MODIFIED"
 
       - run:
           name: Check if Vagrant files were modified
           command: |
-            export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
-            if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c \"^Vagrant/\")" -gt 0 ]; then
-              export VAGRANT_MODIFIED=1
+            if echo "$CIRCLE_COMPARE_URL" | grep '\.\.'; then
+              if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) $(echo $CIRCLE_COMPARE_URL | cut -d '.' -f 5) | grep -c ^Vagrant/)" -gt 0 ]; then
+                export VAGRANT_MODIFIED=1
+              else
+                export VAGRANT_MODIFIED=0
+              fi
             else
-              export VAGRANT_MODIFIED=0
+              export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
+              if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c \"^Vagrant/\")" -gt 0 ]; then
+                export VAGRANT_MODIFIED=1
+              else
+                export VAGRANT_MODIFIED=0
+              fi
             fi
+            echo "VAGRANT_MODIFIED=$VAGRANT_MODIFIED"
 
 
       - run:
           name: Choose which build gets run
           command: |
             if [[ "$PACKER_MODIFIED" -eq 1 ]] && [[ "$VAGRANT_MODIFIED" -eq 1 ]]; then
+              echo "Running the test suite for Packer and Vagrant changes"
               chmod +x ci/circle_workflows/packer_and_vagrant_changes.sh
               ci/circle_workflows/packer_and_vagrant_changes.sh
               exit 0
             fi
             if [[ "$PACKER_MODIFIED" -eq 1 ]] && [[ "$VAGRANT_MODIFIED" -eq 1 ]]; then
+              echo "Running the default test suite (Vagrant-only)"
               chmod +x ci/circle_workflows/vagrant_changes.sh
               ci/circle_workflows/vagrant_changes.sh
               exit 0
             fi
             if [ "$PACKER_MODIFIED" -eq 1 ]; then
+              echo "Running the test suite for Packer-only changes"
               chmod +x ci/circle_workflows/packer_changes.sh
               ci/circle_workflows/packer_changes.sh
               exit 0
             fi
             if [ "$VAGRANT_MODIFIED" -eq 1 ]; then
+              echo "Running the test suite for Vagrant-only changes"
               chmod +x ci/circle_workflows/vagrant_changes.sh
               ci/circle_workflows/vagrant_changes.sh
               exit 0
