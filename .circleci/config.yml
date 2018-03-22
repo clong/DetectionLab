@@ -52,6 +52,8 @@ jobs:
       - run:
           name: Choose which build gets run
           command: |
+            echo "VAGRANT_MODIFIED=$VAGRANT_MODIFIED"
+            echo "PACKER_MODIFIED=$PACKER_MODIFIED"
             if [[ "$PACKER_MODIFIED" -eq 1 ]] && [[ "$VAGRANT_MODIFIED" -eq 1 ]]; then
               echo "Running the test suite for Packer and Vagrant changes"
               chmod +x ci/circle_workflows/packer_and_vagrant_changes.sh
