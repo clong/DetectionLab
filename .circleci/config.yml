@@ -52,7 +52,7 @@ jobs:
               ci/circle_workflows/packer_and_vagrant_changes.sh
               exit 0
             fi
-            if [[ "$PACKER_MODIFIED" -eq 1 ]] && [[ "$VAGRANT_MODIFIED" -eq 1 ]]; then
+            if [[ "$PACKER_MODIFIED" -eq 0 ]] && [[ "$VAGRANT_MODIFIED" -eq 0 ]]; then
               echo "Running the default test suite (Vagrant-only)"
               chmod +x ci/circle_workflows/vagrant_changes.sh
               ci/circle_workflows/vagrant_changes.sh
