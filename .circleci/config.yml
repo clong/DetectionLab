@@ -11,38 +11,38 @@ jobs:
       - run:
           name: Choose which test suite to run based on which files were modified
           command: |
+            ## As far as I'm aware, there are three possibile cases to check for here. The CIRCLE_COMPARE_URL environment variable will either contain:
+            ## - A SHA1 hash for the commit (If there is only a single commit on the branch)
+            ## - Two SHA1 hashes in a "xxxxxxxx..yyyyyyyy" (comparing the two most recent commits
+            ## - Nothing
+            ## There is certainly a better way to accomplish all of this, but my limited knowledge of git has lead me to write this awful spaghetti code :-/
+            ## We'll handle all 3 of these cases below:
             ## Checking commits for changes to Packer files
-            ## This handles the cases where there are multiple commits
-            if echo "$CIRCLE_COMPARE_URL" | grep '\.\.'; then
-              if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) $(echo $CIRCLE_COMPARE_URL | cut -d '.' -f 5) | grep -c ^Packer/)" -gt 0 ]; then
-                export PACKER_MODIFIED=1
-              else
-                export PACKER_MODIFIED=0
-              fi
+            COMMIT_SHA1=""
+            PACKER_MODIFIED=0
+            VAGRANT_MODIFIED=0
+            ## Check for empty CIRCLE_COMPARE_URL. If it is, set the SHA1 hash to the CIRCLE_SHA1 environment variable
+            if [ "$(echo -n $CIRCLE_COMPARE_URL | wc -c)" -eq 0 ]; then
+              export COMMIT_SHA1=$CIRCLE_SHA1
+            ## Check for two short-hashes in the CIRCLE_COMPARE_URL by searching for '..'. If it exists, use the second short-hash
+            elif echo "$CIRCLE_COMPARE_URL" | grep '\.\.'; then
+              export COMMIT_SHA1="$(echo $CIRCLE_COMPARE_URL | cut -d '.' -f 5)"
+            ## Check for a single short hash in the CIRCLE_COMPARE_URL and use it if it exists
+            ## TODO: This check may not be needed.
             else
-              ## This handles the cases where there is only a single commit
-              export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
-              if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c ^Packer/)" -gt 0 ]; then
-                export PACKER_MODIFIED=1
-              else
-                export PACKER_MODIFIED=0
-              fi
+              export COMMIT_SHA1="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
             fi
-            ## Checking commits for changes to Vagrant files
-            if echo "$CIRCLE_COMPARE_URL" | grep '\.\.'; then
-              if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) $(echo $CIRCLE_COMPARE_URL | cut -d '.' -f 5) | grep -c ^Vagrant/)" -gt 0 ]; then
-                export VAGRANT_MODIFIED=1
-              else
-                export VAGRANT_MODIFIED=0
-              fi
-            else
-              export COMMIT_ID="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
-              if [ "$(git diff-tree --no-commit-id --name-only -r $COMMIT_ID | grep -c \"^Vagrant/\")" -gt 0 ]; then
-                export VAGRANT_MODIFIED=1
-              else
-                export VAGRANT_MODIFIED=0
-              fi
+            ## Display the files that were modified in this branch
+            echo "Files modified since origin/Master:"
+            git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) "$COMMIT_SHA1"
+            ## Check to see if Packer files were modified
+            if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) "$COMMIT_SHA1" | grep -c ^Packer/)" -gt 0 ]; then
+              export PACKER_MODIFIED=1
             fi
+            if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) "$COMMIT_SHA1" | grep -c ^Vagrant/)" -gt 0 ]; then
+              export VAGRANT_MODIFIED=1
+            fi
+            echo "Displaying the values of the modifier environment variables:"
             echo "VAGRANT_MODIFIED=$VAGRANT_MODIFIED"
             echo "PACKER_MODIFIED=$PACKER_MODIFIED"
             ## Choosing which test suite to run based on the files that were changed
