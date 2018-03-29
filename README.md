@@ -36,8 +36,11 @@ OSX 10.12.4 | 1.9.2 | 1.0.0 | VMWare Fusion (8.5.6)
 OSX 10.12.5 | 1.9.3 | 1.0.0 | VMWare Fusion (8.5.8)
 OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.9)
 OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.10)
+OSX 10.12.6 | 2.0.3 | 1.2.1 | VMWare Fusion (10.1.1)
 Ubuntu 16.04 | 2.0.1 | 1.1.3 | Virtualbox (5.1)
 Ubuntu 16.04 | 2.0.2 | N/A | Virtualbox (5.2)
+Ubuntu 16.04 | 2.0.3 | 1.2.1 | Virtualbox (5.2)
+
 
 **Known Bad Versions:**
 * Packer 1.1.2 will fail to build VMWare-ISOs correctly due to [this issue](https://github.com/hashicorp/packer/issues/5622).
@@ -61,10 +64,10 @@ There are two build scripts:
 
 Provider | Box  | URL | MD5 | Size
 ------------|-----|-----|----|----
-Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | 614f984c82b51471b5bb753940b59d38 | 6.4GB
-Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | 30b06e30b36b02ccf1dc5c04017654aa | 5.8GB
-VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | 1511b9dc942c69c2cc5a8dc471fa8865 | 6.7GB
-VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | 174ad0f0fd2089ff74a880c6dadac74c | 6.0GB
+Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | b59cf23dfbcdb63c0dc8a98fbc564451 | 6.4GB
+Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | d6304f01caa553a18022ea7b5a73ad0d | 5.8GB
+VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | 249fc2472849582d8b736cdabaf0eceb | 6.7GB
+VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | 4355e9758a862a6f6349e31fdc3a6078 | 6.0GB
 
 If you choose to download the boxes, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
 
