@@ -231,7 +231,7 @@ function preflight_checks {
   Write-Verbose '[preflight_checks] Checking for vagrant instances..'
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Vagrant"
-  if (($(vagrant status) | Select-String 'not created').Count -ne 4) {
+  if (($(vagrant status) | Select-String -Pattern "not[ _]created").Count -ne 4) {
     Write-Error 'You appear to have already created at least one Vagrant instance. This script does not support already created instances. Please either destroy the existing instances or follow the build steps in the README to continue.'
     break
   }
