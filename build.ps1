@@ -165,18 +165,18 @@ function list_providers {
 
 function download_boxes {
   Write-Verbose '[download_boxes] Running..'
-  if ($ProviderName -eq 'virtualbox') {
-    $win10Filename = 'windows_10_virtualbox.box'
-    $win2016Filename = 'windows_2016_virtualbox.box'
+  if ($PackerProvider -eq 'virtualbox') {
     $win10Hash = '30b06e30b36b02ccf1dc5c04017654aa'
     $win2016Hash = '614f984c82b51471b5bb753940b59d38'
   }
-  if ($ProviderName -eq 'vmware') {
-    $win10Filename = 'windows_10_vmware.box'
-    $win2016Filename = 'windows_2016_vmware.box'
+  if ($PackerProvider -eq 'vmware') {
     $win10Hash = '174ad0f0fd2089ff74a880c6dadac74c'
     $win2016Hash = '1511b9dc942c69c2cc5a8dc471fa8865'
   }
+
+  
+  $win10Filename = "windows_10_$PackerProvider.box"
+  $win2016Filename = "windows_2016_$PackerProvider.box"
   
   $wc = New-Object System.Net.WebClient
   Write-Verbose "[download_boxes] Downloading $win10Filename"
@@ -288,7 +288,7 @@ function packer_build_box {
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Packer" 
   Write-Output "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware."
-  &$PackerPath @('build', "--only=$Provider-iso", "$box.json")
+  &$PackerPath @('build', "--only=$PackerProvider-iso", "$box.json")
   Write-Verbose "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE"
 
   if ($LASTEXITCODE -ne 0) {
@@ -302,11 +302,11 @@ function packer_build_box {
 function move_boxes {
   Write-Verbose "[move_boxes] Running.."
   Move-Item -Path $DL_DIR\Packer\*.box -Destination $DL_DIR\Boxes
-  if (-Not (Test-Path "$DL_DIR\Boxes\windows_10_$Provider.box")) {
+  if (-Not (Test-Path "$DL_DIR\Boxes\windows_10_$PackerProvider.box")) {
     Write-Error "Windows 10 box is missing from the Boxes directory. Qutting."
     break
   }
-  if (-Not (Test-Path "$DL_DIR\Boxes\windows_2016_$Provider.box")) {
+  if (-Not (Test-Path "$DL_DIR\Boxes\windows_2016_$PackerProvider.box")) {
     Write-Error "Windows 2016 box is missing from the Boxes directory. Qutting."
     break
   }
@@ -394,10 +394,10 @@ if ($ProviderName -eq $Null -or $ProviderName -eq "") {
 
 # Set Provider variable for use deployment functions
 if ($ProviderName -eq 'vmware_workstation') {
-  $Provider = 'vmware'
+  $PackerProvider = 'vmware'
 }
 else {
-  $Provider = 'virtualbox'
+  $PackerProvider = 'virtualbox'
 }
 
 
