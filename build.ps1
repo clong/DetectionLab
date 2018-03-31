@@ -45,25 +45,14 @@
 [cmdletbinding()]
 Param(
   # Vagrant provider to use.
-  [Parameter(Mandatory=$true)]
   [ValidateSet('virtualbox', 'vmware_workstation')]
   [string]$ProviderName,
   [string]$PackerPath = 'C:\Hashicorp\packer.exe',
   [switch]$VagrantOnly
 )
 
-
 $DL_DIR = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $LAB_HOSTS = ('logger', 'dc', 'wef', 'win10')
-
-# Set Provider variable for use deployment functions
-if ($ProviderName -eq 'vmware_workstation') {
-  $Provider = 'vmware'
-}
-else {
-  $Provider = 'virtualbox'
-}
-
 
 function install_checker {
   param(
@@ -151,23 +140,25 @@ function list_providers {
   [cmdletbinding()]
   param()
 
-  Write-Output 'Available Providers: '
+  Write-Host 'Available Providers: '
   if (check_virtualbox_installed) {
-    Write-Output '[*] virtualbox'
+    Write-Host '[*] virtualbox'
   }
   if (check_vmware_workstation_installed) {
     if (check_vmware_vagrant_plugin_installed) {
-      Write-Output '[*] vmware_workstation' 
+      Write-Host '[*] vmware_workstation' 
     }
   }
   if ((-Not (check_virtualbox_installed)) -and (-Not (check_vmware_workstation_installed))) {
     Write-Error 'You need to install a provider such as VirtualBox or VMware Workstation to continue.'
     break
   }
-  $ProviderName = Read-Host 'Which provider would you like to use?'
-  if ($ProviderName -ne 'virtualbox' -or $ProviderName -ne 'vmware_workstation') {
-    Write-Error "Please choose a valid provider. $ProviderName is not a valid option"
-    break
+  while (-Not ($ProviderName -eq 'virtualbox' -or $ProviderName -eq 'vmware_workstation')) {
+    $ProviderName = Read-Host 'Which provider would you like to use?'
+    Write-Debug "ProviderName = $ProviderName"
+    if (-Not ($ProviderName -eq 'virtualbox' -or $ProviderName -eq 'vmware_workstation')) {
+      Write-Error "Please choose a valid provider. $ProviderName is not a valid option"
+    }
   }
   return $ProviderName
 }
@@ -395,10 +386,20 @@ function post_build_checks {
   }
 }
 
+
 # If no ProviderName was provided, get a provider
-if ($ProviderName -eq $Null) {
+if ($ProviderName -eq $Null -or $ProviderName -eq "") {
   $ProviderName = list_providers
 }
+
+# Set Provider variable for use deployment functions
+if ($ProviderName -eq 'vmware_workstation') {
+  $Provider = 'vmware'
+}
+else {
+  $Provider = 'virtualbox'
+}
+
 
 # Run check functions
 preflight_checks
