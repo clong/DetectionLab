@@ -82,7 +82,7 @@ function install_checker {
 
 function check_packer {
   #Check for packer at $PackerPath
-  if (!(Get-Item $PackerPath)) {
+  if (!(Test-Path $PackerPath)) {
     Write-Error "Packer not found at $PackerPath"
     Write-Output 'Re-run the script setting the PackerPath parameter to the location of packer'
     Write-Output "Example: build.ps1 -PackerPath 'C:\packer.exe'"
