@@ -217,6 +217,16 @@ function preflight_checks {
   if (-Not ($VagrantOnly)) {
     Write-Verbose '[preflight_checks] Checking if packer is installed'
     check_packer
+
+    # Check Packer Version against known bad
+    Write-Verbose '[preflight_checks] Checking for bad packer version..'
+    [System.Version]$PackerVersion = $(& $PackerPath "--version")
+    [System.Version]$PackerKnownBad = 1.1.2
+
+    if ($PackerVersion -eq $PackerKnownBad) {
+      Write-Error 'Packer 1.1.2 is not supported. Please upgrade to a newer version and see https://github.com/hashicorp/packer/issues/5622 for more information.'
+      break
+    }
   }
   Write-Verbose '[preflight_checks] Checking if vagrant is installed'
   check_vagrant
@@ -254,16 +264,6 @@ function preflight_checks {
       Write-Output "[*] $($drive.Name)"
     }
     Write-Output "You can safely ignore this warning if you are deploying DetectionLab to a different drive."
-  }
-
-  # Check Packer Version against known bad
-  Write-Verbose '[preflight_checks] Checking for bad packer version..'
-  [System.Version]$PackerVersion = $(& $PackerPath "--version")
-  [System.Version]$PackerKnownBad = 1.1.2
-
-  if ($PackerVersion -eq $PackerKnownBad) {
-    Write-Error 'Packer 1.1.2 is not supported. Please upgrade to a newer version and see https://github.com/hashicorp/packer/issues/5622 for more information.'
-    break
   }
   
   # Ensure the vagrant-reload plugin is installed
