@@ -1,4 +1,6 @@
 Vagrant/.vagrant/*
+Vagrant/vagrant_build.log
 Packer/packer_cache/*
+Packer/packer_build.log
 Boxes/*
 .DS_Store

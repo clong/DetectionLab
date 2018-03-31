@@ -37,6 +37,7 @@ OSX 10.12.5 | 1.9.3 | 1.0.0 | VMWare Fusion (8.5.8)
 OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.9)
 OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.10)
 Ubuntu 16.04 | 2.0.1 | 1.1.3 | Virtualbox (5.1)
+Ubuntu 16.04 | 2.0.2 | N/A | Virtualbox (5.2)
 
 **Known Bad Versions:**
 * Packer 1.1.2 will fail to build VMWare-ISOs correctly due to [this issue](https://github.com/hashicorp/packer/issues/5622).
@@ -48,15 +49,15 @@ DetectionLab now contains build scripts for \*NIX and MacOS users!
 
 There are two build scripts:
 - `build.sh` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
-- `build_vagrant_only.sh` - Downloads pre-built Packer boxes from S3 and builds the lab from those boxes. This option is recommended if you have more bandwidth than time.
+- `build_vagrant_only.sh` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
 
 ---
 
-## Building from Scratch
+## Building DetectionLab from Scratch
 1. Determine which Vagrant provider you want to use.
   * Note: Virtualbox is free, the [VMWare vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80.
 
-  **NOTE:** If you have more bandwidth than time, you can skip the building of the Packer boxes and download the boxes directly from S3 and put them into the `Boxes` directory:
+  **NOTE:** If you'd like to save time, you can skip the building of the Packer boxes and download the boxes directly from https://detectionlab.network and put them into the `Boxes` directory:
 
 Provider | Box  | URL | MD5 | Size
 ------------|-----|-----|----|----

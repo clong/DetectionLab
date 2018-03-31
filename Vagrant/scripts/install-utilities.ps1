@@ -27,6 +27,8 @@ If ($env:computername -eq "WIN10") {
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
 Write-Host "Determining latest release of Mimikatz..."
+# GitHub requires TLS 1.2 as of 2/27
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $tag = (Invoke-WebRequest "https://api.github.com/repos/gentilkiwi/mimikatz/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $mimikatzDownloadUrl = "https://github.com/gentilkiwi/mimikatz/releases/download/$tag/mimikatz_trunk.zip"
 $mimikatzRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\mimikatz_trunk.zip'

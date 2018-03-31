@@ -41,8 +41,8 @@ else
   # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
   dig @8.8.8.8 splunk.com
   # Download Splunk
-  wget --progress=bar:force -O splunk-7.0.1-2b5b15c4ee89-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.0.1&product=splunk&filename=splunk-7.0.1-2b5b15c4ee89-linux-2.6-amd64.deb&wget=true'
-  dpkg -i splunk-7.0.1-2b5b15c4ee89-linux-2.6-amd64.deb
+  wget --progress=bar:force -O splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.0.2&product=splunk&filename=splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb&wget=true'
+  dpkg -i splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb
   /opt/splunk/bin/splunk start --accept-license
   /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
@@ -90,7 +90,7 @@ go build
 cd /home/vagrant
 
 # Modify the config to work with config importer
-cat /home/vagrant/osquery-configuration/Endpoints/Windows/osquery.conf  | sed 's#packs/#../packs/#g' | grep -v unwanted-chrome-extensions | grep -v security-tooling-checks | grep -v performance-metrics > /home/vagrant/osquery-configuration/Endpoints/Windows/osquery_to_import.conf
+cat /home/vagrant/osquery-configuration/Endpoints/Windows/osquery.conf  | sed 's#packs/#../packs/#g' | grep -v unwanted-chrome-extensions | grep -v security-tooling-checks | grep -v performance-metrics | grep -v logger_snapshot_event_type > /home/vagrant/osquery-configuration/Endpoints/Windows/osquery_to_import.conf
 # Install configimporter
 echo "Installing configimporter"
 echo "Sleeping for 5"

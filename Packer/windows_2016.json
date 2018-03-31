@@ -81,7 +81,7 @@
       "winrm_password": "vagrant",
       "winrm_timeout": "4h",
       "shutdown_command": "a:/sysprep.bat",
-      "guest_os_type": "Windows2012_64",
+      "guest_os_type": "Windows2016_64",
       "guest_additions_mode": "disable",
       "disk_size": 61440,
       "floppy_files": [
