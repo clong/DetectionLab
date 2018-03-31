@@ -26,20 +26,20 @@
   The full path to the packer executable. Default is C:\Hashicorp\packer.exe
 
 .PARAMETER VagrantOnly
-  This switch skips building packer boxes and instead downloads from www.deploymentlab.network
+  This switch skips building packer boxes and instead downloads from www.detectionlab.network
 
 .EXAMPLE
   build.ps1 -ProviderName virtualbox   
 
-  This builds the DeploymentLab using virtualbox and the default path for packer (C:\Hashicorp\packer.exe)
+  This builds the DetectionLab using virtualbox and the default path for packer (C:\Hashicorp\packer.exe)
 .EXAMPLE
   build.ps1 -ProviderName vmware_workstation -PackerPath 'C:\packer.exe'
   
-  This builds the DeploymentLab using Vmware and sets the packer path to 'C:\packer.exe'  
+  This builds the DetectionLab using Vmware and sets the packer path to 'C:\packer.exe'  
 .EXAMPLE
   build.ps1 -ProviderName vmware_workstation -VagrantOnly
 
-  This command builds the DeploymentLab using vmware and skips the packer process, downloading the boxes instead.
+  This command builds the DetectionLab using vmware and skips the packer process, downloading the boxes instead.
 #>
 
 [cmdletbinding()]
