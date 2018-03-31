@@ -54,6 +54,14 @@ Param(
 $DL_DIR = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $LAB_HOSTS = ('logger', 'dc', 'wef', 'win10')
 
+# Register-EngineEvent PowerShell.Exiting -SupportEvent -Action {
+#   Set-Location $DL_DIR
+# }
+
+# Register-ObjectEvent -InputObject ([System.Console]) -EventName CancelKeyPress -Action {
+#   Set-Location $DL_DIR
+# }
+
 function install_checker {
   param(
     [string]$Name 
