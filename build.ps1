@@ -321,7 +321,7 @@ function vagrant_up_host {
   Write-Host "Attempting to bring up the $VagrantHost host using Vagrant"
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Vagrant"
-  &vagrant.exe @('up', $VagrantHost, '--provider', "$Provider")
+  &vagrant.exe @('up', $VagrantHost, '--provider', "$ProviderName")
   Set-Location $CurrentDir
   Write-Verbose "[vagrant_up_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE"
   return $LASTEXITCODE
