@@ -195,9 +195,9 @@ function download_boxes {
   }
 
   Write-Verbose "[download_boxes] Getting filehash for: $win10Filename"
-  $win10Filehash = Get-FileHash -Path "$DL_DIR\Boxes\$win10Filename" -Algorithm MD5
+  $win10Filehash = (Get-FileHash -Path "$DL_DIR\Boxes\$win10Filename" -Algorithm MD5).Hash
   Write-Verbose "[download_boxes] Getting filehash for: $win2016Filename"
-  $win2016Filehash = Get-FileHash -Path "$DL_DIR\Boxes\$win2016Filename" -Algorithm MD5
+  $win2016Filehash = (Get-FileHash -Path "$DL_DIR\Boxes\$win2016Filename" -Algorithm MD5).Hash
 
   Write-Verbose '[download_boxes] Checking Filehashes..'
   if ($win10hash -ne $win10Filehash) {
