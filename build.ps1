@@ -12,7 +12,7 @@
    * If VirtualBox or VMWare are installed
    * If the proper vagrant plugins are available
    * Various aspects of system health
-  
+
    Post deployment it also verifies that services are installed and
    running.
 
@@ -29,13 +29,13 @@
   This switch skips building packer boxes and instead downloads from www.detectionlab.network
 
 .EXAMPLE
-  build.ps1 -ProviderName virtualbox   
+  build.ps1 -ProviderName virtualbox
 
   This builds the DetectionLab using virtualbox and the default path for packer (C:\Hashicorp\packer.exe)
 .EXAMPLE
   build.ps1 -ProviderName vmware_workstation -PackerPath 'C:\packer.exe'
-  
-  This builds the DetectionLab using Vmware and sets the packer path to 'C:\packer.exe'  
+
+  This builds the DetectionLab using Vmware and sets the packer path to 'C:\packer.exe'
 .EXAMPLE
   build.ps1 -ProviderName vmware_workstation -VagrantOnly
 
@@ -64,8 +64,8 @@ $LAB_HOSTS = ('logger', 'dc', 'wef', 'win10')
 
 function install_checker {
   param(
-    [string]$Name 
-  ) 
+    [string]$Name
+  )
   $results = Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | Select-Object DisplayName
   $results += Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | Select-Object DisplayName
 
@@ -94,7 +94,7 @@ function check_vagrant {
   }
   catch {
     Write-Error 'Vagrant was not found. Please correct this before continuing.'
-    break 
+    break
   }
 
   # Check Vagrant version >= 2.0.0
@@ -128,7 +128,7 @@ function check_vmware_workstation_installed {
     Write-Verbose '[check_vmware_workstation_installed] Vmware not found.'
     return $false
   }
-} 
+}
 
 function check_vmware_vagrant_plugin_installed {
   Write-Verbose '[check_vmware_vagrant_plugin_installed] Running..'
@@ -139,7 +139,7 @@ function check_vmware_vagrant_plugin_installed {
   else {
     Write-Host 'VMWare Workstation is installed, but the Vagrant plugin is not.'
     Write-Host 'Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase and install it'
-    Write-Host 'VMWare Workstation will not be listed as a provider until the Vagrant plugin has been installed.'  
+    Write-Host 'VMWare Workstation will not be listed as a provider until the Vagrant plugin has been installed.'
     return $false
   }
 }
@@ -154,7 +154,7 @@ function list_providers {
   }
   if (check_vmware_workstation_installed) {
     if (check_vmware_vagrant_plugin_installed) {
-      Write-Host '[*] vmware_workstation' 
+      Write-Host '[*] vmware_workstation'
     }
   }
   if ((-Not (check_virtualbox_installed)) -and (-Not (check_vmware_workstation_installed))) {
@@ -174,18 +174,17 @@ function list_providers {
 function download_boxes {
   Write-Verbose '[download_boxes] Running..'
   if ($PackerProvider -eq 'virtualbox') {
-    $win10Hash = '30b06e30b36b02ccf1dc5c04017654aa'
-    $win2016Hash = '614f984c82b51471b5bb753940b59d38'
+    $win10Hash = 'd6304f01caa553a18022ea7b5a73ad0d'
+    $win2016Hash = 'b59cf23dfbcdb63c0dc8a98fbc564451'
   }
   if ($PackerProvider -eq 'vmware') {
-    $win10Hash = '174ad0f0fd2089ff74a880c6dadac74c'
-    $win2016Hash = '1511b9dc942c69c2cc5a8dc471fa8865'
+    $win10Hash = '4355e9758a862a6f6349e31fdc3a6078'
+    $win2016Hash = '249fc2472849582d8b736cdabaf0eceb'
   }
 
-  
   $win10Filename = "windows_10_$PackerProvider.box"
   $win2016Filename = "windows_2016_$PackerProvider.box"
-  
+
   $wc = New-Object System.Net.WebClient
   Write-Verbose "[download_boxes] Downloading $win10Filename"
   $wc.DownloadFile("https://www.detectionlab.network/$win10Filename", "$DL_DIR\Boxes\$win10Filename")
@@ -238,11 +237,10 @@ function preflight_checks {
   }
   Write-Verbose '[preflight_checks] Checking if vagrant is installed'
   check_vagrant
-  
+
   Write-Verbose '[preflight_checks] Checking for pre-existing boxes..'
   if ((Get-ChildItem "$DL_DIR\Boxes\*.box").Count -gt 0) {
-    Write-Error 'You appear to have already built at least one box using Packer. This script does not support pre-built boxes. Please either delete the existing boxes or follow the build steps in the README to continue.'
-    break
+    Write-Host 'You seem to have at least one .box file present in the Boxes directory already. If you would like fresh boxes downloaded, please remove all files from the Boxes directory and re-run this script.'
   }
 
   # Check to see that no vagrant instances exist
@@ -259,13 +257,13 @@ function preflight_checks {
   Write-Verbose '[preflight_checks] Checking disk space..'
   $drives = Get-PSDrive | Where-Object {$_.Provider -like '*FileSystem*'}
   $drivesList = @()
-  
+
   forEach ($drive in $drives) {
     if ($drive.free -lt 80GB) {
       $DrivesList = $DrivesList + $drive
     }
   }
-  
+
   if ($DrivesList.Count -gt 0) {
     Write-Output "The following drives have less than 80GB of free space. They should not be used for deploying DetectionLab"
     forEach ($drive in $DrivesList) {
@@ -273,7 +271,7 @@ function preflight_checks {
     }
     Write-Output "You can safely ignore this warning if you are deploying DetectionLab to a different drive."
   }
-  
+
   # Ensure the vagrant-reload plugin is installed
   Write-Verbose '[preflight_checks] Checking if vagrant-reload is installed..'
   if (-Not (vagrant plugin list | Select-String 'vagrant-reload')) {
@@ -294,7 +292,7 @@ function packer_build_box {
 
   Write-Verbose "[packer_build_box] Running for $Box"
   $CurrentDir = Get-Location
-  Set-Location "$DL_DIR\Packer" 
+  Set-Location "$DL_DIR\Packer"
   Write-Output "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware."
   &$PackerPath @('build', "--only=$PackerProvider-iso", "$box.json")
   Write-Verbose "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE"
@@ -356,7 +354,7 @@ function download {
   Write-Verbose "[download] Running for $URL, looking for $PatternToMatch"
   [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
   [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
-  
+
   $wc = New-Object System.Net.WebClient
   $result = $wc.DownloadString($URL)
   if ($result -like "*$PatternToMatch*") {
@@ -370,19 +368,19 @@ function download {
 }
 
 function post_build_checks {
- 
+
   Write-Verbose '[post_build_checks] Running Caldera Check.'
   $CALDERA_CHECK = download -URL 'https://192.168.38.5:8888' -PatternToMatch '<title>CALDERA</title>'
   Write-Verbose "[post_build_checks] Cladera Result: $CALDERA_CHECK"
- 
+
   Write-Verbose '[post_build_checks] Running Splunk Check.'
   $SPLUNK_CHECK = download -URL 'https://192.168.38.5:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
   Write-Verbose "[post_build_checks] Splunk Result: $SPLUNK_CHECK"
- 
+
   Write-Verbose '[post_build_checks] Running Fleet Check.'
   $FLEET_CHECK = download -URL 'https://192.168.38.5:8412' -PatternToMatch 'Kolide Fleet'
   Write-Verbose "[post_build_checks] Fleet Result: $FLEET_CHECK"
- 
+
   if ($CALDERA_CHECK -eq $false) {
     Write-Warning 'Caldera failed post-build tests and may not be functioning correctly.'
   }
@@ -440,7 +438,7 @@ forEach ($VAGRANT_HOST in $LAB_HOSTS) {
       Write-Error "Failed to bring up $VAGRANT_HOST after a reload. Exiting"
       break
     }
-  }  
+  }
   Write-Verbose "[main] Finished for: $VAGRANT_HOST"
 }
 
