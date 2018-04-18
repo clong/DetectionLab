@@ -48,11 +48,16 @@ Ubuntu 16.04 | 2.0.3 | 1.2.1 | Virtualbox (5.2)
 ---
 
 ## Quickstart
-DetectionLab now contains build scripts for \*NIX and MacOS users!
+DetectionLab now contains build scripts for \*NIX, MacOS, and Windows users!
 
-There are two build scripts:
-- `build.sh` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
-- `build_vagrant_only.sh` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
+There is a single build script that supports 3 different options:
+- `./build.sh <virtualbox|vmware_fusion>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
+- `./build.sh <virtualbox|vmware_fusion> --vagrant-only` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
+- `./build.sh <virtualbox|vmware_fusion> --packer-only` - This option only builds the Packer boxes and will not use Vagrant to start up the lab.
+
+Windows users will want to use the following script:
+- `./build.ps1 -ProviderName=<virtualbox|vmware_workstation>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
+- `./build.ps1 -ProviderName=<virtualbox|vmware_workstation> -VagrantOnly` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
 
 ---
 
