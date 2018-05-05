@@ -1,0 +1,102 @@
+# Purpose: Downloads, installs and configures Microsft ATA 1.9
+$title = "Microsoft ATA 1.9"
+$downloadUrl = "http://download.microsoft.com/download/4/9/1/491394D1-3F28-4261-ABC6-C836A301290E/ATA1.9.iso"
+
+# Enable web requests to endpoints with invalid SSL certs (like self-signed certs)
+if (-not("SSLValidator" -as [type])) {
+    add-type -TypeDefinition @"
+using System;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+
+public static class SSLValidator {
+    public static bool ReturnTrue(object sender,
+        X509Certificate certificate,
+        X509Chain chain,
+        SslPolicyErrors sslPolicyErrors) { return true; }
+
+    public static RemoteCertificateValidationCallback GetDelegate() {
+        return new RemoteCertificateValidationCallback(SSLValidator.ReturnTrue);
+    }
+}
+"@
+}
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = [SSLValidator]::GetDelegate()
+
+if (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center"))
+{
+    if (-not (Test-Path "$env:temp\$title.iso"))
+    {
+        Write-Host "Downloading $title..."
+        Invoke-WebRequest -Uri $downloadUrl -OutFile "$env:temp\$title.iso"
+    }
+    $Mount = Mount-DiskImage -ImagePath "$env:temp\$title.iso" -StorageType ISO -Access ReadOnly -PassThru
+    $Volume = $Mount | Get-Volume
+    Write-Host "Installing $title"
+    $Install = Start-Process -Wait -FilePath ($Volume.DriveLetter + ":\Microsoft ATA Center Setup.exe") -ArgumentList "/q --LicenseAccepted NetFrameworkCommandLineArguments=`"/q`" --EnableMicrosoftUpdate" -PassThru
+    $Install
+    $Mount | Dismount-DiskImage -Confirm:$false
+    $body = get-content "C:\vagrant\resources\microsoft_ata\microsoft-ata-config.json"
+    
+    $req = [System.Net.WebRequest]::CreateHttp("https://wef")
+    try 
+    {
+        $req.GetResponse()
+    }
+    catch 
+    {
+        # we don't care about errors here, we just want to get the cert ;)
+    }
+    $ThumbPrint = $req.ServicePoint.Certificate.GetCertHashString()
+    $body = $body -replace "{{THUMBPRINT}}", $ThumbPrint
+    
+    Invoke-RestMethod -uri https://localhost/api/management/systemProfiles/center -body $body -Method Post -UseBasicParsing -UseDefaultCredentials -ContentType "application/json"
+
+}
+
+Start-Sleep -Seconds 60
+
+Invoke-Command -computername dc -Credential (new-object pscredential("windomain\vagrant",(ConvertTo-SecureString -AsPlainText -Force -String "vagrant"))) -ScriptBlock {
+    
+    Write-Host "[$env:computername] Installing ATA Lightweight gateway..."
+    
+    # Enable web requests to endpoints with invalid SSL certs (like self-signed certs)
+    if (-not("SSLValidator" -as [type])) {
+        add-type -TypeDefinition @"
+    using System;
+    using System.Net;
+    using System.Net.Security;
+    using System.Security.Cryptography.X509Certificates;
+    
+    public static class SSLValidator {
+        public static bool ReturnTrue(object sender,
+            X509Certificate certificate,
+            X509Chain chain,
+            SslPolicyErrors sslPolicyErrors) { return true; }
+    
+        public static RemoteCertificateValidationCallback GetDelegate() {
+            return new RemoteCertificateValidationCallback(SSLValidator.ReturnTrue);
+        }
+    }
+"@
+    }
+    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = [SSLValidator]::GetDelegate()
+    
+    Invoke-WebRequest -uri https://wef/api/management/softwareUpdates/gateways/deploymentPackage -UseBasicParsing -OutFile "$env:temp\gatewaysetup.zip" -Credential (new-object pscredential("wef\vagrant",(convertto-securestring -AsPlainText -Force -String "vagrant")))
+    Expand-Archive -Path "$env:temp\gatewaysetup.zip" -DestinationPath "$env:temp\gatewaysetup" -Force
+    
+    Set-Location "$env:temp\gatewaysetup"
+    Start-Process -Wait -FilePath ".\Microsoft ATA Gateway Setup.exe" -ArgumentList "/q NetFrameworkCommandLineArguments=`"/q`" ConsoleAccountName=`"wef\vagrant`" ConsoleAccountPassword=`"vagrant`""
+    # Disable invalid web requests to endpoints with invalid SSL certs again
+    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+}
+
+# set dc as domain synchronizer
+$config = Invoke-RestMethod -Uri "https://localhost/api/management/systemProfiles/gateways" -UseDefaultCredentials -UseBasicParsing
+$config[0].Configuration.DirectoryServicesResolverConfiguration.UpdateDirectoryEntityChangesConfiguration.IsEnabled = $true
+
+Invoke-RestMethod -Uri "https://localhost/api/management/systemProfiles/gateways/$($config[0].Id)" -UseDefaultCredentials -UseBasicParsing -Method Post -ContentType "application/json" -Body ($config[0] | convertto-json -depth 99)
+
+# Disable invalid web requests to endpoints with invalid SSL certs again
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null
