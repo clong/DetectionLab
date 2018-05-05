@@ -349,21 +349,39 @@ function vagrant_reload_host {
 function download {
   param(
     [string]$URL,
-    [string]$PatternToMatch
+    [string]$PatternToMatch,
+    [switch]$SuccessOn401
+
   )
   Write-Verbose "[download] Running for $URL, looking for $PatternToMatch"
   [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
   [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
   $wc = New-Object System.Net.WebClient
-  $result = $wc.DownloadString($URL)
-  if ($result -like "*$PatternToMatch*") {
-    Write-Verbose "[download] Found $PatternToMatch at $URL"
-    return $true
+  try
+  {
+    $result = $wc.DownloadString($URL)
+    if ($result -like "*$PatternToMatch*") {
+      Write-Verbose "[download] Found $PatternToMatch at $URL"
+      return $true
+    }
+    else {
+      Write-Verbose "[download] Could not find $PatternToMatch at $URL"
+      return $false
+    }
   }
-  else {
-    Write-Verbose "[download] Could not find $PatternToMatch at $URL"
-    return $false
+  catch
+  {
+    if ($_.Exception.InnerException.Response.StatusCode -eq 401 -and $SuccessOn401.IsPresent) 
+    {
+      return $true
+    }
+    else 
+    {
+      Write-Verbose "Error occured on webrequest: $_"
+      return $false  
+    }
+
   }
 }
 
@@ -381,6 +399,11 @@ function post_build_checks {
   $FLEET_CHECK = download -URL 'https://192.168.38.5:8412' -PatternToMatch 'Kolide Fleet'
   Write-Verbose "[post_build_checks] Fleet Result: $FLEET_CHECK"
 
+  Write-Verbose '[post_build_checks] Running MS ATA Check.'
+  $ATA_CHECK = download -URL 'https://192.168.38.3' -SuccessOn401 
+  Write-Verbose "[post_build_checks] ATA Result: $ATA_CHECK"
+
+
   if ($CALDERA_CHECK -eq $false) {
     Write-Warning 'Caldera failed post-build tests and may not be functioning correctly.'
   }
@@ -389,6 +412,9 @@ function post_build_checks {
   }
   if ($FLEET_CHECK -eq $false) {
     Write-Warning 'Fleet failed post-build tests and may not be functioning correctly.'
+  }
+  if ($ATA_CHECK -eq $false) {
+    Write-Warning 'MS ATA failed post-build tests and may not be functioning correctly.'
   }
 }
 

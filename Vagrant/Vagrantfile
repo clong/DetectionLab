@@ -57,15 +57,15 @@ Vagrant.configure("2") do |config|
 
     cfg.vm.provider "vmware_fusion" do |v, override|
       override.vm.box = "../Boxes/windows_2016_vmware.box"
-      v.memory = 2048
-      v.cpus = 1
+      v.memory = 6144
+      v.cpus = 2
       v.gui = true
     end
 
     cfg.vm.provider "virtualbox" do |vb, override|
       vb.gui = true
-      vb.customize ["modifyvm", :id, "--memory", 2048]
-      vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--memory", 6144]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
       vb.customize ["modifyvm", :id, "--vram", "32"]
       vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
       vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
@@ -96,18 +96,19 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/configure-pslogstranscriptsshare.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: true
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: true
+    cfg.vm.provision "shell", path: "scripts/install-microsoft-ata.ps1", privileged: true
 
     cfg.vm.provider "vmware_fusion" do |v, override|
       override.vm.box = "../Boxes/windows_2016_vmware.box"
-      v.memory = 2048
-      v.cpus = 1
+      v.memory = 8192
+      v.cpus = 2
       v.gui = true
     end
 
     cfg.vm.provider "virtualbox" do |vb, override|
       vb.gui = true
-      vb.customize ["modifyvm", :id, "--memory", 2048]
-      vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--memory", 8192]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
       vb.customize ["modifyvm", :id, "--vram", "32"]
       vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
       vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]

@@ -9,6 +9,7 @@ Read more about Detection Lab on Medium here: https://medium.com/@clong/introduc
 NOTE: This lab has not been hardened in any way and runs with default vagrant credentials. Please do not connect or bridge it to any networks you care about. This lab is deliberately designed to be insecure; the primary purpose of it is to provide visibility and introspection into each host.
 
 ## Primary Lab Features:
+* Microsoft Advanced Threat Analytics (https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics) is installed on the WEF machine, with the lightweight ATA gateway installed on the DC
 * Splunk forwarders are pre-installed and all indexes are pre-created. Technology add-ons for Windows are also preconfigured.
 * A custom Windows auditing configuration is set via GPO to include command line process auditing and additional OS-level logging
 * [Palantir's Windows Event Forwarding](http://github.com/palantir/windows-event-forwarding)  subscriptions and custom channels are implemented
@@ -18,6 +19,7 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * Mitre's [Caldera](https://github.com/mitre/caldera) server is built on the logger host and the Caldera agent gets pre-installed on all Windows hosts
 * All autostart items are logged to Windows Event Logs via [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog)
 * SMBv1 Auditing is enabled
+
 
 ## Requirements
 * 55GB+ of free disk space
@@ -124,6 +126,7 @@ Vagrant commands must be run from the "Vagrant" folder.
 * Fleet login: https://192.168.38.5:8412 - admin:admin123#
 * Splunk login: https://192.168.38.5:8000 - admin:changeme
 * Caldera login: https://192.168.38.5:8888 - admin:caldera
+* MS ATA login: https://192.168.38.3 - wef\vagrant:vagrant
 
 ## Lab Hosts
 * DC - Windows 2016 Domain Controller
@@ -134,7 +137,9 @@ Vagrant commands must be run from the "Vagrant" folder.
   * osquery
   * Splunk Universal Forwarder (Forwards Sysmon & osquery)
   * Sysinternals Tools
+  * Microsft Advanced Threat Analytics Lightweight Gateway
 * WEF - Windows 2016 Server
+  * Microsoft Advanced Threat Analytics
   * Windows Event Collector
   * Windows Event Subscription Creation
   * Powershell transcription logging share
@@ -235,7 +240,8 @@ Requests for tools and features will be reviewed on a case by case basis, but I 
 ## Credits/Resources
 A sizable percentage of this code was borrowed and adapted from [Stefan Scherer](https://twitter.com/stefscherer)'s [packer-windows](https://github.com/StefanScherer/packer-windows) and [adfs2](https://github.com/StefanScherer/adfs2) Github repos. A huge thanks to him for building the foundation that allowed me to design this lab environment.
 
-# Acknowledgements
+# Acknowledgements 
+* [Microsoft Advanced Threat Analytics](https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics)
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)
 * [Fleet](https://kolide.co/fleet)
