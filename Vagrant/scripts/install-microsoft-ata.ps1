@@ -1,6 +1,7 @@
 # Purpose: Downloads, installs and configures Microsft ATA 1.9
 $title = "Microsoft ATA 1.9"
 $downloadUrl = "http://download.microsoft.com/download/4/9/1/491394D1-3F28-4261-ABC6-C836A301290E/ATA1.9.iso"
+$fileHash = "DC1070A9E8F84E75198A920A2E00DDC3CA8D12745AF64F6B161892D9F3975857" # Use Get-FileHash on a correct downloaded file to get the hash
 
 # Enable web requests to endpoints with invalid SSL certs (like self-signed certs)
 if (-not("SSLValidator" -as [type])) {
@@ -26,10 +27,30 @@ public static class SSLValidator {
 
 if (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center"))
 {
-    if (-not (Test-Path "$env:temp\$title.iso"))
+    $download = $false
+    if (-not (Test-Path "$env:temp\$title.iso")) 
+    {
+        Write-Host "$title.iso doesn't exist yet, downloading..."
+        $download = $true
+    }
+    else
+    {
+        $actualHash = (Get-FileHash -Algorithm SHA256 -Path "$env:temp\$title.iso").Hash
+        If (-not ($actualHash -eq $fileHash))
+        {
+            Write-Host "$title.iso exists, but has wrong hash, downloading..."
+            $download = $true
+        } 
+    }
+    if ($download -eq $true)
     {
         Write-Host "Downloading $title..."
         Invoke-WebRequest -Uri $downloadUrl -OutFile "$env:temp\$title.iso"
+        $actualHash = (Get-FileHash -Algorithm SHA256 -Path "$env:temp\$title.iso").Hash 
+        If (-not ($actualHash -eq $fileHash))
+        {
+            throw "$title.iso was not downloaded correctly: hash from downloaded file: $actualHash, should've been: $fileHash"
+        }
     }
     $Mount = Mount-DiskImage -ImagePath "$env:temp\$title.iso" -StorageType ISO -Access ReadOnly -PassThru
     $Volume = $Mount | Get-Volume

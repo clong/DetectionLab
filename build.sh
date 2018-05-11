@@ -253,8 +253,8 @@ post_build_checks() {
   CALDERA_CHECK=$(curl -ks -m 2 https://192.168.38.5:8888 | grep -c '302: Found' || echo "")
   SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.38.5:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk' || echo "")
   FLEET_CHECK=$(curl -ks -m 2 https://192.168.38.5:8412 | grep -c 'Kolide Fleet' || echo "")
-  curl --fail -ks https://192.168.38.3 -m 2
-  ATA_CHECK=$([[ $? == 22 ]] && echo 1)
+  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.38.3 -m 2)
+  [[ $ATA_CHECK == 401 ]] && ATA_CHECK=1
 
   BASH_MAJOR_VERSION=$(/bin/bash --version | grep 'GNU bash' | grep -o version\.\.. | cut -d ' ' -f 2 | cut -d '.' -f 1)
   # Associative arrays are only supported in bash 4 and up
