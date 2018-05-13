@@ -19,7 +19,7 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * Mitre's [Caldera](https://github.com/mitre/caldera) server is built on the logger host and the Caldera agent gets pre-installed on all Windows hosts
 * All autostart items are logged to Windows Event Logs via [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog)
 * SMBv1 Auditing is enabled
-
+ test
 
 ## Requirements
 * 55GB+ of free disk space
