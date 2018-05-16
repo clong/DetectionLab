@@ -10,4 +10,8 @@ If (-not (Test-Path "C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe"))
 } Else {
   Write-Host "Splunk is already installed. Moving on."
 }
+If ((Get-Service -name splunkforwarder).Status -ne "Running")
+{
+  throw "Splunk forwarder service not running"
+}
 Write-Host "Splunk installation complete!"

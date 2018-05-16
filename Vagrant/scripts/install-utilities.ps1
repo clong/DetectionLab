@@ -21,8 +21,14 @@ apm install language-docker
 
 # Disable Windows Defender realtime scanning before downloading Mimikatz
 If ($env:computername -eq "WIN10") {
-  set-MpPreference -DisableRealtimeMonitoring $true
+  If (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender")
+  {
+    Remove-Item "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Recurse -Force
+  }
+  gpupdate /force | Out-String
   Set-MpPreference -ExclusionPath C:\commander.exe, C:\Tools
+  set-MpPreference -DisableRealtimeMonitoring $true
+  
 }
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
@@ -31,6 +37,19 @@ Write-Host "Determining latest release of Mimikatz..."
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $tag = (Invoke-WebRequest "https://api.github.com/repos/gentilkiwi/mimikatz/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $mimikatzDownloadUrl = "https://github.com/gentilkiwi/mimikatz/releases/download/$tag/mimikatz_trunk.zip"
+
 $mimikatzRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\mimikatz_trunk.zip'
-Invoke-WebRequest -Uri "$mimikatzDownloadUrl" -OutFile $mimikatzRepoPath
-Expand-Archive -path "$mimikatzRepoPath" -destinationpath 'c:\Tools\Mimikatz' -Force
+if (-not (Test-Path $mimikatzRepoPath))
+{
+  Invoke-WebRequest -Uri "$mimikatzDownloadUrl" -OutFile $mimikatzRepoPath
+  Expand-Archive -path "$mimikatzRepoPath" -destinationpath 'c:\Tools\Mimikatz' -Force
+}
+else
+{
+  Write-Host "Mimikatz was already installed. Moving On."
+}
+# Enable realtime monitoring again, now that exclusion is set for mimikatz
+If ($env:computername -eq "WIN10") {
+  set-MpPreference -DisableRealtimeMonitoring $false
+}
+Write-Host "Utilties installation complete!"
