@@ -1,16 +1,17 @@
 # Purpose: Installs the Caldera agent on the host
 
-# Add /etc/hosts entry
-Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.5    logger"
+if (-not (Test-Path 'C:\Program Files\cagent\cagent.exe'))
+{
+  # Add /etc/hosts entry
+  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.5    logger"
 
-# Make the directory
-New-Item "c:\Program Files\cagent" -type directory
+  # Make the directory
+  New-Item "c:\Program Files\cagent" -type directory
 
-# Install Visual Studio 2015 C++ Redistributable
-choco install -y vcredist2015
+  # Install Visual Studio 2015 C++ Redistributable
+  choco install -y vcredist2015
 
-# Download cagent and start the service
-If (-not (Test-Path "C:\Program Files\cagent\cagent.exe")) {
+  # Download cagent and start the service
   Write-Host "Downloading Caldera Agent (cagent.exe)"
   $cagentPath = "C:\Program Files\cagent\cagent.exe"
   $cagentConfPath = "C:\Program Files\cagent\conf.yml"
@@ -21,8 +22,12 @@ If (-not (Test-Path "C:\Program Files\cagent\cagent.exe")) {
   # https://stackoverflow.com/questions/34331206/ignore-ssl-warning-with-powershell-downloadstring
   [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true} ;(New-Object System.Net.WebClient).DownloadFile('https://logger:8888/conf.yml', $cagentConfPath)
   Start-Process -FilePath $cagentPath -ArgumentList '--startup', 'auto', 'install' -Wait
-  Start-Process -FilePath $cagentPath -ArgumentList 'start' -Wait
+  Start-Process -FilePath $cagentPath -ArgumentList 'start' -Wait  
 } Else {
   Write-Host "Caldera Agent is already installed. Moving on."
+}
+If ((Get-Service -name cagent).Status -ne "Running")
+{
+  throw "Caldera Agent service not running"
 }
 Write-Host "Cagent installation complete!"

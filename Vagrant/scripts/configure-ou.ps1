@@ -2,10 +2,23 @@
 Write-Host "Sleeping for 30 seconds, then creating Server and Workstation OUs"
 Start-Sleep 30
 Write-Host "Creating Servers OU"
-New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
+if (!([ADSI]::Exists("LDAP://OU=Servers,DC=windomain,DC=local")))
+{    
+    New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
+}
+else
+{
+    Write-Host "Servers OU already exists. Moving On."
+}
 Write-Host "Creating Workstations OU"
-New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
-
+if (!([ADSI]::Exists("LDAP://OU=Workstations,DC=windomain,DC=local")))
+{
+    New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
+}
+else
+{
+    Write-Host "Workstations OU already exists. Moving On."
+}
 # Sysprep breaks auto-login. Let's restore it here:
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name AutoAdminLogon -Value 1
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name DefaultUserName -Value "vagrant"

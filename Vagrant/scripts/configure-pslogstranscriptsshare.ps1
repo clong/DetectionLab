@@ -1,7 +1,10 @@
 # Purpose: Configure an SMB share for Powershell transcription logs to be written to
 # Source: https://blogs.msdn.microsoft.com/powershell/2015/06/09/powershell-the-blue-team/
 Write-Host "Configuring the Powershell Transcripts Share"
-md c:\pslogs
+If (-not (Test-Path c:\pslogs))
+{
+    md c:\pslogs
+}
 
 
 ## Kill all inherited permissions
@@ -39,4 +42,7 @@ $acl | Set-Acl c:\pslogs\
 
 ## Create the SMB Share, granting Everyone the right to read and write files. Specific
 ## actions will actually be enforced by the ACL on the file folder.
-New-SmbShare -Name pslogs -Path c:\pslogs -ChangeAccess Everyone
+if ((Get-SmbShare -Name pslogs -ea silent) -eq $null)
+{
+    New-SmbShare -Name pslogs -Path c:\pslogs -ChangeAccess Everyone
+}

@@ -104,11 +104,30 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
     }
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = [SSLValidator]::GetDelegate()
     
-    Invoke-WebRequest -uri https://wef/api/management/softwareUpdates/gateways/deploymentPackage -UseBasicParsing -OutFile "$env:temp\gatewaysetup.zip" -Credential (new-object pscredential("wef\vagrant",(convertto-securestring -AsPlainText -Force -String "vagrant")))
-    Expand-Archive -Path "$env:temp\gatewaysetup.zip" -DestinationPath "$env:temp\gatewaysetup" -Force
-    
-    Set-Location "$env:temp\gatewaysetup"
-    Start-Process -Wait -FilePath ".\Microsoft ATA Gateway Setup.exe" -ArgumentList "/q NetFrameworkCommandLineArguments=`"/q`" ConsoleAccountName=`"wef\vagrant`" ConsoleAccountPassword=`"vagrant`""
+    If (-not (Test-Path "$env:temp\gatewaysetup.zip"))
+    {
+        Invoke-WebRequest -uri https://wef/api/management/softwareUpdates/gateways/deploymentPackage -UseBasicParsing -OutFile "$env:temp\gatewaysetup.zip" -Credential (new-object pscredential("wef\vagrant",(convertto-securestring -AsPlainText -Force -String "vagrant")))
+        Expand-Archive -Path "$env:temp\gatewaysetup.zip" -DestinationPath "$env:temp\gatewaysetup" -Force
+    }
+    else
+    {
+        Write-Host "[$env:computername] Gateway setup already downloaded. Moving On."
+    }
+    if (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics"))
+    {
+        Set-Location "$env:temp\gatewaysetup"    
+        Start-Process -Wait -FilePath ".\Microsoft ATA Gateway Setup.exe" -ArgumentList "/q NetFrameworkCommandLineArguments=`"/q`" ConsoleAccountName=`"wef\vagrant`" ConsoleAccountPassword=`"vagrant`""
+    }
+    else 
+    {
+        Write-Host "[$env:computername] ATA Gateway already installed. Moving On."
+    }
+    Write-Host "Sleeping 5 minutes to allow ATA gateway to start up..."
+    Start-Sleep -Seconds 300
+    If ((Get-Service "ATAGateway").Status -ne "Running")
+    {
+        throw "ATA lightweight gateway not running"
+    }
     # Disable invalid web requests to endpoints with invalid SSL certs again
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null
 }
@@ -121,3 +140,8 @@ Invoke-RestMethod -Uri "https://localhost/api/management/systemProfiles/gateways
 
 # Disable invalid web requests to endpoints with invalid SSL certs again
 [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null
+
+If ((Get-Service -name "ATACenter").Status -ne "Running")
+{
+    throw "MS ATA service was not running."
+}
