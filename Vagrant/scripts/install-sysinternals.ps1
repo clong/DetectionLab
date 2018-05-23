@@ -32,14 +32,8 @@ Invoke-WebRequest -Uri "https://live.sysinternals.com/Sysmon64.exe" -Outfile $sy
 Invoke-WebRequest -Uri "https://live.sysinternals.com/Tcpview.exe" -Outfile $tcpviewPath
 Copy-Item $sysmonPath $sysmonDir
 
-# Download SwiftOnSecurity's Sysmon config
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml" -Outfile "$sysmonConfigPath"
-
-# Convert Sysmon config schema from 3.30 to 4.0 per GitHub Issue #38
-(Get-Content $sysmonConfigPath) -replace 'schemaversion="3.30"', 'schemaversion="4.00"' | Set-Content $sysmonConfigPath
-
-# Convert Schema from 3.30 to 4.0 per GitHub Issue #38
-(Get-Content $sysmonConfigPath) -replace 'schemaversion="3.30"', 'schemaversion="4.00"' | Set-Content $sysmonConfigPath
+# Download Olaf Hartong's Sysmon config
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/olafhartong/sysmon-modular/master/sysmonconfig.xml" -Outfile "$sysmonConfigPath"
 
 # Startup Sysmon
 Write-Host "Starting Sysmon..."
