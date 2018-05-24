@@ -34,7 +34,6 @@ OS | Vagrant | Packer | Provider
 ---|---------|--------|-----------
 OSX 10.12.4 | 1.9.3 | 1.0.0 | Virtualbox (5.1.14)
 OSX 10.12.6 | 2.0.1 | 1.1.2 | Virtualbox (5.1.30)
-OSX 10.13.4 | 2.0.1 | 1.2.3 | Virtualbox (5.2.6)
 OSX 10.12.4 | 1.9.2 | 1.0.0 | VMWare Fusion (8.5.6)
 OSX 10.12.5 | 1.9.3 | 1.0.0 | VMWare Fusion (8.5.8)
 OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.9)
@@ -241,7 +240,7 @@ Requests for tools and features will be reviewed on a case by case basis, but I 
 ## Credits/Resources
 A sizable percentage of this code was borrowed and adapted from [Stefan Scherer](https://twitter.com/stefscherer)'s [packer-windows](https://github.com/StefanScherer/packer-windows) and [adfs2](https://github.com/StefanScherer/adfs2) Github repos. A huge thanks to him for building the foundation that allowed me to design this lab environment.
 
-# Acknowledgements
+# Acknowledgements 
 * [Microsoft Advanced Threat Analytics](https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics)
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)
