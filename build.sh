@@ -373,6 +373,7 @@ choose_md5_tool() {
 
 # Downloads pre-built Packer boxes from detectionlab.network to save time during CI builds
 download_boxes() {
+  choose_md5_tool
   if [ "$PROVIDER" == "virtualbox" ]; then
     wget "https://www.detectionlab.network/windows_2016_virtualbox.box" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
     wget "https://www.detectionlab.network/windows_10_virtualbox.box" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
