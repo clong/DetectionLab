@@ -41,9 +41,11 @@ else
   # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
   dig @8.8.8.8 splunk.com
   # Download Splunk
-  wget --progress=bar:force -O splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.0.2&product=splunk&filename=splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb&wget=true'
-  dpkg -i splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb
-  /opt/splunk/bin/splunk start --accept-license
+  wget --progress=bar:force -O splunk-7.1.1-8f0ead9ec3db-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.1.1&product=splunk&filename=splunk-7.1.1-8f0ead9ec3db-linux-2.6-amd64.deb&wget=true'
+  dpkg -i splunk-7.1.1-8f0ead9ec3db-linux-2.6-amd64.deb
+  # Setup admin user with default credentials admin:changeme
+  cp /opt/splunk/etc/system/README/user-seed.conf.example /opt/splunk/etc/system/local/user-seed.conf
+  /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt
   /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index osquery-status -auth 'admin:changeme'
