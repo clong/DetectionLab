@@ -36,10 +36,14 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel]
 "{20D04FE0-3AEA-1069-A2D8-08002B30309D}"=dword:00000000
- 
+
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu]
 "{20D04FE0-3AEA-1069-A2D8-08002B30309D}"=dword:00000000
 
 # Enable Developer Mode (prerequisite for Linux subsystem)
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock]
 "AllowDevelopmentWithoutDevLicense"=dword:00000001
+
+# Disable Microsoft People icon from taskbar
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People]
+"PeopleBand"=dword:00000000

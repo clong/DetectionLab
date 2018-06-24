@@ -3,8 +3,7 @@
 Write-Host "Installing AutorunsToWinEventLog..."
 If ((Get-ScheduledTask -TaskName "AutorunsToWinEventLog" -ea silent) -eq $null)
 {
-    cd "c:\Users\vagrant\AppData\Local\Temp\windows-event-forwarding-master\AutorunsToWinEventLog"
-    .\Install.ps1
+    . c:\Users\vagrant\AppData\Local\Temp\windows-event-forwarding-master\AutorunsToWinEventLog\Install.ps1
     Write-Host "AutorunsToWinEventLog installed. Starting the scheduled task. Future runs will begin at 11am"
     Start-ScheduledTask -TaskName "AutorunsToWinEventLog"
     $Tsk = Get-ScheduledTask -TaskName "AutorunsToWinEventLog"
@@ -13,7 +12,7 @@ If ((Get-ScheduledTask -TaskName "AutorunsToWinEventLog" -ea silent) -eq $null)
         throw "AutorunsToWinEventLog scheduled tasks wasn't running after starting it"
     }
 }
-else 
+else
 {
     Write-Host "AutorunsToWinEventLog already installed. Moving On."
 }

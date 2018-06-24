@@ -1,5 +1,5 @@
 Vagrant/.vagrant/*
-Vagrant/vagrant_build.log
+Vagrant/vagrant*.log
 Packer/packer_cache/*
 Packer/packer_build.log
 Boxes/*
