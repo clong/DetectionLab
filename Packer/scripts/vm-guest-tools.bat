@@ -1,8 +1,8 @@
 if not exist "C:\Windows\Temp\7z920-x64.msi" (
-    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://www.7-zip.org/a/7z920-x64.msi', 'C:\Windows\Temp\7z920-x64.msi')" <NUL
+    powershell -Command "Start-Sleep 5; Invoke-WebRequest -Uri 'https://astuteinternet.dl.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920-x64.msi' -Outfile 'C:\Windows\Temp\7z920-x64.msi'" <NUL
 )
 if not exist "C:\Windows\Temp\7z920-x64.msi" (
-    powershell -Command "Start-Sleep 5 ; (New-Object System.Net.WebClient).DownloadFile('http://www.7-zip.org/a/7z920-x64.msi', 'C:\Windows\Temp\7z920-x64.msi')" <NUL
+    powershell -Command "Start-Sleep 5; Invoke-WebRequest -Uri 'http://www.7-zip.org/a/7z920-x64.msi' -Outfile 'C:\Windows\Temp\7z920-x64.msi')" <NUL
 )
 msiexec /qb /i C:\Windows\Temp\7z920-x64.msi
 
