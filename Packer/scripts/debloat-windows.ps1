@@ -14,6 +14,9 @@ if ($env:PACKER_BUILDER_TYPE -And $($env:PACKER_BUILDER_TYPE).startsWith("hyperv
   #. $env:TEMP\Debloat-Windows-10-master\scripts\block-telemetry.ps1
   #Write-Host Disable services
   #. $env:TEMP\Debloat-Windows-10-master\scripts\disable-services.ps1
+  Write-host Disable Windows Defender
+  #. $env:TEMP\Debloat-Windows-10-master\scripts\disable-windows-defender.ps1
+  Uninstall-WindowsFeature Windows-Defender-Features
   Write-host Optimize Windows Update
   . $env:TEMP\Debloat-Windows-10-master\scripts\optimize-windows-update.ps1
   #Write-host Disable Windows Update

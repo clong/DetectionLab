@@ -24,25 +24,28 @@ $sysmonPath = "C:\Tools\Sysinternals\Sysmon64.exe"
 $tcpviewPath = "C:\Tools\Sysinternals\Tcpview.exe"
 $sysmonConfigPath = "$sysmonDir\sysmonConfig.xml"
 
+
+# Microsoft likes TLSv1.2 as well
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Write-Host "Downloading Autoruns64.exe..."
-Invoke-WebRequest -Uri "https://live.sysinternals.com/Autoruns64.exe" -OutFile $autorunsPath
+(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Autoruns64.exe', $autorunsPath)
 Write-Host "Downloading Procmon.exe..."
-Invoke-WebRequest -Uri "https://live.sysinternals.com/Procmon.exe" -OutFile $procmonPath
+(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Procmon.exe', $procmonPath)
 Write-Host "Downloading PsExec64.exe..."
-Invoke-WebRequest -Uri "https://live.sysinternals.com/PsExec64.exe" -OutFile $psexecPath
+(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/PsExec64.exe', $psexecPath)
 Write-Host "Downloading procexp64.exe..."
-Invoke-WebRequest -Uri "https://live.sysinternals.com/procexp64.exe" -OutFile $procexpPath
+(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/procexp64.exe', $procexpPath)
 Write-Host "Downloading Sysmon64.exe..."
-Invoke-WebRequest -Uri "https://live.sysinternals.com/Sysmon64.exe" -Outfile $sysmonPath
+(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Sysmon64.exe', $sysmonPath)
 Write-Host "Downloading Tcpview.exe..."
-Invoke-WebRequest -Uri "https://live.sysinternals.com/Tcpview.exe" -Outfile $tcpviewPath
+(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Tcpview.exe', $tcpviewPath)
 Copy-Item $sysmonPath $sysmonDir
 
 # Download SwiftOnSecurity's Sysmon config
 Write-Host "Downloading SwiftOnSecurity's Sysmon config..."
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml" -Outfile "$sysmonConfigPath"
-# Alternative: Download Olaf Hartong's Sysmon config (more CPU intensive)
-#Invoke-WebRequest -Uri "https://raw.githubusercontent.com/olafhartong/sysmon-modular/master/sysmonconfig.xml" -Outfile "$sysmonConfigPath"
+(New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml', "$sysmonConfigPath")
+# Alternative: Download Olaf Hartongs Sysmon config (more CPU intensive)
+# (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/olafhartong/sysmon-modular/master/sysmonconfig.xml, "$sysmonConfigPath"
 
 # Start Sysmon
 Write-Host "Starting Sysmon..."

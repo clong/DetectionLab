@@ -1,9 +1,8 @@
 # Purpose: Sets up the Server and Workstations OUs
-Write-Host "Sleeping for 30 seconds, then creating Server and Workstation OUs"
-Start-Sleep 30
-Write-Host "Creating Servers OU"
+Write-Host "Creating Server and Workstation OUs..."
+Write-Host "Creating Servers OU..."
 if (!([ADSI]::Exists("LDAP://OU=Servers,DC=windomain,DC=local")))
-{    
+{
     New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
 }
 else
