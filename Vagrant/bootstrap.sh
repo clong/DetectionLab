@@ -8,6 +8,22 @@ echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.
 apt-get update
 apt-get install -y jq whois build-essential git docker docker-compose unzip mongodb-org
 
+# Fix static IP if it's not set correctly
+ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
+if [ "$ETH1_IP" != "192.168.38.5" ]; then
+  echo "Incorrect IP Address settings detected. Attempting to fix."
+  ifdown eth1
+  ip addr flush dev eth1
+  ifup eth1
+  ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
+  if [ "$ETH1_IP" == "192.168.38.5" ]; then
+    echo "The static IP has been fixed and set to 192.168.38.5"
+  else
+    echo "Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
+    exit 1
+  fi
+fi
+
 # Install Python 3.6.4
 echo "Installing Python v3.6.4..."
 wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
@@ -41,9 +57,9 @@ else
   # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
   dig @8.8.8.8 splunk.com
   # Download Splunk
-  wget --progress=bar:force -O splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.0.2&product=splunk&filename=splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb&wget=true'
-  dpkg -i splunk-7.0.2-03bbabbd5c0f-linux-2.6-amd64.deb
-  /opt/splunk/bin/splunk start --accept-license
+  wget --progress=bar:force -O splunk-7.1.1-8f0ead9ec3db-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.1.1&product=splunk&filename=splunk-7.1.1-8f0ead9ec3db-linux-2.6-amd64.deb&wget=true'
+  dpkg -i splunk-7.1.1-8f0ead9ec3db-linux-2.6-amd64.deb
+  /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
   /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
   /opt/splunk/bin/splunk add index osquery-status -auth 'admin:changeme'
@@ -73,6 +89,7 @@ git clone https://github.com/kolide/kolide-quickstart.git
 cd kolide-quickstart
 cp /vagrant/resources/fleet/server.* .
 sed -i 's/ -it//g' demo.sh
+sed -i 's#kolide/fleet:latest#kolide/fleet:1.0.8#g' docker-compose.yml
 ./demo.sh up simple
 # Set the enrollment secret to match what we deploy to Windows hosts
 docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u kolide --password=kolide -e 'update app_configs set osquery_enroll_secret = "enrollmentsecret" where id=1;' --batch kolide

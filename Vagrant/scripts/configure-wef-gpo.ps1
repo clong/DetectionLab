@@ -54,7 +54,7 @@ else
 {
     Write-Host "GpLink $GPOName already linked on $OU. Moving On."
 }
-$OU = "ou=Workstations,dc=windomain,dc=local" 
+$OU = "ou=Workstations,dc=windomain,dc=local"
 $gPLinks = Get-ADOrganizationalUnit -Identity $OU -Properties name,distinguishedName, gPLink, gPOptions
 $GPO = Get-GPO -Name $GPOName
 If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
@@ -67,7 +67,3 @@ else
 }
 
 gpupdate /force
-# Enable WinRM
-Write-Host "Enabling WinRM"
-winrm qc /q:true
-Write-Host "Rebooting to make settings take effect..."

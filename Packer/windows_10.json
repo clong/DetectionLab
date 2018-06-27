@@ -135,8 +135,8 @@
       "type": "powershell",
       "scripts": [
         "./scripts/debloat-windows.ps1",
-        "./scripts/MakeWindows10GreatAgain.ps1",
-        "./scripts/rearm-windows.ps1"
+        "./scripts/rearm-windows.ps1",
+        "./scripts/MakeWindows10GreatAgain.ps1"
       ]
     },
     {
@@ -170,9 +170,9 @@
     }
   ],
   "variables": {
-    "iso_url": "http://care.dlservice.microsoft.com/dl/download/B/8/B/B8B452EC-DD2D-4A8F-A88C-D2180C177624/15063.0.170317-1834.RS2_RELEASE_CLIENTENTERPRISEEVAL_OEMRET_X64FRE_EN-US.ISO",
-    "iso_checksum_type": "sha1",
-    "iso_checksum": "6c60f91bf0ad7b20f469ab8f80863035c517f34f",
+    "iso_checksum": "27e4feb9102f7f2b21ebdb364587902a70842fb550204019d1a14b120918e455",
+    "iso_checksum_type": "sha256",
+    "iso_url": "https://software-download.microsoft.com/download/pr/17134.1.180410-1804.rs4_release_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
     "autounattend": "./answer_files/10/Autounattend.xml",
     "disk_size": "61440"
   }

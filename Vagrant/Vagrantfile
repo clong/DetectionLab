@@ -12,6 +12,12 @@ Vagrant.configure("2") do |config|
       v.gui = true
     end
 
+    cfg.vm.provider "vmware_desktop" do |v, override|
+      v.memory = 2048
+      v.cpus = 1
+      v.gui = true
+    end
+
     cfg.vm.provider "virtualbox" do |vb, override|
       vb.gui = true
       vb.customize ["modifyvm", :id, "--memory", 2048]
@@ -25,15 +31,16 @@ Vagrant.configure("2") do |config|
   config.vm.define "dc" do |cfg|
     cfg.vm.box = "../Boxes/windows_2016_virtualbox.box"
     cfg.vm.hostname = "dc"
-
+    cfg.vm.boot_timeout = 600
     # use the plaintext WinRM transport and force it to use basic authentication.
     # NB this is needed because the default negotiate transport stops working
     #    after the domain controller is installed.
     #    see https://groups.google.com/forum/#!topic/vagrant-up/sZantuCM0q4
     cfg.winrm.transport = :plaintext
-    cfg.winrm.basic_auth_only = true
-
     cfg.vm.communicator = "winrm"
+    cfg.winrm.basic_auth_only = true
+    cfg.winrm.timeout = 300
+    cfg.winrm.retry_limit = 20
     cfg.vm.network :private_network, ip: "192.168.38.2", gateway: "192.168.38.1"
 
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "192.168.38.2"
@@ -51,11 +58,18 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/configure-ou.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/configure-wef-gpo.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/configure-powershelllogging.ps1", privileged: true
-    cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/configure-AuditingPolicyGPOs.ps1", privileged: true
+    cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: true
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: true
 
     cfg.vm.provider "vmware_fusion" do |v, override|
+      override.vm.box = "../Boxes/windows_2016_vmware.box"
+      v.memory = 2560
+      v.cpus = 2
+      v.gui = true
+    end
+
+    cfg.vm.provider "vmware_desktop" do |v, override|
       override.vm.box = "../Boxes/windows_2016_vmware.box"
       v.memory = 2560
       v.cpus = 2
@@ -75,8 +89,11 @@ Vagrant.configure("2") do |config|
   config.vm.define "wef" do |cfg|
     cfg.vm.box = "../Boxes/windows_2016_virtualbox.box"
     cfg.vm.hostname = "wef"
-
+    cfg.vm.boot_timeout = 600
     cfg.vm.communicator = "winrm"
+    cfg.winrm.basic_auth_only = true
+    cfg.winrm.timeout = 300
+    cfg.winrm.retry_limit = 20
     cfg.vm.network :private_network, ip: "192.168.38.3", gateway: "192.168.38.1", dns: "192.168.38.2"
 
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.3 -dns 192.168.38.2"
@@ -105,6 +122,13 @@ Vagrant.configure("2") do |config|
       v.gui = true
     end
 
+    cfg.vm.provider "vmware_desktop" do |v, override|
+      override.vm.box = "../Boxes/windows_2016_vmware.box"
+      v.memory = 2048
+      v.cpus = 2
+      v.gui = true
+    end
+
     cfg.vm.provider "virtualbox" do |vb, override|
       vb.gui = true
       vb.customize ["modifyvm", :id, "--memory", 2048]
@@ -118,8 +142,10 @@ Vagrant.configure("2") do |config|
   config.vm.define "win10" do |cfg|
     cfg.vm.box = "../Boxes/windows_10_virtualbox.box"
     cfg.vm.hostname = "win10"
-
     cfg.vm.communicator = "winrm"
+    cfg.winrm.basic_auth_only = true
+    cfg.winrm.timeout = 300
+    cfg.winrm.retry_limit = 20
     cfg.vm.network :private_network, ip: "192.168.38.4", gateway: "192.168.38.1", dns: "192.168.38.2"
 
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.4 -dns 192.168.38.2"
@@ -141,6 +167,15 @@ Vagrant.configure("2") do |config|
       v.vmx["gui.fullscreenatpoweron"] = "FALSE"
       v.vmx["gui.viewModeAtPowerOn"] = "windowed"
       v.vmx["gui.fitguestusingnativedisplayresolution"] = "FALSE"
+      v.memory = 2048
+      v.cpus = 1
+      v.gui = true
+    end
+
+    cfg.vm.provider "vmware_desktop" do |v, override|
+      override.vm.box = "../Boxes/windows_10_vmware.box"
+      v.vmx["gui.fullscreenatpoweron"] = "FALSE"
+      v.vmx["gui.viewModeAtPowerOn"] = "windowed"
       v.memory = 2048
       v.cpus = 1
       v.gui = true

@@ -1,5 +1,8 @@
 if not exist "C:\Windows\Temp\7z920-x64.msi" (
-    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://www.7-zip.org/a/7z920-x64.msi', 'C:\Windows\Temp\7z920-x64.msi')" <NUL
+    powershell -Command "Start-Sleep 5; Invoke-WebRequest -Uri 'https://astuteinternet.dl.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920-x64.msi' -Outfile 'C:\Windows\Temp\7z920-x64.msi'" <NUL
+)
+if not exist "C:\Windows\Temp\7z920-x64.msi" (
+    powershell -Command "Start-Sleep 5; Invoke-WebRequest -Uri 'http://www.7-zip.org/a/7z920-x64.msi' -Outfile 'C:\Windows\Temp\7z920-x64.msi')" <NUL
 )
 msiexec /qb /i C:\Windows\Temp\7z920-x64.msi
 
@@ -15,7 +18,7 @@ if exist "C:\Users\vagrant\windows.iso" (
 )
 
 if not exist "C:\Windows\Temp\windows.iso" (
-    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://softwareupdate.vmware.com/cds/vmw-desktop/ws/14.1.1/7528167/windows/packages/tools-windows.tar', 'C:\Windows\Temp\vmware-tools.tar')" <NUL
+    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://softwareupdate.vmware.com/cds/vmw-desktop/ws/14.1.2/8497320/windows/packages/tools-windows.tar', 'C:\Windows\Temp\vmware-tools.tar')" <NUL
     cmd /c ""C:\Program Files\7-Zip\7z.exe" x C:\Windows\Temp\vmware-tools.tar -oC:\Windows\Temp"
     FOR /r "C:\Windows\Temp" %%a in (VMware-tools-windows-*.iso) DO REN "%%~a" "windows.iso"
     rd /S /Q "C:\Program Files (x86)\VMWare"
@@ -23,6 +26,11 @@ if not exist "C:\Windows\Temp\windows.iso" (
 
 cmd /c ""C:\Program Files\7-Zip\7z.exe" x "C:\Windows\Temp\windows.iso" -oC:\Windows\Temp\VMWare"
 cmd /c C:\Windows\Temp\VMWare\setup.exe /S /v"/qn REBOOT=R\"
+
+sc query vmtools > NUL
+IF ERRORLEVEL 1060 cmd /c C:\Windows\Temp\VMWare\setup.exe /S /v"/qn REBOOT=R\"
+sc query vmtools > NUL
+IF ERRORLEVEL 1060 ECHO "Unable to install VMware Tools." & exit /b 1
 
 rd /Q "C:\Windows\Temp\vmware-tools.tar"
 rd /Q "C:\Windows\Temp\windows.iso"
@@ -36,7 +44,7 @@ if exist "C:\Users\vagrant\VBoxGuestAdditions.iso" (
 )
 
 if not exist "C:\Windows\Temp\VBoxGuestAdditions.iso" (
-    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://download.virtualbox.org/virtualbox/5.2.4/VBoxGuestAdditions_5.2.4.iso', 'C:\Windows\Temp\VBoxGuestAdditions.iso')" <NUL
+    powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://download.virtualbox.org/virtualbox/5.2.10/VBoxGuestAdditions_5.2.10.iso', 'C:\Windows\Temp\VBoxGuestAdditions.iso')" <NUL
 )
 
 cmd /c ""C:\Program Files\7-Zip\7z.exe" x C:\Windows\Temp\VBoxGuestAdditions.iso -oC:\Windows\Temp\virtualbox"

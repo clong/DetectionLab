@@ -1,4 +1,5 @@
 # Purpose: Downloads and unzips a copy of the Palantir osquery Github Repo. These configs are added to the Fleet server in bootstrap.sh.
+# The items from this config file are used later in install-osquery.ps1
 Write-Host "Downloading and unzipping the Palantir osquery Repo from Github..."
 
 $osqueryRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\osquery-Master.zip'
@@ -9,8 +10,8 @@ if (-not (Test-Path $osqueryRepoPath))
     Invoke-WebRequest -Uri "https://github.com/palantir/osquery-configuration/archive/master.zip" -OutFile $osqueryRepoPath
     Expand-Archive -path "$osqueryRepoPath" -destinationpath 'c:\Users\vagrant\AppData\Local\Temp' -Force
 }
-else 
+else
 {
     Write-Host "$osqueryRepoPath already exists. Moving On."
 }
-Write-Host "Palantir OSQuery download complete!"
+Write-Host "Palantir osquery config download complete!"
