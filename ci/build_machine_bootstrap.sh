@@ -51,8 +51,8 @@ if [ "$PACKER_ONLY" -eq 0 ]; then
   # Install Vagrant
   mkdir /opt/vagrant
   cd /opt/vagrant || exit 1
-  wget https://releases.hashicorp.com/vagrant/2.1.1/vagrant_2.1.1_x86_64.deb
-  dpkg -i vagrant_2.1.1_x86_64.deb
+  wget https://releases.hashicorp.com/vagrant/2.1.2/vagrant_2.1.2_x86_64.deb
+  dpkg -i vagrant_2.1.2_x86_64.deb
   vagrant plugin install vagrant-reload
 
   # Make the Vagrant instances headless

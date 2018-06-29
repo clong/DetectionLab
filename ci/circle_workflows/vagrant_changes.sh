@@ -47,7 +47,7 @@ while [ "$MINUTES_PAST" -lt 120 ]; do
   STATUS=$(curl $IP_ADDRESS)
   if [ "$STATUS" == "building" ]; then
     echo "$STATUS"
-    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_build.log /tmp/artifacts/vagrant_build.log || echo "vagrant_build.log not available yet"
+    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
     sleep 300
     ((MINUTES_PAST += 5))
   else
@@ -55,7 +55,7 @@ while [ "$MINUTES_PAST" -lt 120 ]; do
   fi
   if [ "$MINUTES_PAST" -gt 120 ]; then
     echo "Serer timed out. Uptime: $MINUTES_PAST minutes."
-    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_build.log /tmp/artifacts/vagrant_build.log
+    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
     curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
     exit 1
   fi
@@ -64,7 +64,7 @@ done
 ## Recording the build results
 echo $STATUS
 if [ "$STATUS" != "success" ]; then
-  scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_build.log /tmp/artifacts/vagrant_build.log
+  scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
   echo "Build failed. Cleaning up server with ID $DEVICE_ID"
   curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
   exit 1
