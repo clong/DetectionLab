@@ -71,10 +71,10 @@ Windows users will want to use the following script:
 
 Provider | Box  | URL | MD5 | Size
 ------------|-----|-----|----|----
-Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | b59cf23dfbcdb63c0dc8a98fbc564451 | 6.4GB
-Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | d6304f01caa553a18022ea7b5a73ad0d | 5.8GB
-VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | 249fc2472849582d8b736cdabaf0eceb | 6.7GB
-VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | 4355e9758a862a6f6349e31fdc3a6078 | 6.0GB
+Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | f352c852ed1b849dab18442caef83712 | 6.4GB
+Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | ad78b3406dd2c0e3418d1dd61e2abc2c | 5.8GB
+VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | da1111c765b2fdc2ce012b6348cf74e2 | 6.7GB
+VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | 14e1c4cc15e1dc47aead906b25c5b3cc | 6.0GB
 
 If you choose to download the boxes, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
 
@@ -240,7 +240,7 @@ Requests for tools and features will be reviewed on a case by case basis, but I 
 ## Credits/Resources
 A sizable percentage of this code was borrowed and adapted from [Stefan Scherer](https://twitter.com/stefscherer)'s [packer-windows](https://github.com/StefanScherer/packer-windows) and [adfs2](https://github.com/StefanScherer/adfs2) Github repos. A huge thanks to him for building the foundation that allowed me to design this lab environment.
 
-# Acknowledgements 
+# Acknowledgements
 * [Microsoft Advanced Threat Analytics](https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics)
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)

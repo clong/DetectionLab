@@ -28,6 +28,7 @@ If (-not (Test-Path 'C:\Program Files\cagent\cagent.exe')) {
 } Else {
   Write-Host "Caldera Agent is already installed. Moving on."
 }
+Start-Sleep 5
 If ((Get-Service -name cagent).Status -ne "Running") {
   throw "Caldera Agent service not running"
 }
