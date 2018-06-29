@@ -174,12 +174,12 @@ function list_providers {
 function download_boxes {
   Write-Verbose '[download_boxes] Running..'
   if ($PackerProvider -eq 'virtualbox') {
-    $win10Hash = 'd6304f01caa553a18022ea7b5a73ad0d'
-    $win2016Hash = 'b59cf23dfbcdb63c0dc8a98fbc564451'
+    $win10Hash = 'ad78b3406dd2c0e3418d1dd61e2abc2c'
+    $win2016Hash = 'f352c852ed1b849dab18442caef83712'
   }
   if ($PackerProvider -eq 'vmware') {
-    $win10Hash = '4355e9758a862a6f6349e31fdc3a6078'
-    $win2016Hash = '249fc2472849582d8b736cdabaf0eceb'
+    $win10Hash = '14e1c4cc15e1dc47aead906b25c5b3cc'
+    $win2016Hash = 'da1111c765b2fdc2ce012b6348cf74e2'
   }
 
   $win10Filename = "windows_10_$PackerProvider.box"
@@ -372,14 +372,14 @@ function download {
   }
   catch
   {
-    if ($_.Exception.InnerException.Response.StatusCode -eq 401 -and $SuccessOn401.IsPresent) 
+    if ($_.Exception.InnerException.Response.StatusCode -eq 401 -and $SuccessOn401.IsPresent)
     {
       return $true
     }
-    else 
+    else
     {
       Write-Verbose "Error occured on webrequest: $_"
-      return $false  
+      return $false
     }
 
   }
@@ -400,7 +400,7 @@ function post_build_checks {
   Write-Verbose "[post_build_checks] Fleet Result: $FLEET_CHECK"
 
   Write-Verbose '[post_build_checks] Running MS ATA Check.'
-  $ATA_CHECK = download -URL 'https://192.168.38.3' -SuccessOn401 
+  $ATA_CHECK = download -URL 'https://192.168.38.3' -SuccessOn401
   Write-Verbose "[post_build_checks] ATA Result: $ATA_CHECK"
 
 
