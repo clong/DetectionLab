@@ -242,7 +242,7 @@ vagrant_reload_host() {
   HOST="$1"
   cd "$DL_DIR"/Vagrant || exit 1
   # Attempt to reload the host if the vagrant up command didn't exit cleanly
-  $(which vagrant) reload "$HOST" --provision 1>&2
+  $(which vagrant) reload "$HOST" --provision &>> "$DL_DIR/Vagrant/vagrant_up_$HOST.log"
   echo "$?"
 }
 
