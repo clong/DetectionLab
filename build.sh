@@ -8,7 +8,7 @@
 # https://github.com/clong/DetectionLab/issues
 
 print_usage() {
-  echo "Usage: ./build.sh <virtualbox|vmware_fusion>"
+  echo "Usage: ./build.sh <virtualbox|vmware_desktop>"
   exit 0
 }
 
@@ -54,16 +54,24 @@ check_vmware_fusion_installed() {
 }
 
 # Returns 0 if not installed or 1 if installed
-check_vmware_vagrant_plugin_installed() {
-  VAGRANT_VMWARE_PLUGIN_PRESENT="$(vagrant plugin list | grep -c 'vagrant-vmware-fusion')"
-  if [ "$VAGRANT_VMWARE_PLUGIN_PRESENT" -eq 0 ]; then
-    (echo >&2 "VMWare Fusion is installed, but the Vagrant plugin is not.")
-    (echo >&2 "Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase and install it")
-    (echo >&2 "VMWare Fusion will not be listed as a provider until the Vagrant plugin has been installed.")
+check_vmware_desktop_vagrant_plugin_installed() {
+  LEGACY_PLUGIN_CHECK="$(vagrant plugin list | grep -c 'vagrant-vmware-fusion')"
+  if [ "$LEGACY_PLUGIN_CHECK" -gt 0 ]; then
+    (echo >&2 "The VMware Fusion Vagrant plugin is deprecated and is no longer supported by the DetectionLab build script.")
+    (echo >&2 "Please upgrade to the VMware Desktop plugin: https://www.vagrantup.com/docs/vmware/installation.html")
+    (echo >&2 "NOTE: The VMware plugin does not work with trial versions of VMware Fusion")
     echo "0"
-  else
-    echo "$VAGRANT_VMWARE_PLUGIN_PRESENT"
   fi
+  VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT="$(vagrant plugin list | grep -c 'vagrant-vmware-desktop')"
+  if [ "$VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT" -eq 0 ]; then
+  (echo >&2 "VMWare Fusion is installed, but the vagrant-vmware-desktop plugin is not.")
+  (echo >&2 "If you are seeing this, you may have the deprecated vagrant-vmware-fusion plugin installed. Please remove it and install the vagrant-vmware-desktop plugin.")
+  (echo >&2 "Visit https://www.hashicorp.com/blog/introducing-the-vagrant-vmware-desktop-plugin for more information on how to purchase and install it")
+  (echo >&2 "VMWare Fusion will not be listed as a provider until the vagrant-vmware-desktop plugin has been installed.")
+  echo "0"
+else
+  echo "$VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT"
+fi
 }
 
 # List the available Vagrant providers present on the system
@@ -75,7 +83,7 @@ list_providers() {
     # Detect Providers on OSX
     VBOX_PRESENT=$(check_virtualbox_installed)
     VMWARE_FUSION_PRESENT=$(check_vmware_fusion_installed)
-    VAGRANT_VMWARE_PLUGIN_PRESENT=$(check_vmware_vagrant_plugin_installed)
+    VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=$(check_vmware_desktop_vagrant_plugin_installed)
   else
     # Assume the only other available provider is VirtualBox
     VBOX_PRESENT=$(check_virtualbox_installed)
@@ -85,8 +93,8 @@ list_providers() {
   if [ "$VBOX_PRESENT" == "1" ]; then
     (echo >&2 "virtualbox")
   fi
-  if [[ $VMWARE_FUSION_PRESENT -eq 1 ]] && [[ $VAGRANT_VMWARE_PLUGIN_PRESENT -eq 1 ]]; then
-    (echo >&2 "vmware_fusion")
+  if [[ $VMWARE_FUSION_PRESENT -eq 1 ]] && [[ $VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT -eq 1 ]]; then
+    (echo >&2 "vmware_desktop")
   fi
   if [[ $VBOX_PRESENT -eq 0 ]] && [[ $VMWARE_FUSION_PRESENT -eq 0 ]]; then
     (echo >&2 "You need to install a provider such as VirtualBox or VMware Fusion to continue.")
@@ -95,8 +103,8 @@ list_providers() {
   (echo >&2 -e "\\nWhich provider would you like to use?")
   read -r PROVIDER
   # Sanity check
-  if [[ "$PROVIDER" != "virtualbox" ]] && [[ "$PROVIDER" != "vmware_fusion" ]]; then
-    (echo >&2 "Please choose a valid provider. \"$PROVIDER\" is not a valid option")
+  if [[ "$PROVIDER" != "virtualbox" ]] && [[ "$PROVIDER" != "vmware_desktop" ]]; then
+    (echo >&2 "Please choose a valid provider. \"$PROVIDER\" is not a valid option.")
     exit 1
   fi
   echo "$PROVIDER"
@@ -200,29 +208,22 @@ preflight_checks() {
 # Builds a box using Packer
 packer_build_box() {
   BOX="$1"
-  if [ "$PROVIDER" == "vmware_fusion" ]; then
-    PROVIDER="vmware"
-  fi
   cd "$DL_DIR/Packer" || exit 1
   (echo >&2 "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware.")
-  PACKER_LOG=1 PACKER_LOG_PATH="$DL_DIR/Packer/packer_build.log" $(which packer) build --only="$PROVIDER-iso" "$BOX".json >&2
+  PACKER_LOG=1 PACKER_LOG_PATH="$DL_DIR/Packer/packer_build.log" $(which packer) build --only="$PACKER_PROVIDER-iso" "$BOX".json >&2
   echo "$?"
 }
 
 # Moves the boxes from the Packer directory to the Boxes directory
 move_boxes() {
-  # Hacky workaround for VMware
-  if [ "$PROVIDER" == "vmware_fusion" ]; then
-    PROVIDER="vmware"
-  fi
   mv "$DL_DIR"/Packer/*.box "$DL_DIR"/Boxes
   # Ensure Windows 10 box exists
-  if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PROVIDER".box ]; then
+  if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box ]; then
     (echo >&2 "Windows 10 box is missing from the Boxes directory. Qutting.")
     exit 1
   fi
   # Ensure Windows 2016 box exists
-  if [ ! -f "$DL_DIR"/Boxes/windows_2016_"$PROVIDER".box ]; then
+  if [ ! -f "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box ]; then
     (echo >&2 "Windows 2016 box is missing from the Boxes directory. Qutting.")
     exit 1
   fi
@@ -298,9 +299,11 @@ parse_cli_arguments() {
     case "$1" in
       virtualbox)
         PROVIDER="$1"
+        PACKER_PROVIDER="$1"
         ;;
-      vmware_fusion)
+      vmware_desktop)
         PROVIDER="$1"
+        PACKER_PROVIDER="vmware"
         ;;
       *)
         echo "\"$1\" is not a valid provider. Listing available providers:"
@@ -377,57 +380,44 @@ download_boxes() {
   if [ "$PROVIDER" == "virtualbox" ]; then
     wget "https://www.detectionlab.network/windows_2016_virtualbox.box" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
     wget "https://www.detectionlab.network/windows_10_virtualbox.box" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
-  elif [ "$PROVIDER" == "vmware_fusion" ]; then
+  elif [ "$PROVIDER" == "vmware_desktop" ]; then
     wget "https://www.detectionlab.network/windows_2016_vmware.box" -O "$DL_DIR"/Boxes/windows_2016_vmware.box
     wget "https://www.detectionlab.network/windows_10_vmware.box" -O "$DL_DIR"/Boxes/windows_10_vmware.box
   fi
 
-  # Hacky workaround
-  if [ "$PROVIDER" == "vmware_fusion" ]; then
-    PROVIDER="vmware"
-  fi
-
   # Ensure Windows 10 box exists
-  if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PROVIDER".box ]; then
+  if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box ]; then
     (echo >&2 "Windows 10 box is missing from the Boxes directory. Qutting.")
     exit 1
   fi
   # Ensure Windows 2016 box exists
-  if [ ! -f "$DL_DIR"/Boxes/windows_2016_"$PROVIDER".box ]; then
+  if [ ! -f "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box ]; then
     (echo >&2 "Windows 2016 box is missing from the Boxes directory. Qutting.")
     exit 1
   fi
   # Verify hashes of VirtualBox boxes
-  if [ "$PROVIDER" == "virtualbox" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "ad78b3406dd2c0e3418d1dd61e2abc2c" ]; then
+  if [ "$PACKER_PROVIDER" == "virtualbox" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "ad78b3406dd2c0e3418d1dd61e2abc2c" ]; then
       (echo >&2 "Hash mismatch on windows_10_virtualbox.box")
     fi
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "f352c852ed1b849dab18442caef83712" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "f352c852ed1b849dab18442caef83712" ]; then
       (echo >&2 "Hash mismatch on windows_2016_virtualbox.box")
     fi
     # Verify hashes of VMware boxes
-  elif [ "$PROVIDER" == "vmware" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "14e1c4cc15e1dc47aead906b25c5b3cc" ]; then
+  elif [ "$PACKER_PROVIDER" == "vmware" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "14e1c4cc15e1dc47aead906b25c5b3cc" ]; then
       (echo >&2 "Hash mismatch on windows_10_vmware.box")
       exit 1
     fi
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "da1111c765b2fdc2ce012b6348cf74e2" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "da1111c765b2fdc2ce012b6348cf74e2" ]; then
       (echo >&2 "Hash mismatch on windows_2016_vmware.box")
       exit 1
-    fi
-    # Reset PROVIDER variable if using VMware
-    if [ "$PROVIDER" == "vmware" ]; then
-      PROVIDER="vmware_fusion"
     fi
   fi
 }
 
 build_vagrant_hosts() {
   LAB_HOSTS=("logger" "dc" "wef" "win10")
-  # Change provider back to original selection if using vmware_fusion
-  if [ "$PROVIDER" == "vmware" ]; then
-    PROVIDER="vmware_fusion"
-  fi
 
   # Vagrant up each box and attempt to reload one time if it fails
   for VAGRANT_HOST in "${LAB_HOSTS[@]}"; do

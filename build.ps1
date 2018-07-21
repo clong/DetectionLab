@@ -9,7 +9,7 @@
    DetectionLab deployment. It checks:
 
    * If Packer and Vagrant are installed
-   * If VirtualBox or VMWare are installed
+   * If VirtualBox or VMware are installed
    * If the proper vagrant plugins are available
    * Various aspects of system health
 
@@ -20,7 +20,7 @@
    https://github.com/clong/DetectionLab/issues
 
 .PARAMETER ProviderName
-  The Hypervisor you're using for the lab. Valid options are 'virtualbox' or 'vmware_workstation'
+  The Hypervisor you're using for the lab. Valid options are 'virtualbox' or 'vmware_desktop'
 
 .PARAMETER PackerPath
   The full path to the packer executable. Default is C:\Hashicorp\packer.exe
@@ -33,11 +33,11 @@
 
   This builds the DetectionLab using virtualbox and the default path for packer (C:\Hashicorp\packer.exe)
 .EXAMPLE
-  build.ps1 -ProviderName vmware_workstation -PackerPath 'C:\packer.exe'
+  build.ps1 -ProviderName vmware_desktop -PackerPath 'C:\packer.exe'
 
-  This builds the DetectionLab using Vmware and sets the packer path to 'C:\packer.exe'
+  This builds the DetectionLab using VMware and sets the packer path to 'C:\packer.exe'
 .EXAMPLE
-  build.ps1 -ProviderName vmware_workstation -VagrantOnly
+  build.ps1 -ProviderName vmware_desktop -VagrantOnly
 
   This command builds the DetectionLab using vmware and skips the packer process, downloading the boxes instead.
 #>
@@ -45,7 +45,7 @@
 [cmdletbinding()]
 Param(
   # Vagrant provider to use.
-  [ValidateSet('virtualbox', 'vmware_workstation')]
+  [ValidateSet('virtualbox', 'vmware_desktop)]
   [string]$ProviderName,
   [string]$PackerPath = 'C:\Hashicorp\packer.exe',
   [switch]$VagrantOnly
@@ -120,26 +120,32 @@ function check_virtualbox_installed {
 }
 function check_vmware_workstation_installed {
   Write-Verbose '[check_vmware_workstation_installed] Running..'
-  if (install_checker -Name "VMWare Workstation") {
-    Write-Verbose '[check_vmware_workstation_installed] Vmware found.'
+  if (install_checker -Name "VMware Workstation") {
+    Write-Verbose '[check_vmware_workstation_installed] VMware Workstation found.'
     return $true
   }
   else {
-    Write-Verbose '[check_vmware_workstation_installed] Vmware not found.'
+    Write-Verbose '[check_vmware_workstation_installed] VMware Workstation not found.'
     return $false
   }
 }
 
 function check_vmware_vagrant_plugin_installed {
   Write-Verbose '[check_vmware_vagrant_plugin_installed] Running..'
-  if (vagrant plugin list | Select-String 'vagrant-vmware-workstation') {
-    Write-Verbose '[check_vmware_vagrant_plugin_installed] VMware vagrant plugin found.'
+  if (vagrant plugin list | Select-String 'vagrant-vmware-desktop') {
+    Write-Verbose 'The vagrant VMware Workstation plugin is no longer supported.'
+    Write-Verbose 'Please upgrade to the VMware Desktop plugin: https://www.vagrantup.com/docs/vmware/installation.html'
+    return $false
+  }
+  if (vagrant plugin list | Select-String 'vagrant-vmware-desktop') {
+    Write-Verbose '[check_vmware_vagrant_plugin_installed] Vagrant VMware Desktop plugin found.'
     return $true
   }
   else {
-    Write-Host 'VMWare Workstation is installed, but the Vagrant plugin is not.'
+    Write-Host 'VMware Workstation is installed, but the Vagrant plugin is not.'
     Write-Host 'Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase and install it'
-    Write-Host 'VMWare Workstation will not be listed as a provider until the Vagrant plugin has been installed.'
+    Write-Host 'VMware Workstation will not be listed as a provider until the Vagrant plugin has been installed.'
+    Write-Host 'NOTE: The plugin does not work with trial versions of VMware Workstation'
     return $false
   }
 }
@@ -154,17 +160,17 @@ function list_providers {
   }
   if (check_vmware_workstation_installed) {
     if (check_vmware_vagrant_plugin_installed) {
-      Write-Host '[*] vmware_workstation'
+      Write-Host '[*] vmware_desktop'
     }
   }
   if ((-Not (check_virtualbox_installed)) -and (-Not (check_vmware_workstation_installed))) {
     Write-Error 'You need to install a provider such as VirtualBox or VMware Workstation to continue.'
     break
   }
-  while (-Not ($ProviderName -eq 'virtualbox' -or $ProviderName -eq 'vmware_workstation')) {
+  while (-Not ($ProviderName -eq 'virtualbox' -or $ProviderName -eq 'vmware_desktop')) {
     $ProviderName = Read-Host 'Which provider would you like to use?'
     Write-Debug "ProviderName = $ProviderName"
-    if (-Not ($ProviderName -eq 'virtualbox' -or $ProviderName -eq 'vmware_workstation')) {
+    if (-Not ($ProviderName -eq 'virtualbox' -or $ProviderName -eq 'vmware_desktop')) {
       Write-Error "Please choose a valid provider. $ProviderName is not a valid option"
     }
   }
@@ -222,7 +228,7 @@ function preflight_checks {
   Write-Verbose '[preflight_checks] Running..'
   # Check to see that no boxes exist
   if (-Not ($VagrantOnly)) {
-    Write-Verbose '[preflight_checks] Checking if packer is installed'
+    Write-Verbose '[preflight_checks] Checking if Packer is installed'
     check_packer
 
     # Check Packer Version against known bad
@@ -235,7 +241,7 @@ function preflight_checks {
       break
     }
   }
-  Write-Verbose '[preflight_checks] Checking if vagrant is installed'
+  Write-Verbose '[preflight_checks] Checking if Vagrant is installed'
   check_vagrant
 
   Write-Verbose '[preflight_checks] Checking for pre-existing boxes..'
@@ -425,7 +431,7 @@ if ($ProviderName -eq $Null -or $ProviderName -eq "") {
 }
 
 # Set Provider variable for use deployment functions
-if ($ProviderName -eq 'vmware_workstation') {
+if ($ProviderName -eq 'vmware_desktop') {
   $PackerProvider = 'vmware'
 }
 else {
