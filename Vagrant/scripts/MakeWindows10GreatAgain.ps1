@@ -21,3 +21,8 @@ $appname = "Microsoft Store"
 ((New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | ?{$_.Name -eq $appname}).Verbs() | ?{$_.Name.replace('&','') -match 'Unpin from taskbar'} | %{$_.DoIt(); $exec = $true}
 $appname = "Mail"
 ((New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | ?{$_.Name -eq $appname}).Verbs() | ?{$_.Name.replace('&','') -match 'Unpin from taskbar'} | %{$_.DoIt(); $exec = $true}
+
+Write-Host "Disabling automatic screen turnoff in order to prevent screen locking..."
+powercfg -change -monitor-timeout-ac 0
+powercfg -change -standby-timeout-ac 0
+powercfg -change -hibernate-timeout-ac 0
