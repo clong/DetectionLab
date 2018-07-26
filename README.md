@@ -39,6 +39,7 @@ OSX 10.12.5 | 1.9.3 | 1.0.0 | VMWare Fusion (8.5.8)
 OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.9)
 OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.10)
 OSX 10.12.6 | 2.0.3 | 1.2.1 | VMWare Fusion (10.1.1)
+OSX 10.13.6 | 2.1.2 | 1.2.4 | VMWare Fusion (10.1.2)
 Ubuntu 16.04 | 2.0.1 | 1.1.3 | Virtualbox (5.1)
 Ubuntu 16.04 | 2.0.2 | N/A | Virtualbox (5.2)
 Ubuntu 16.04 | 2.0.3 | 1.2.1 | Virtualbox (5.2)
@@ -53,19 +54,19 @@ Ubuntu 16.04 | 2.0.3 | 1.2.1 | Virtualbox (5.2)
 DetectionLab now contains build scripts for \*NIX, MacOS, and Windows users!
 
 There is a single build script that supports 3 different options:
-- `./build.sh <virtualbox|vmware_fusion>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
-- `./build.sh <virtualbox|vmware_fusion> --vagrant-only` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
-- `./build.sh <virtualbox|vmware_fusion> --packer-only` - This option only builds the Packer boxes and will not use Vagrant to start up the lab.
+- `./build.sh <virtualbox|vmware_desktop>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
+- `./build.sh <virtualbox|vmware_desktop> --vagrant-only` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
+- `./build.sh <virtualbox|vmware_desktop> --packer-only` - This option only builds the Packer boxes and will not use Vagrant to start up the lab.
 
 Windows users will want to use the following script:
-- `./build.ps1 -ProviderName=<virtualbox|vmware_workstation>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
-- `./build.ps1 -ProviderName=<virtualbox|vmware_workstation> -VagrantOnly` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
+- `./build.ps1 -ProviderName=<virtualbox|vmware_desktop>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
+- `./build.ps1 -ProviderName=<virtualbox|vmware_desktop> -VagrantOnly` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
 
 ---
 
 ## Building DetectionLab from Scratch
 1. Determine which Vagrant provider you want to use.
-  * Note: Virtualbox is free, the [VMWare vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80.
+  * Note: Virtualbox is free, the [VMWare Desktop vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80.
 
   **NOTE:** If you'd like to save time, you can skip the building of the Packer boxes and download the boxes directly from https://detectionlab.network and put them into the `Boxes` directory:
 
@@ -107,7 +108,7 @@ $ packer build --only=[vmware|virtualbox]-iso windows_2016.json
 ## Basic Vagrant Usage
 Vagrant commands must be run from the "Vagrant" folder.
 
-* Bring up all Detection Lab hosts: `vagrant up` (optional `--provider=[virtualbox|vmware_fusion|vmware_workstation]`)
+* Bring up all Detection Lab hosts: `vagrant up` (optional `--provider=[virtualbox|vmware_desktop]`)
 * Bring up a specific host: `vagrant up <hostname>`
 * Restart a specific host: `vagrant reload <hostname>`
 * Restart a specific host and re-run the provision process: `vagrant reload <hostname> --provision`

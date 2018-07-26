@@ -9,7 +9,7 @@ If (test-path "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_wind
 }
 
 # Install Windows TA (this only needs to be done on the WEF server)
-$windowstaPath = "C:\vagrant\resources\splunk_forwarder\splunk-add-on-for-microsoft-windows_483.tgz"
+$windowstaPath = "C:\vagrant\resources\splunk_forwarder\splunk-add-on-for-microsoft-windows_500.tgz"
 $inputsPath = "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_windows\local\inputs.conf"
 Write-Host "Installing the Windows TA"
 Start-Process -FilePath "C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe" -ArgumentList "install app $windowstaPath -auth admin:changeme" -NoNewWindow
