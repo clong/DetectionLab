@@ -45,7 +45,7 @@
 [cmdletbinding()]
 Param(
   # Vagrant provider to use.
-  [ValidateSet('virtualbox', 'vmware_desktop)]
+  [ValidateSet('virtualbox', 'vmware_desktop')]
   [string]$ProviderName,
   [string]$PackerPath = 'C:\Hashicorp\packer.exe',
   [switch]$VagrantOnly
