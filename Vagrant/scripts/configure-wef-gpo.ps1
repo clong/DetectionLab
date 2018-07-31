@@ -9,9 +9,7 @@ $GPO = Get-GPO -Name $GPOName
 If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 {
     New-GPLink -Name $GPOName -Target $OU -Enforced yes
-}
-else
-{
+} else {
     Write-Host "GpLink $GPOName already linked on $OU. Moving On."
 }
 $OU = "ou=Domain Controllers,dc=windomain,dc=local"
@@ -21,9 +19,17 @@ $GPO = Get-GPO -Name $GPOName
 If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 {
     New-GPLink -Name $GPOName -Target $OU -Enforced yes
+} else {
+    Write-Host "GpLink $GPOName already linked on $OU. Moving On."
 }
-else
+$OU = "ou=Workstations,dc=windomain,dc=local"
+$gpLinks = $null
+$gPLinks = Get-ADOrganizationalUnit -Identity $OU -Properties name,distinguishedName, gPLink, gPOptions
+$GPO = Get-GPO -Name $GPOName
+If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 {
+    New-GPLink -Name $GPOName -Target $OU -Enforced yes
+} else {
     Write-Host "GpLink $GPOName already linked on $OU. Moving On."
 }
 

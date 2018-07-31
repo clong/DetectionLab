@@ -20,9 +20,9 @@ if ($currentContent -ne $targetContent)
     Write-Host "Starting the Splunk forwarder"
     Start-Service splunkforwarder
 }
-else 
+else
 {
-    Write-Host "Splunk forwarder already configured. Moving on." 
+    Write-Host "Splunk forwarder already configured. Moving on."
 }
 If ((Get-Service -name splunkforwarder).Status -ne "Running")
 {

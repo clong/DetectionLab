@@ -7,14 +7,6 @@ if [ ! -d "/tmp/artifacts" ]; then
   mkdir /tmp/artifacts
 fi
 
-## Delete stale servers if they exist
-echo "Deleting stale Packet.net servers"
-DELETE_DEVICE_ID=$(curl -X GET -s --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."devices[0].id" | tr -d '"')
-if [ "$(echo -n $DELETE_DEVICE_ID | wc -c)" -eq 36 ]; then
-  echo "Requesting deletion for Packet server with ID $DELETE_DEVICE_ID"
-  curl -X DELETE -s --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DELETE_DEVICE_ID"
-fi
-
 ## Provision two Type1 baremetal Packet.net servers
 echo "Provisioning packerwindows2016 on Packet.net"
 SERVER1_ID=$(curl -X POST -s --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "sjc1", "plan": "baremetal_1", "hostname": "packerwindows2016", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys":["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."id" | tr -d '"')

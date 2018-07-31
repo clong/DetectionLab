@@ -13,7 +13,11 @@ apt_install_prerequisites() {
 }
 
 fix_eth1_static_ip() {
-  # Fix static IP if it's not set correctly
+  # There's a fun issue where dhclient keeps messing with eth1 despite the fact
+  # that eth1 has a static IP set. We workaround this by telling dhclient to leave it alone.
+  echo 'interface "eth1" {}' >> /etc/dhcp/dhclient.conf
+  systemctl restart networking.service
+  # Fix eth1 if the IP isn't set correctly
   ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
   if [ "$ETH1_IP" != "192.168.38.5" ]; then
     echo "Incorrect IP Address settings detected. Attempting to fix."
@@ -54,10 +58,10 @@ install_golang() {
     mkdir /home/vagrant/.go
     chown vagrant:vagrant /home/vagrant/.go
     mkdir /root/.go
-    echo 'export GOPATH=$HOME/.go' >> /home/vagrant/.bashrc
+    echo 'export GOPATH=$HOME/.go' >> /home/vagrant/.
     echo 'export GOROOT=/usr/local/go' >> /home/vagrant/.bashrc
     echo 'export GOPATH=$HOME/.go' >> /root/.bashrc
-    echo '/home/vagrant/.bashrc' >> /root/.bashrc
+    echo 'export GOROOT=/usr/local/go' >> /root/.bashrc
     source /root/.bashrc
     sudo update-alternatives --install "/usr/bin/go" "go" "/usr/local/go/bin/go" 0
     sudo update-alternatives --set go /usr/local/go/bin/go
@@ -66,7 +70,6 @@ install_golang() {
     echo "GoLang seems to be downloaded already.. Skipping."
   fi
 }
-
 
 install_splunk() {
   # Check if Splunk is already installed
