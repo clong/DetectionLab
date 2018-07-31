@@ -74,6 +74,7 @@ Vagrant.configure("2") do |config|
       v.memory = 2560
       v.cpus = 2
       v.gui = true
+      v.enable_vmrun_ip_lookup = false
     end
 
     cfg.vm.provider "virtualbox" do |vb, override|
@@ -105,10 +106,10 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-wefsubscriptions.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-windows_ta.ps1", privileged: true
+    cfg.vm.provision "shell", path: "scripts/install-inputsconf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-caldera-agent.ps1", privileged: true
-    cfg.vm.provision "shell", path: "scripts/install-inputsconf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/configure-pslogstranscriptsshare.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: true
@@ -127,6 +128,7 @@ Vagrant.configure("2") do |config|
       v.memory = 2048
       v.cpus = 2
       v.gui = true
+      v.enable_vmrun_ip_lookup = false
     end
 
     cfg.vm.provider "virtualbox" do |vb, override|
@@ -180,6 +182,7 @@ Vagrant.configure("2") do |config|
       v.memory = 2048
       v.cpus = 1
       v.gui = true
+      v.enable_vmrun_ip_lookup = false
     end
 
     cfg.vm.provider "virtualbox" do |vb, override|
