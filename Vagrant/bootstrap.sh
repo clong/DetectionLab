@@ -219,37 +219,18 @@ install_caldera() {
 
 install_bro() {
     # environment variables
-	BRO_VERSION=2.5.4
-	BRO_SRC=/usr/src/bro
 	NODECFG=/opt/bro/etc/node.cfg
 	SPLUNK_BRO_JSON=/opt/splunk/etc/apps/TA-bro_json
 	SPLUNK_BRO_MONITOR='monitor:///opt/bro/spool/manager'
 	SPLUNK_SURICATA_MONITOR='monitor:///var/log/suricata'
-
+    echo "deb http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/ /" > /etc/apt/sources.list.d/bro.list
+    curl -s http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/Release.key |apt-key add -
     # update APT repositories
 	apt-get -qq -ym update
+    apt-get -qq -ym install \
+        bro \
+        crudini \
     # install tools to build and configure bro
-	apt-get -qq -ym install crudini \
-			build-essential \
-			git \
-			unzip \
-			python-pip \
-			flex \
-			libpcap-dev \
-			flex \
-			bison \
-			libpcap-dev \
-			swig \
-			cmake \
-			libssl-dev \
-			devscripts
-
-    # grab bro from github and build and install
-	git clone --recursive --branch v$BRO_VERSION git://git.bro.org/bro $BRO_SRC
-	cd $BRO_SRC
-	./configure --disable-broker --prefix=/opt/bro
-	make
-	make install
 
     # load bro scripts
 	cat<<EOF >> /opt/bro/share/bro/site/local.bro
