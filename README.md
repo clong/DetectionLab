@@ -28,22 +28,6 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * Vagrant 1.9.2 or newer
 * Virtualbox or VMWare Fusion/Workstation
 
-This lab has been successfully tested on:
-
-OS | Vagrant | Packer | Provider
----|---------|--------|-----------
-OSX 10.12.4 | 1.9.3 | 1.0.0 | Virtualbox (5.1.14)
-OSX 10.12.6 | 2.0.1 | 1.1.2 | Virtualbox (5.1.30)
-OSX 10.12.4 | 1.9.2 | 1.0.0 | VMWare Fusion (8.5.6)
-OSX 10.12.5 | 1.9.3 | 1.0.0 | VMWare Fusion (8.5.8)
-OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.9)
-OSX 10.12.6 | 2.0.1 | 1.1.3 | VMWare Fusion (8.5.10)
-OSX 10.12.6 | 2.0.3 | 1.2.1 | VMWare Fusion (10.1.1)
-OSX 10.13.6 | 2.1.2 | 1.2.4 | VMWare Fusion (10.1.2)
-Ubuntu 16.04 | 2.0.1 | 1.1.3 | Virtualbox (5.1)
-Ubuntu 16.04 | 2.0.2 | N/A | Virtualbox (5.2)
-Ubuntu 16.04 | 2.0.3 | 1.2.1 | Virtualbox (5.2)
-
 
 **Known Bad Versions:**
 * Packer 1.1.2 will fail to build VMWare-ISOs correctly due to [this issue](https://github.com/hashicorp/packer/issues/5622).
@@ -158,6 +142,8 @@ Vagrant commands must be run from the "Vagrant" folder.
   * Splunk Enterprise
   * Fleet osquery Manager
   * Mitre's Caldera Server
+  * Bro
+  * Suricata 
 
 ## Splunk Indexes
 Index Name | Description
@@ -167,6 +153,8 @@ osquery-status | osquery/fleet INFO/WARN/ERROR logs
 powershell | Powershell transcription logs
 sysmon | Logs from the Sysmon service
 wineventlog | Windows Event Logs
+bro | Bro network traffic logs
+suricata | Suricata IDS logs
 
 ## Installed Tools on Windows
   * Sysmon
