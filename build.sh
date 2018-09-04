@@ -430,7 +430,9 @@ build_vagrant_hosts() {
       (echo >&2 "Something went wrong while attempting to build the $VAGRANT_HOST box.")
       (echo >&2 "Attempting to reload and reprovision the host...")
       RETRY_STATUS=$(vagrant_reload_host "$VAGRANT_HOST")
-      if [ "$RETRY_STATUS" -ne 0 ]; then
+      if [ "$RETRY_STATUS" -eq 0 ]; then
+        (echo >&2 "Good news! $VAGRANT_HOST was built successfully after a reload!")
+      else
         (echo >&2 "Failed to bring up $VAGRANT_HOST after a reload. Exiting.")
         exit 1
       fi
