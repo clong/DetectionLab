@@ -43,12 +43,13 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
     -SysvolPath "C:\Windows\SYSVOL" `
     -Force:$true
 
-  $newDNSServers = "8.8.8.8", "4.4.4.4"
-  $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -And ($_.IPAddress).StartsWith($subnet) }
-  if ($adapters) {
-    Write-Host Setting DNS
-    $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}
-  }
+  #$newDNSServers = "8.8.8.8", "4.4.4.4"
+  #$adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -And ($_.IPAddress).StartsWith($subnet) }
+  #if ($adapters) {
+  #  Write-Host Setting DNS
+  #  $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}
+  #}
+  
   Write-Host "Setting timezone to UTC"
   c:\windows\system32\tzutil.exe /s "UTC"
   Write-Host "Excluding NAT interface from DNS"
