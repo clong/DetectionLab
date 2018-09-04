@@ -13,16 +13,17 @@ Vagrant.configure("2") do |config|
     end
 
     cfg.vm.provider "vmware_desktop" do |v, override|
-      v.memory = 2048
-      v.cpus = 1
+      v.memory = 4096
+      v.cpus = 2
       v.gui = true
     end
 
     cfg.vm.provider "virtualbox" do |vb, override|
       vb.gui = true
-      vb.customize ["modifyvm", :id, "--memory", 2048]
-      vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--memory", 4096]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
       vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
       vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
     end

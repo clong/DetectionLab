@@ -88,6 +88,8 @@ install_splunk() {
     /opt/splunk/bin/splunk add index osquery-status -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index sysmon -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index powershell -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add index bro -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_500.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_800.tgz -auth 'admin:changeme'
     # Add a Splunk TCP input on port 9997
@@ -215,6 +217,129 @@ install_caldera() {
   fi
 }
 
+install_bro() {
+    # environment variables
+	NODECFG=/opt/bro/etc/node.cfg
+	SPLUNK_BRO_JSON=/opt/splunk/etc/apps/TA-bro_json
+	SPLUNK_BRO_MONITOR='monitor:///opt/bro/spool/manager'
+	SPLUNK_SURICATA_MONITOR='monitor:///var/log/suricata'
+    echo "deb http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/ /" > /etc/apt/sources.list.d/bro.list
+    curl -s http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/Release.key |apt-key add -
+    # update APT repositories
+	apt-get -qq -ym update
+    apt-get -qq -ym install \
+        bro \
+        crudini \
+    # install tools to build and configure bro
+
+    # load bro scripts
+	cat<<EOF >> /opt/bro/share/bro/site/local.bro
+
+@load protocols/ftp/software
+@load protocols/smtp/software
+@load protocols/ssh/software
+@load protocols/http/software
+
+@load tuning/json-logs
+@load policy/integration/collective-intel
+@load policy/frameworks/intel/do_notice
+
+@load frameworks/intel/seen
+@load frameworks/intel/do_notice
+@load frameworks/files/hash-all-files
+
+@load policy/protocols/smb
+
+@load policy/protocols/conn/vlan-logging
+
+@load policy/protocols/conn/mac-logging
+
+redef Intel::read_files += {
+        "/opt/bro/etc/intel.dat"
+};
+
+EOF
+
+
+    # configure bro
+	crudini --del $NODECFG bro
+	crudini --set $NODECFG manager type manager
+	crudini --set $NODECFG manager host localhost
+	crudini --set $NODECFG proxy type proxy
+	crudini --set $NODECFG proxy host localhost
+	CPUS=$(lscpu  -e |awk /yes/'{print $1'} |wc -l)
+
+    # setup $CPUS numbers of bro workers
+	for i in eth1
+	do
+			crudini --set $NODECFG worker-$i type worker
+			crudini --set $NODECFG worker-$i host localhost
+			crudini --set $NODECFG worker-$i interface $i
+			crudini --set $NODECFG worker-$i lb_method pf_ring
+			crudini --set $NODECFG worker-$i lb_procs $CPUS
+	done
+
+    # setup bro to run at boot
+    cp /vagrant/resources/bro/bro.service /lib/systemd/system/bro.service
+
+    for i in bro
+    do
+        systemctl enable $i
+        systemctl start $i
+    done
+
+    # setup splunk TA to ingest bro and suricata data
+	git clone https://github.com/jahshuah/splunk-ta-bro-json $SPLUNK_BRO_JSON
+
+	mkdir -p $SPLUNK_BRO_JSON/local
+	cp $SPLUNK_BRO_JSON/default/inputs.conf $SPLUNK_BRO_JSON/local/inputs.conf
+
+
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR index   bro
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR sourcetype   json_bro
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR whitelist   '.*\.log$'
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR blacklist   '.*(communication|stderr)\.log$'
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR disabled   0
+
+
+
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR index   suricata
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR sourcetype   json_suricata
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR whitelist   'eve.json'
+	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR disabled   0
+
+    # ensure permissions are correct and restart splunk
+	chown -R splunk $SPLUNK_BRO_JSON
+    /opt/splunk/bin/splunk restart
+}
+
+install_suricata() {
+    # install yq to maniuplate the suricata.yaml inline
+    /usr/bin/go get -u  github.com/mikefarah/yq
+    # install suricata
+    add-apt-repository -y ppa:oisf/suricata-stable
+    apt-get -qq -y update && apt-get -qq -y install suricata crudini
+    # install suricata-update
+    pip3.6 install --pre --upgrade suricata-update
+    # add DC_SERVERS variable to suricata.yaml in support et-open signatures
+    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
+    crudini --set --format=sh /etc/default/suricata '' iface eth1
+    # update suricata signature sources
+    suricata-update update-sources
+    # disable protocol decode as it is duplicative of bro
+    echo re:protocol-command-decode >> /etc/suricata/disable.conf
+    # enable et-open and attackdetection sources
+    for i in et/open ptresearch/attackdetection
+    do
+                suricata-update enable-source $i
+
+            done
+    # update suricata and restart
+    suricata-update
+    systemctl restart suricata
+
+}
+
 main() {
   install_mongo_db_apt_key
   apt_install_prerequisites
@@ -226,6 +351,8 @@ main() {
   download_palantir_osquery_config
   import_osquery_config_into_fleet
   install_caldera
+  install_suricata
+  install_bro
 }
 
 main
