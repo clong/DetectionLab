@@ -323,6 +323,7 @@ install_suricata() {
     pip3.6 install --pre --upgrade suricata-update
     # add DC_SERVERS variable to suricata.yaml in support et-open signatures
     /root/go/bin/yq w  -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
+    sed -i '0,/^/s//%YAML 1.1\n---\n/' /etc/suricata/suricata.yaml
     crudini --set --format=sh /etc/default/suricata '' iface eth1
     # update suricata signature sources
     suricata-update update-sources
