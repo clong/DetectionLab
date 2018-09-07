@@ -15,12 +15,11 @@ apt_install_prerequisites() {
 fix_eth1_static_ip() {
   # There's a fun issue where dhclient keeps messing with eth1 despite the fact
   # that eth1 has a static IP set. We workaround this by setting a static DHCP lease.
-  echo -e 'lease {
-      interface "eth1";
-      fixed-address 192.168.38.105;
-      send dhcp-requested-address 192.168.38.105;
-    }' >> /etc/dhcp/dhclient.conf
-  systemctl restart networking.service
+  echo -e 'interface "eth1" {
+    send host-name = gethostname();
+    send dhcp-requested-address 192.168.38.105;
+  }' >> /etc/dhcp/dhclient.conf
+  service networking restart
   # Fix eth1 if the IP isn't set correctly
   ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
   if [ "$ETH1_IP" != "192.168.38.105" ]; then
@@ -39,17 +38,17 @@ fix_eth1_static_ip() {
 }
 
 install_python() {
-# Install Python 3.6.4
-if ! which /usr/local/bin/python3.6 > /dev/null; then
-  echo "Installing Python v3.6.4..."
-  wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
-  tar -xvf Python-3.6.4.tgz
-  cd Python-3.6.4 || exit
-  ./configure && make && make install
-  cd /home/vagrant || exit
-else
-  echo "Python seems to be downloaded already.. Skipping."
-fi
+  # Install Python 3.6.4
+  if ! which /usr/local/bin/python3.6 > /dev/null; then
+    echo "Installing Python v3.6.4..."
+    wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
+    tar -xvf Python-3.6.4.tgz
+    cd Python-3.6.4 || exit
+    ./configure && make && make install
+    cd /home/vagrant || exit
+  else
+    echo "Python seems to be downloaded already.. Skipping."
+  fi
 }
 
 install_golang() {
@@ -66,6 +65,7 @@ install_golang() {
     echo 'export GOROOT=/usr/local/go' >> /home/vagrant/.bashrc
     echo 'export GOPATH=$HOME/.go' >> /root/.bashrc
     echo 'export GOROOT=/usr/local/go' >> /root/.bashrc
+    echo 'export PATH=$PATH:/opt/splunk/bin' >> /root/.bashrc
     source /root/.bashrc
     sudo update-alternatives --install "/usr/bin/go" "go" "/usr/local/go/bin/go" 0
     sudo update-alternatives --set go /usr/local/go/bin/go
@@ -96,11 +96,15 @@ install_splunk() {
     /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_500.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_800.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_012.tgz -auth 'admin:changeme'
     # Add a Splunk TCP input on port 9997
     echo -e "[splunktcp://9997]\nconnection_host = ip" > /opt/splunk/etc/apps/search/local/inputs.conf
     # Add props.conf and transforms.conf
     cp /vagrant/resources/splunk_server/props.conf /opt/splunk/etc/apps/search/local/
     cp /vagrant/resources/splunk_server/transforms.conf /opt/splunk/etc/apps/search/local/
+    cp /opt/splunk/etc/system/default/limits.conf /opt/splunk/etc/system/local/limits.conf
+    # Bump the memtable limits to allow for the ASN lookup table
+    sed -i .bak 's/max_memtable_bytes = 10000000/max_memtable_bytes = 30000000/g' /opt/splunk/etc/system/local/limits.conf
     # Skip Splunk Tour and Change Password Dialog
     touch /opt/splunk/etc/.ui_login
     # Enable SSL Login for Splunk
@@ -109,6 +113,8 @@ install_splunk() {
     # Reboot Splunk to make changes take effect
     /opt/splunk/bin/splunk restart
     /opt/splunk/bin/splunk enable boot-start
+    # Generate the ASN lookup table
+    /opt/splunk/bin/splunk search "|asngen | outputlookup asn" -auth 'admin:changeme'
   fi
 }
 
@@ -222,20 +228,20 @@ install_caldera() {
 }
 
 install_bro() {
-    # environment variables
-	NODECFG=/opt/bro/etc/node.cfg
-	SPLUNK_BRO_JSON=/opt/splunk/etc/apps/TA-bro_json
-	SPLUNK_BRO_MONITOR='monitor:///opt/bro/spool/manager'
-	SPLUNK_SURICATA_MONITOR='monitor:///var/log/suricata'
+  # Environment variables
+  NODECFG=/opt/bro/etc/node.cfg
+  SPLUNK_BRO_JSON=/opt/splunk/etc/apps/TA-bro_json
+  SPLUNK_BRO_MONITOR='monitor:///opt/bro/spool/manager'
+  SPLUNK_SURICATA_MONITOR='monitor:///var/log/suricata'
   echo "deb http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/ /" > /etc/apt/sources.list.d/bro.list
   curl -s http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/Release.key |apt-key add -
 
-  # update APT repositories
-	apt-get -qq -ym update
-  # install tools to build and configure bro
+  # Update APT repositories
+  apt-get -qq -ym update
+  # Install tools to build and configure bro
   apt-get -qq -ym install bro crudini
-  # load bro scripts
-	echo '
+  # Load bro scripts
+  echo '
   @load protocols/ftp/software
   @load protocols/smtp/software
   @load protocols/ssh/software
@@ -251,23 +257,23 @@ install_bro() {
   @load policy/protocols/conn/mac-logging
 
   redef Intel::read_files += {
-        "/opt/bro/etc/intel.dat"
+    "/opt/bro/etc/intel.dat"
   };
   ' >> /opt/bro/share/bro/site/local.bro
 
   # Configure Bro
-	crudini --del $NODECFG bro
-	crudini --set $NODECFG manager type manager
-	crudini --set $NODECFG manager host localhost
-	crudini --set $NODECFG proxy type proxy
-	crudini --set $NODECFG proxy host localhost
+  crudini --del $NODECFG bro
+  crudini --set $NODECFG manager type manager
+  crudini --set $NODECFG manager host localhost
+  crudini --set $NODECFG proxy type proxy
+  crudini --set $NODECFG proxy host localhost
 
   # Setup $CPUS numbers of bro workers
-	crudini --set $NODECFG worker-eth1 type worker
-	crudini --set $NODECFG worker-eth1 host localhost
-	crudini --set $NODECFG worker-eth1 interface eth1
-	crudini --set $NODECFG worker-eth1 lb_method pf_ring
-	crudini --set $NODECFG worker-eth1 lb_procs "$(nproc)"
+  crudini --set $NODECFG worker-eth1 type worker
+  crudini --set $NODECFG worker-eth1 host localhost
+  crudini --set $NODECFG worker-eth1 interface eth1
+  crudini --set $NODECFG worker-eth1 lb_method pf_ring
+  crudini --set $NODECFG worker-eth1 lb_procs "$(nproc)"
 
   # Setup bro to run at boot
   cp /vagrant/resources/bro/bro.service /lib/systemd/system/bro.service
@@ -275,23 +281,23 @@ install_bro() {
   systemctl start bro
 
   # Setup splunk TA to ingest bro and suricata data
-	git clone https://github.com/jahshuah/splunk-ta-bro-json $SPLUNK_BRO_JSON
+  git clone https://github.com/jahshuah/splunk-ta-bro-json $SPLUNK_BRO_JSON
 
-	mkdir -p $SPLUNK_BRO_JSON/local
-	cp $SPLUNK_BRO_JSON/default/inputs.conf $SPLUNK_BRO_JSON/local/inputs.conf
+  mkdir -p $SPLUNK_BRO_JSON/local
+  cp $SPLUNK_BRO_JSON/default/inputs.conf $SPLUNK_BRO_JSON/local/inputs.conf
 
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR index   bro
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR sourcetype   json_bro
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR whitelist   '.*\.log$'
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR blacklist   '.*(communication|stderr)\.log$'
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR disabled   0
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR index   suricata
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR sourcetype   json_suricata
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR whitelist   'eve.json'
-	crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR disabled   0
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR index   bro
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR sourcetype   json_bro
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR whitelist   '.*\.log$'
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR blacklist   '.*(communication|stderr)\.log$'
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR disabled   0
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR index   suricata
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR sourcetype   json_suricata
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR whitelist   'eve.json'
+  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR disabled   0
 
   # Ensure permissions are correct and restart splunk
-	chown -R splunk $SPLUNK_BRO_JSON
+  chown -R splunk $SPLUNK_BRO_JSON
   /opt/splunk/bin/splunk restart
 
   # Verify that Bro is running
@@ -302,64 +308,64 @@ install_bro() {
 }
 
 install_suricata() {
-    # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
+  # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
 
-    # Install yq to maniuplate the suricata.yaml inline
-    /usr/bin/go get -u  github.com/mikefarah/yq
-    # Install suricata
-    add-apt-repository -y ppa:oisf/suricata-stable
-    apt-get -qq -y update && apt-get -qq -y install suricata crudini
-    # Install suricata-update
-    cd /home/vagrant || exit 1
-    git clone https://github.com/OISF/suricata-update.git
-    cd /home/vagrant/suricata-update || exit 1
-    python setup.py install
-    # Add DC_SERVERS variable to suricata.yaml in support et-open signatures
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
+  # Install yq to maniuplate the suricata.yaml inline
+  /usr/bin/go get -u  github.com/mikefarah/yq
+  # Install suricata
+  add-apt-repository -y ppa:oisf/suricata-stable
+  apt-get -qq -y update && apt-get -qq -y install suricata crudini
+  # Install suricata-update
+  cd /home/vagrant || exit 1
+  git clone https://github.com/OISF/suricata-update.git
+  cd /home/vagrant/suricata-update || exit 1
+  python setup.py install
+  # Add DC_SERVERS variable to suricata.yaml in support et-open signatures
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
 
-    # It may make sense to store the suricata.yaml file as a resource file if this begins to become too complex
-    # Add more verbose alert logging
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload true
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-buffer-size 4kb
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-printable yes
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.packet yes
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.http yes
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.tls yes
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.ssh yes
-    /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.smtp yes
-    # Turn off traffic flow logging (duplicative of Bro and wrecks Splunk trial license)
-    /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove HTTP
-    /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove DNS
-    /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove TLS
-    /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SMTP
-    /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SSH
-    /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Stats
-    /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Flow
-    # AF packet monitoring should be set to eth1
-    /root/go/bin/yq w -i /etc/suricata/suricata.yaml af-packet.0.interface eth1
+  # It may make sense to store the suricata.yaml file as a resource file if this begins to become too complex
+  # Add more verbose alert logging
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload true
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-buffer-size 4kb
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-printable yes
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.packet yes
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.http yes
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.tls yes
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.ssh yes
+  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.smtp yes
+  # Turn off traffic flow logging (duplicative of Bro and wrecks Splunk trial license)
+  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove HTTP
+  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove DNS
+  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove TLS
+  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SMTP
+  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SSH
+  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Stats
+  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Flow
+  # AF packet monitoring should be set to eth1
+  /root/go/bin/yq w -i /etc/suricata/suricata.yaml af-packet.0.interface eth1
 
-    crudini --set --format=sh /etc/default/suricata '' iface eth1
-    # update suricata signature sources
-    suricata-update update-sources
-    # disable protocol decode as it is duplicative of bro
-    echo re:protocol-command-decode >> /etc/suricata/disable.conf
-    # enable et-open and attackdetection sources
-    suricata-update enable-source et/open
-    suricata-update enable-source ptresearch/attackdetection
-    # Add the YAML header to the top of the suricata config
-    echo "Adding the YAML header to /etc/suricata/suricata.yaml"
-    echo -e "%YAML 1.1\n---\n$(cat /etc/suricata/suricata.yaml)" > /etc/suricata/suricata.yaml
+  crudini --set --format=sh /etc/default/suricata '' iface eth1
+  # update suricata signature sources
+  suricata-update update-sources
+  # disable protocol decode as it is duplicative of bro
+  echo re:protocol-command-decode >> /etc/suricata/disable.conf
+  # enable et-open and attackdetection sources
+  suricata-update enable-source et/open
+  suricata-update enable-source ptresearch/attackdetection
+  # Add the YAML header to the top of the suricata config
+  echo "Adding the YAML header to /etc/suricata/suricata.yaml"
+  echo -e "%YAML 1.1\n---\n$(cat /etc/suricata/suricata.yaml)" > /etc/suricata/suricata.yaml
 
-    # Update suricata and restart
-    suricata-update
-    service suricata stop
-    service suricata start
+  # Update suricata and restart
+  suricata-update
+  service suricata stop
+  service suricata start
 
-    # Verify that Suricata is running
-    if ! pgrep -f suricata > /dev/null; then
-      echo "Suricata attempted to start but is not running. Exiting"
-      exit 1
-    fi
+  # Verify that Suricata is running
+  if ! pgrep -f suricata > /dev/null; then
+    echo "Suricata attempted to start but is not running. Exiting"
+    exit 1
+  fi
 }
 
 main() {
