@@ -394,19 +394,19 @@ function download {
 function post_build_checks {
 
   Write-Verbose '[post_build_checks] Running Caldera Check.'
-  $CALDERA_CHECK = download -URL 'https://192.168.38.5:8888' -PatternToMatch '<title>CALDERA</title>'
+  $CALDERA_CHECK = download -URL 'https://192.168.38.105:8888' -PatternToMatch '<title>CALDERA</title>'
   Write-Verbose "[post_build_checks] Cladera Result: $CALDERA_CHECK"
 
   Write-Verbose '[post_build_checks] Running Splunk Check.'
-  $SPLUNK_CHECK = download -URL 'https://192.168.38.5:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
+  $SPLUNK_CHECK = download -URL 'https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
   Write-Verbose "[post_build_checks] Splunk Result: $SPLUNK_CHECK"
 
   Write-Verbose '[post_build_checks] Running Fleet Check.'
-  $FLEET_CHECK = download -URL 'https://192.168.38.5:8412' -PatternToMatch 'Kolide Fleet'
+  $FLEET_CHECK = download -URL 'https://192.168.38.105:8412' -PatternToMatch 'Kolide Fleet'
   Write-Verbose "[post_build_checks] Fleet Result: $FLEET_CHECK"
 
   Write-Verbose '[post_build_checks] Running MS ATA Check.'
-  $ATA_CHECK = download -URL 'https://192.168.38.3' -SuccessOn401
+  $ATA_CHECK = download -URL 'https://192.168.38.103' -SuccessOn401
   Write-Verbose "[post_build_checks] ATA Result: $ATA_CHECK"
 
 
