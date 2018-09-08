@@ -360,6 +360,7 @@ install_suricata() {
   suricata-update
   service suricata stop
   service suricata start
+  sleep 3
 
   # Verify that Suricata is running
   if ! pgrep -f suricata > /dev/null; then
