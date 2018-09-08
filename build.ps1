@@ -180,12 +180,12 @@ function list_providers {
 function download_boxes {
   Write-Verbose '[download_boxes] Running..'
   if ($PackerProvider -eq 'virtualbox') {
-    $win10Hash = 'ad78b3406dd2c0e3418d1dd61e2abc2c'
-    $win2016Hash = 'f352c852ed1b849dab18442caef83712'
+    $win10Hash = '94c1ff7264e67af3d7df6d19275086ac'
+    $win2016Hash = '2a0b5dbc432e27a0223da026cc1f378b'
   }
   if ($PackerProvider -eq 'vmware') {
-    $win10Hash = '14e1c4cc15e1dc47aead906b25c5b3cc'
-    $win2016Hash = 'da1111c765b2fdc2ce012b6348cf74e2'
+    $win10Hash = '7d26d3247162dfbf6026fd5bab6a21ee'
+    $win2016Hash = '634628e04a1c6c94b4036b76d0568948'
   }
 
   $win10Filename = "windows_10_$PackerProvider.box"

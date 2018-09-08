@@ -397,19 +397,19 @@ download_boxes() {
   fi
   # Verify hashes of VirtualBox boxes
   if [ "$PACKER_PROVIDER" == "virtualbox" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "ad78b3406dd2c0e3418d1dd61e2abc2c" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "94c1ff7264e67af3d7df6d19275086ac" ]; then
       (echo >&2 "Hash mismatch on windows_10_virtualbox.box")
     fi
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "f352c852ed1b849dab18442caef83712" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "2a0b5dbc432e27a0223da026cc1f378b" ]; then
       (echo >&2 "Hash mismatch on windows_2016_virtualbox.box")
     fi
     # Verify hashes of VMware boxes
   elif [ "$PACKER_PROVIDER" == "vmware" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "14e1c4cc15e1dc47aead906b25c5b3cc" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "7d26d3247162dfbf6026fd5bab6a21ee" ]; then
       (echo >&2 "Hash mismatch on windows_10_vmware.box")
       exit 1
     fi
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "da1111c765b2fdc2ce012b6348cf74e2" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "634628e04a1c6c94b4036b76d0568948" ]; then
       (echo >&2 "Hash mismatch on windows_2016_vmware.box")
       exit 1
     fi
