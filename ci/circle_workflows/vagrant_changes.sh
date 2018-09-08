@@ -36,7 +36,7 @@ ssh -i ~/.ssh/id_rsa root@"$IP_ADDRESS" 'bash -s' -- < ci/build_machine_bootstra
 
 ## Waiting for Packet server to post build results
 MINUTES_PAST=0
-while [ "$MINUTES_PAST" -lt 120 ]; do
+while [ "$MINUTES_PAST" -lt 180 ]; do
   STATUS=$(curl $IP_ADDRESS)
   if [ "$STATUS" == "building" ]; then
     echo "$STATUS"
@@ -44,9 +44,10 @@ while [ "$MINUTES_PAST" -lt 120 ]; do
     sleep 300
     ((MINUTES_PAST += 5))
   else
+    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
     break
   fi
-  if [ "$MINUTES_PAST" -gt 120 ]; then
+  if [ "$MINUTES_PAST" -gt 180 ]; then
     echo "Serer timed out. Uptime: $MINUTES_PAST minutes."
     scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
     curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"

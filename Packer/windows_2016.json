@@ -32,6 +32,7 @@
       "enable_secure_boot":true
     },
     {
+      "vm_name":"WindowsServer2016",
       "type": "vmware-iso",
       "communicator": "winrm",
       "iso_url": "{{user `iso_url`}}",
@@ -70,6 +71,7 @@
       }
     },
     {
+      "vm_name":"WindowsServer2016",
       "type": "virtualbox-iso",
       "communicator": "winrm",
       "iso_url": "{{user `iso_url`}}",
