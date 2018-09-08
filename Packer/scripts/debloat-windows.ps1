@@ -8,21 +8,27 @@ if ($env:PACKER_BUILDER_TYPE -And $($env:PACKER_BUILDER_TYPE).startsWith("hyperv
   (New-Object System.Net.WebClient).DownloadFile($url, "$env:TEMP\debloat.zip")
   Expand-Archive -Path $env:TEMP\debloat.zip -DestinationPath $env:TEMP -Force
 
-  #Write-Host Disable scheduled tasks
-  #. $env:TEMP\Debloat-Windows-10-master\utils\disable-scheduled-tasks.ps1
-  #Write-Host Block telemetry
-  #. $env:TEMP\Debloat-Windows-10-master\scripts\block-telemetry.ps1
-  #Write-Host Disable services
-  #. $env:TEMP\Debloat-Windows-10-master\scripts\disable-services.ps1
+  # Disable Windows Defender
   Write-host Disable Windows Defender
-  #. $env:TEMP\Debloat-Windows-10-master\scripts\disable-windows-defender.ps1
-  Uninstall-WindowsFeature Windows-Defender-Features
+  $os = (gwmi win32_operatingsystem).caption
+  if ($os -like "*Windows 10*") {
+    set-MpPreference -DisableRealtimeMonitoring $true
+  } else {
+    Uninstall-WindowsFeature Windows-Defender-Features
+  }
+
+  # Optimize Windows Update
   Write-host Optimize Windows Update
   . $env:TEMP\Debloat-Windows-10-master\scripts\optimize-windows-update.ps1
-  #Write-host Disable Windows Update
-  #Set-Service wuauserv -StartupType Disabled
-  #Write-Host Remove OneDrive
-  #. $env:TEMP\Debloat-Windows-10-master\scripts\remove-onedrive.ps1
+  Write-host Disable Windows Update
+  Set-Service wuauserv -StartupType Disabled
+
+  # Turn off shutdown event tracking
+  if ( -Not (Test-Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Reliability'))
+  {
+    New-Item -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT' -Name Reliability -Force
+  }
+  Set-ItemProperty -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Reliability' -Name ShutdownReasonOn -Value 0
 
   rm $env:TEMP\debloat.zip
   rm -recurse $env:TEMP\Debloat-Windows-10-master

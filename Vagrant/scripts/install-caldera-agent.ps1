@@ -2,7 +2,7 @@
 
 If (-not (Test-Path 'C:\Program Files\cagent\cagent.exe')) {
   # Add /etc/hosts entry
-  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.5    logger"
+  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.105    logger"
 
   # Make the directory
   New-Item "c:\Program Files\cagent" -type directory

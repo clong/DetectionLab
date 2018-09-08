@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.box = "bento/ubuntu-16.04"
     cfg.vm.hostname = "logger"
     config.vm.provision :shell, path: "bootstrap.sh"
-    cfg.vm.network :private_network, ip: "192.168.38.5", gateway: "192.168.38.1", dns: "8.8.8.8"
+    cfg.vm.network :private_network, ip: "192.168.38.105", gateway: "192.168.38.1", dns: "8.8.8.8"
 
     cfg.vm.provider "vmware_fusion" do |v, override|
       v.vmx["displayname"] = "logger"
@@ -45,9 +45,9 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.2", gateway: "192.168.38.1"
+    cfg.vm.network :private_network, ip: "192.168.38.102", gateway: "192.168.38.1"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "192.168.38.2"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "192.168.38.102"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -64,6 +64,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/configure-powershelllogging.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/configure-AuditingPolicyGPOs.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: true
+    cfg.vm.provision "shell", inline: 'wevtutil el | Foreach-Object {wevtutil cl "$_"}', privileged: true
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: true
 
     cfg.vm.provider "vmware_fusion" do |v, override|
@@ -102,14 +103,15 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.3", gateway: "192.168.38.1", dns: "192.168.38.2"
+    cfg.vm.network :private_network, ip: "192.168.38.103", gateway: "192.168.38.1", dns: "192.168.38.102"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.3 -dns 192.168.38.2"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.103 -dns 192.168.38.102"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: true
+    cfg.vm.provision "shell", inline: 'wevtutil el | Foreach-Object {wevtutil cl "$_"}', privileged: true
     cfg.vm.provision "shell", path: "scripts/install-wefsubscriptions.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-windows_ta.ps1", privileged: true
@@ -158,15 +160,16 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.4", gateway: "192.168.38.1", dns: "192.168.38.2"
+    cfg.vm.network :private_network, ip: "192.168.38.104", gateway: "192.168.38.1", dns: "192.168.38.102"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.4 -dns 192.168.38.2"
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.104 -dns 192.168.38.102"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/MakeWindows10GreatAgain.ps1", privileged: true
+    cfg.vm.provision "shell", inline: 'wevtutil el | Foreach-Object {wevtutil cl "$_"}', privileged: true
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: true
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: true
