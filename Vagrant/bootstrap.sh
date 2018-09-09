@@ -104,7 +104,7 @@ install_splunk() {
     cp /vagrant/resources/splunk_server/transforms.conf /opt/splunk/etc/apps/search/local/
     cp /opt/splunk/etc/system/default/limits.conf /opt/splunk/etc/system/local/limits.conf
     # Bump the memtable limits to allow for the ASN lookup table
-    sed -i .bak 's/max_memtable_bytes = 10000000/max_memtable_bytes = 30000000/g' /opt/splunk/etc/system/local/limits.conf
+    sed -i.bak 's/max_memtable_bytes = 10000000/max_memtable_bytes = 30000000/g' /opt/splunk/etc/system/local/limits.conf
     # Skip Splunk Tour and Change Password Dialog
     touch /opt/splunk/etc/.ui_login
     # Enable SSL Login for Splunk
