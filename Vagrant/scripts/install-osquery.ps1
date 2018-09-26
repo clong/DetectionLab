@@ -19,7 +19,7 @@ If (-not ($service)) {
   ###  --- TLS CONFIG BEGINS ---
   ### COMMENT ALL LINES BELOW UNTIL "TLS CONFIG ENDS" if using local configuration
   ## Add entry to hosts file for Kolide for SSL validation
-  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.5    kolide"
+  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.105    kolide"
   ## Add kolide secret and avoid BOM
   $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
   [System.IO.File]::WriteAllLines("c:\ProgramData\osquery\kolide_secret.txt", "enrollmentsecret", $Utf8NoBomEncoding)

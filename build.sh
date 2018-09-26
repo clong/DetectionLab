@@ -8,12 +8,12 @@
 # https://github.com/clong/DetectionLab/issues
 
 print_usage() {
-  echo "Usage: ./build.sh <virtualbox|vmware_desktop>"
+  echo "Usage: ./build.sh <virtualbox | vmware_desktop>  <--vagrant-only | --packer-only>"
   exit 0
 }
 
 check_packer_path() {
-# Check for existence of Packer in PATH
+  # Check for existence of Packer in PATH
   if ! which packer >/dev/null; then
     (echo >&2 "Packer was not found in your PATH.")
     (echo >&2 "Please correct this before continuing. Quitting.")
@@ -23,16 +23,16 @@ check_packer_path() {
 }
 
 check_vagrant_path() {
-# Check for existence of Vagrant in PATH
-if ! which vagrant >/dev/null; then
-  (echo >&2 "Vagrant was not found in your PATH.")
-  (echo >&2 "Please correct this before continuing. Quitting.")
-  exit 1
-fi
-# Ensure Vagrant >= 2.0.0
-if [ "$(vagrant --version | grep -o "[0-9]" | head -1)" -lt 2 ]; then
-  (echo >&2 "WARNING: It is highly recommended to use Vagrant 2.0.0 or above before continuing")
-fi
+  # Check for existence of Vagrant in PATH
+  if ! which vagrant >/dev/null; then
+    (echo >&2 "Vagrant was not found in your PATH.")
+    (echo >&2 "Please correct this before continuing. Quitting.")
+    exit 1
+  fi
+  # Ensure Vagrant >= 2.0.0
+  if [ "$(vagrant --version | grep -o "[0-9]" | head -1)" -lt 2 ]; then
+    (echo >&2 "WARNING: It is highly recommended to use Vagrant 2.0.0 or above before continuing")
+  fi
 }
 
 # Returns 0 if not installed or 1 if installed
@@ -64,14 +64,14 @@ check_vmware_desktop_vagrant_plugin_installed() {
   fi
   VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT="$(vagrant plugin list | grep -c 'vagrant-vmware-desktop')"
   if [ "$VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT" -eq 0 ]; then
-  (echo >&2 "VMWare Fusion is installed, but the vagrant-vmware-desktop plugin is not.")
-  (echo >&2 "If you are seeing this, you may have the deprecated vagrant-vmware-fusion plugin installed. Please remove it and install the vagrant-vmware-desktop plugin.")
-  (echo >&2 "Visit https://www.hashicorp.com/blog/introducing-the-vagrant-vmware-desktop-plugin for more information on how to purchase and install it")
-  (echo >&2 "VMWare Fusion will not be listed as a provider until the vagrant-vmware-desktop plugin has been installed.")
-  echo "0"
-else
-  echo "$VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT"
-fi
+    (echo >&2 "VMWare Fusion is installed, but the vagrant-vmware-desktop plugin is not.")
+    (echo >&2 "If you are seeing this, you may have the deprecated vagrant-vmware-fusion plugin installed. Please remove it and install the vagrant-vmware-desktop plugin.")
+    (echo >&2 "Visit https://www.hashicorp.com/blog/introducing-the-vagrant-vmware-desktop-plugin for more information on how to purchase and install it")
+    (echo >&2 "VMWare Fusion will not be listed as a provider until the vagrant-vmware-desktop plugin has been installed.")
+    echo "0"
+  else
+    echo "$VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT"
+  fi
 }
 
 # List the available Vagrant providers present on the system
@@ -251,10 +251,10 @@ vagrant_reload_host() {
 post_build_checks() {
   # If the curl operation fails, we'll just leave the variable equal to 0
   # This is needed to prevent the script from exiting if the curl operation fails
-  CALDERA_CHECK=$(curl -ks -m 2 https://192.168.38.5:8888 | grep -c '302: Found' || echo "")
-  SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.38.5:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk' || echo "")
-  FLEET_CHECK=$(curl -ks -m 2 https://192.168.38.5:8412 | grep -c 'Kolide Fleet' || echo "")
-  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.38.3 -m 2)
+  CALDERA_CHECK=$(curl -ks -m 2 https://192.168.38.105:8888 | grep -c '302: Found' || echo "")
+  SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk' || echo "")
+  FLEET_CHECK=$(curl -ks -m 2 https://192.168.38.105:8412 | grep -c 'Kolide Fleet' || echo "")
+  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.38.103 -m 2)
   [[ $ATA_CHECK == 401 ]] && ATA_CHECK=1
 
   BASH_MAJOR_VERSION=$(/bin/bash --version | grep 'GNU bash' | grep -o version\.\.. | cut -d ' ' -f 2 | cut -d '.' -f 1)
@@ -298,27 +298,27 @@ parse_cli_arguments() {
     # TODO: Check to make sure they actually have their provider installed
     case "$1" in
       virtualbox)
-        PROVIDER="$1"
-        PACKER_PROVIDER="$1"
-        ;;
+      PROVIDER="$1"
+      PACKER_PROVIDER="$1"
+      ;;
       vmware_desktop)
-        PROVIDER="$1"
-        PACKER_PROVIDER="vmware"
-        ;;
+      PROVIDER="$1"
+      PACKER_PROVIDER="vmware"
+      ;;
       *)
-        echo "\"$1\" is not a valid provider. Listing available providers:"
-        PROVIDER=$(list_providers)
-        ;;
+      echo "\"$1\" is not a valid provider. Listing available providers:"
+      PROVIDER=$(list_providers)
+      ;;
     esac
   fi
   if [ $# -eq 2 ]; then
     case "$2" in
       --packer-only)
-        PACKER_ONLY=1
-        ;;
+      PACKER_ONLY=1
+      ;;
       --vagrant-only)
-        VAGRANT_ONLY=1
-        ;;
+      VAGRANT_ONLY=1
+      ;;
       *)
       echo -e "\"$2\" is not recognized as an option. Available options are:\\n--packer-only\\n--vagrant-only"
       exit 1
@@ -331,37 +331,37 @@ build_packer_boxes() {
   PACKER_BOXES=("windows_2016" "windows_10")
 
   if [ "$(hostname)" == "packerwindows10" ]; then   # Workaround for CI environment
-    (echo >&2 "CI Environment detected. If you are a user and are seeing this, please file an issue on GitHub.")
-    RET=$(packer_build_box "windows_10")
-    if [ "$RET" -eq 0 ]; then
-      (echo >&2 "Good news! The windows_10 box was built with Packer successfully!")
-    else
-      (echo >&2 "Something went wrong while attempting to build the windows_10 box.")
-      (echo >&2 "To file an issue, please visit https://github.com/clong/DetectionLab/issues/")
-      exit 1
-    fi
-  elif [ "$(hostname)" == "packerwindows2016" ]; then  # Workaround for CI environment
-    (echo >&2 "CI Environment detected. If you are a user and are seeing this, please file an issue on GitHub.")
-    RET=$(packer_build_box "windows_2016")
-    if [ "$RET" -eq 0 ]; then
-      (echo >&2 "Good news! The windows_2016 box was built with Packer successfully!")
-    else
-      (echo >&2 "Something went wrong while attempting to build the windows_2016 box.")
-      (echo >&2 "To file an issue, please visit https://github.com/clong/DetectionLab/issues/")
-      exit 1
-    fi
+  (echo >&2 "CI Environment detected. If you are a user and are seeing this, please file an issue on GitHub.")
+  RET=$(packer_build_box "windows_10")
+  if [ "$RET" -eq 0 ]; then
+    (echo >&2 "Good news! The windows_10 box was built with Packer successfully!")
   else
-    for PACKER_BOX in "${PACKER_BOXES[@]}"; do  # Normal user workflow
-      RET=$(packer_build_box "$PACKER_BOX")
-      if [ "$RET" -eq 0 ]; then
-        (echo >&2 "Good news! $PACKER_BOX was built successfully!")
-      else
-        (echo >&2 "Something went wrong while attempting to build the $PACKER_BOX box.")
-        (echo >&2 "To file an issue, please visit https://github.com/clong/DetectionLab/issues/")
-        exit 1
-      fi
-    done
+    (echo >&2 "Something went wrong while attempting to build the windows_10 box.")
+    (echo >&2 "To file an issue, please visit https://github.com/clong/DetectionLab/issues/")
+    exit 1
   fi
+elif [ "$(hostname)" == "packerwindows2016" ]; then  # Workaround for CI environment
+(echo >&2 "CI Environment detected. If you are a user and are seeing this, please file an issue on GitHub.")
+RET=$(packer_build_box "windows_2016")
+if [ "$RET" -eq 0 ]; then
+  (echo >&2 "Good news! The windows_2016 box was built with Packer successfully!")
+else
+  (echo >&2 "Something went wrong while attempting to build the windows_2016 box.")
+  (echo >&2 "To file an issue, please visit https://github.com/clong/DetectionLab/issues/")
+  exit 1
+fi
+else
+  for PACKER_BOX in "${PACKER_BOXES[@]}"; do  # Normal user workflow
+  RET=$(packer_build_box "$PACKER_BOX")
+  if [ "$RET" -eq 0 ]; then
+    (echo >&2 "Good news! $PACKER_BOX was built successfully!")
+  else
+    (echo >&2 "Something went wrong while attempting to build the $PACKER_BOX box.")
+    (echo >&2 "To file an issue, please visit https://github.com/clong/DetectionLab/issues/")
+    exit 1
+  fi
+done
+fi
 }
 
 choose_md5_tool() {
@@ -397,19 +397,19 @@ download_boxes() {
   fi
   # Verify hashes of VirtualBox boxes
   if [ "$PACKER_PROVIDER" == "virtualbox" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "ad78b3406dd2c0e3418d1dd61e2abc2c" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "94c1ff7264e67af3d7df6d19275086ac" ]; then
       (echo >&2 "Hash mismatch on windows_10_virtualbox.box")
     fi
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "f352c852ed1b849dab18442caef83712" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "2a0b5dbc432e27a0223da026cc1f378b" ]; then
       (echo >&2 "Hash mismatch on windows_2016_virtualbox.box")
     fi
     # Verify hashes of VMware boxes
   elif [ "$PACKER_PROVIDER" == "vmware" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "14e1c4cc15e1dc47aead906b25c5b3cc" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "7d26d3247162dfbf6026fd5bab6a21ee" ]; then
       (echo >&2 "Hash mismatch on windows_10_vmware.box")
       exit 1
     fi
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "da1111c765b2fdc2ce012b6348cf74e2" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "634628e04a1c6c94b4036b76d0568948" ]; then
       (echo >&2 "Hash mismatch on windows_2016_vmware.box")
       exit 1
     fi
@@ -430,7 +430,9 @@ build_vagrant_hosts() {
       (echo >&2 "Something went wrong while attempting to build the $VAGRANT_HOST box.")
       (echo >&2 "Attempting to reload and reprovision the host...")
       RETRY_STATUS=$(vagrant_reload_host "$VAGRANT_HOST")
-      if [ "$RETRY_STATUS" -ne 0 ]; then
+      if [ "$RETRY_STATUS" -eq 0 ]; then
+        (echo >&2 "Good news! $VAGRANT_HOST was built successfully after a reload!")
+      else
         (echo >&2 "Failed to bring up $VAGRANT_HOST after a reload. Exiting.")
         exit 1
       fi
@@ -465,7 +467,7 @@ main() {
     build_vagrant_hosts
     post_build_checks
   fi
- }
+}
 
 main "$@"
 exit 0

@@ -1,6 +1,13 @@
 # Detection Lab
 CircleCI: [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.svg?style=svg)](https://circleci.com/gh/clong/DetectionLab/tree/master)
 
+#### Donate to the project:
+
+All of the infrastructure, building, and testing of DetectionLab is currently funded by myself in my spare time. If you find this project useful, feel free to buy me a coffee using one of the buttons below!
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](paypal.me/clong0)
+[![Donate](https://img.shields.io/badge/Donate-Crypto-blue.svg)](https://commerce.coinbase.com/checkout/838ac7a2-7b9d-4d40-b475-fd1015fdaacd)
+
 ## Purpose
 This lab has been designed with defenders in mind. Its primary purpose is to allow the user to quickly build a Windows domain that comes pre-loaded with security tooling and some best practices when it comes to system logging configurations. It can easily be modified to fit most needs or expanded to include additional hosts.
 
@@ -56,10 +63,10 @@ Windows users will want to use the following script:
 
 Provider | Box  | URL | MD5 | Size
 ------------|-----|-----|----|----
-Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | f352c852ed1b849dab18442caef83712 | 6.4GB
-Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | ad78b3406dd2c0e3418d1dd61e2abc2c | 5.8GB
-VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | da1111c765b2fdc2ce012b6348cf74e2 | 6.7GB
-VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | 14e1c4cc15e1dc47aead906b25c5b3cc | 6.0GB
+Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | 2a0b5dbc432e27a0223da026cc1f378b | 6.4GB
+Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | 94c1ff7264e67af3d7df6d19275086ac | 5.8GB
+VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | 634628e04a1c6c94b4036b76d0568948 | 6.7GB
+VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | 7d26d3247162dfbf6026fd5bab6a21ee | 6.0GB
 
 If you choose to download the boxes, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
 
@@ -85,9 +92,9 @@ $ packer build --only=[vmware|virtualbox]-iso windows_2016.json
   * Provision the WEF host and configure it as a Windows Event Collector in the Servers OU
   * Provision the Win10 host and configure it as a computer in the Workstations OU
 
-7. Navigate to https://192.168.38.5:8000 in a browser to access the Splunk instance on logger. Default credentials are admin:changeme (you will have the option to change them on the next screen)
-8. Navigate to https://192.168.38.5:8412 in a browser to access the Fleet server on logger. Default credentials are admin:admin123#. Query packs are pre-configured with queries from [palantir/osquery-configuration](https://github.com/palantir/osquery-configuration).
-9. Navigate to https://192.168.38.5:8888 in a browser to access the Caldera server on logger. Default credentials are admin:caldera.
+7. Navigate to https://192.168.38.105:8000 in a browser to access the Splunk instance on logger. Default credentials are admin:changeme (you will have the option to change them on the next screen)
+8. Navigate to https://192.168.38.105:8412 in a browser to access the Fleet server on logger. Default credentials are admin:admin123#. Query packs are pre-configured with queries from [palantir/osquery-configuration](https://github.com/palantir/osquery-configuration).
+9. Navigate to https://192.168.38.105:8888 in a browser to access the Caldera server on logger. Default credentials are admin:caldera.
 
 ## Basic Vagrant Usage
 Vagrant commands must be run from the "Vagrant" folder.
@@ -108,10 +115,10 @@ Vagrant commands must be run from the "Vagrant" folder.
 ## Lab Information
 * Domain Name: windomain.local
 * Admininstrator login: vagrant:vagrant
-* Fleet login: https://192.168.38.5:8412 - admin:admin123#
-* Splunk login: https://192.168.38.5:8000 - admin:changeme
-* Caldera login: https://192.168.38.5:8888 - admin:caldera
-* MS ATA login: https://192.168.38.3 - wef\vagrant:vagrant
+* Fleet login: https://192.168.38.105:8412 - admin:admin123#
+* Splunk login: https://192.168.38.105:8000 - admin:changeme
+* Caldera login: https://192.168.38.105:8888 - admin:caldera
+* MS ATA login: https://192.168.38.103 - wef\vagrant:vagrant
 
 ## Lab Hosts
 * DC - Windows 2016 Domain Controller
@@ -143,7 +150,7 @@ Vagrant commands must be run from the "Vagrant" folder.
   * Fleet osquery Manager
   * Mitre's Caldera Server
   * Bro
-  * Suricata 
+  * Suricata
 
 ## Splunk Indexes
 Index Name | Description
