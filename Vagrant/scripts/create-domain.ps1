@@ -4,6 +4,8 @@ param ([String] $ip)
 
 $subnet = $ip -replace "\.\d+$", ""
 
+$domain= "windomain.local"
+
 if ((gwmi win32_computersystem).partofdomain -eq $false) {
 
   Write-Host 'Installing RSAT tools'
@@ -34,7 +36,7 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
     -CreateDnsDelegation:$false `
     -DatabasePath "C:\Windows\NTDS" `
     -DomainMode "7" `
-    -DomainName "windomain.local" `
+    -DomainName $domain `
     -DomainNetbiosName "WINDOMAIN" `
     -ForestMode "7" `
     -InstallDns:$true `
@@ -51,5 +53,32 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
   }
   Write-Host "Setting timezone to UTC"
   c:\windows\system32\tzutil.exe /s "UTC"
+  
   Write-Host "Excluding NAT interface from DNS"
+  $nics=Get-WmiObject "Win32_NetworkAdapterConfiguration where IPEnabled='TRUE'" |? { $_.IPAddress[0] -ilike "172.25.*" }
+  $dnslistenip=$nics.IPAddress
+  $dnslistenip
+  dnscmd /ResetListenAddresses  $dnslistenip
+
+  $nics=Get-WmiObject "Win32_NetworkAdapterConfiguration where IPEnabled='TRUE'" |? { $_.IPAddress[0] -ilike "10.*" }
+  foreach($nic in $nics)
+  {
+    $nic.DomainDNSRegistrationEnabled = $false
+    $nic.SetDynamicDNSRegistration($false) |Out-Null
+    }
+
+
+ #Get-DnsServerResourceRecord -ZoneName $domain -type 1 -Name "@" |Select-Object HostName,RecordType -ExpandProperty RecordData |Where-Object {$_.IPv4Address -ilike "10.*"}|Remove-DnsServerResourceRecord
+ $RRs= Get-DnsServerResourceRecord -ZoneName $domain -type 1 -Name "@"
+
+ foreach($RR in $RRs)
+ {
+  if ( (Select-Object  -InputObject $RR HostName,RecordType -ExpandProperty RecordData).IPv4Address -ilike "10.*")
+  { 
+   Remove-DnsServerResourceRecord -ZoneName $domain -RRType A -Name "@" -RecordData $RR.RecordData.IPv4Address -Confirm
+  }
+
+ }
+  Restart-Service DNS
+  
 }
