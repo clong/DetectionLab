@@ -16,7 +16,7 @@ choco install -y NotepadPlusPlus
 choco install -y GoogleChrome
 choco install -y WinRar
 
-# Disable Windows Defender realtime scanning before downloading Mimikatz
+# Disable Windows Defender realtime scanning before downloading Mimikatz and drop the firewall
 If ($env:computername -eq "win10") {
   If (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender")
   {
@@ -25,7 +25,7 @@ If ($env:computername -eq "win10") {
   gpupdate /force | Out-String
   Set-MpPreference -ExclusionPath C:\commander.exe, C:\Tools
   set-MpPreference -DisableRealtimeMonitoring $true
-
+  Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 }
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
