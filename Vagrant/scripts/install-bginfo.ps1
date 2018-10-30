@@ -4,6 +4,8 @@ if (!(Test-Path 'c:\Program Files\sysinternals')) {
   New-Item -Path 'c:\Program Files\sysinternals' -type directory -Force -ErrorAction SilentlyContinue
 }
 if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
+  # SysInternals requires TLS 1.2
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   (New-Object Net.WebClient).DownloadFile('http://live.sysinternals.com/bginfo.exe', 'c:\Program Files\sysinternals\bginfo.exe')
 }
 $vbsScript = @'
