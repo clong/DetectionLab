@@ -51,8 +51,8 @@ if [ "$PACKER_ONLY" -eq 0 ]; then
   # Install Vagrant
   mkdir /opt/vagrant
   cd /opt/vagrant || exit 1
-  wget https://releases.hashicorp.com/vagrant/2.1.4/vagrant_2.1.4_x86_64.deb
-  dpkg -i vagrant_2.1.4_x86_64.deb
+  wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
+  dpkg -i vagrant_2.2.2_x86_64.deb
   vagrant plugin install vagrant-reload
 
   # Make the Vagrant instances headless
@@ -64,8 +64,8 @@ if [ "$VAGRANT_ONLY" -eq 0 ]; then
   # Install Packer
   mkdir /opt/packer
   cd /opt/packer || exit 1
-  wget https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_linux_amd64.zip
-  unzip packer_1.2.5_linux_amd64.zip
+  wget https://releases.hashicorp.com/packer/1.3.2/packer_1.3.2_linux_amd64.zip
+  unzip packer_1.3.2_linux_amd64.zip
   cp packer /usr/local/bin/packer
 
   # Make the Packer images headless
