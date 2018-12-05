@@ -64,7 +64,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/configure-powershelllogging.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/configure-AuditingPolicyGPOs.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
-    cfg.vm.provision "shell", inline: 'wevtutil el | Foreach-Object {wevtutil cl "$_"}', privileged: false
+    cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
 
     cfg.vm.provider "vmware_fusion" do |v, override|
@@ -111,7 +111,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: false
-    cfg.vm.provision "shell", inline: 'wevtutil el | Foreach-Object {wevtutil cl "$_"}', privileged: false
+    cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", path: "scripts/install-wefsubscriptions.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-windows_ta.ps1", privileged: false
@@ -170,7 +170,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/MakeWindows10GreatAgain.ps1", privileged: false
-    cfg.vm.provision "shell", inline: 'wevtutil el | Foreach-Object {wevtutil cl "$_"}', privileged: false
+    cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
