@@ -14,7 +14,13 @@ DEVICE_ID=$(curl -s -X POST --header 'Accept: application/json' --header 'Conten
 # TODO: maybe make this a regex
 if [ "$(echo -n $DEVICE_ID | wc -c)" -ne 36 ]; then
   echo "Server may have failed provisionining. Device ID is set to: $DEVICE_ID"
-  exit 1
+  echo "This usually happens if there are no servers available in the selected datacenter."
+  echo "Attempting to retry in another datacenter..."
+  DEVICE_ID=$(curl -s -X POST --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "ewr1", "plan": "baremetal_1", "hostname": "detectionlab", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys": ["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."id" | tr -d '"')
+  if [ "$(echo -n $DEVICE_ID | wc -c)" -ne 36 ]; then
+    echo "This script was still unable to successfully provision a server. Exiting."
+    exit 1
+  fi
 fi
 echo "Server successfully provisioned with ID: $DEVICE_ID"
 
