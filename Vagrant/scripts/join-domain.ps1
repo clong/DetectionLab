@@ -27,3 +27,10 @@ If ($hostname -eq "wef") {
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name AutoAdminLogon -Value 1
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name DefaultUserName -Value "vagrant"
 Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name DefaultPassword -Value "vagrant"
+
+# Stop Windows Update
+Write-Host "Disabling Windows Updates and Windows Module Services"
+Set-Service wuauserv -StartupType Disabled
+Stop-Service wuauserv
+Set-Service TrustedInstaller -StartupType Disabled
+Stop-Service TrustedInstaller

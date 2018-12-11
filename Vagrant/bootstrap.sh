@@ -84,8 +84,8 @@ install_splunk() {
     # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
     dig @8.8.8.8 splunk.com
     # Download Splunk
-    wget --progress=bar:force -O splunk-7.1.2-a0c72a66db66-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.1.2&product=splunk&filename=splunk-7.1.2-a0c72a66db66-linux-2.6-amd64.deb&wget=true'
-    dpkg -i splunk-7.1.2-a0c72a66db66-linux-2.6-amd64.deb
+    wget --progress=bar:force -O splunk-7.2.1-be11b2c46e23-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.1&product=splunk&filename=splunk-7.2.1-be11b2c46e23-linux-2.6-amd64.deb&wget=true'
+    dpkg -i splunk-7.2.1-be11b2c46e23-linux-2.6-amd64.deb
     /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
     /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
@@ -94,9 +94,17 @@ install_splunk() {
     /opt/splunk/bin/splunk add index powershell -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index bro -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add index threathunting -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_500.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_800.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_012.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/force-directed-app-for-splunk_200.tgz  -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz  -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz  -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_11.tgz  -auth 'admin:changeme'
+    # Add custom Macro definitions for ThreatHunting App
+    cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/local
+
     # Add a Splunk TCP input on port 9997
     echo -e "[splunktcp://9997]\nconnection_host = ip" > /opt/splunk/etc/apps/search/local/inputs.conf
     # Add props.conf and transforms.conf
@@ -105,6 +113,7 @@ install_splunk() {
     cp /opt/splunk/etc/system/default/limits.conf /opt/splunk/etc/system/local/limits.conf
     # Bump the memtable limits to allow for the ASN lookup table
     sed -i.bak 's/max_memtable_bytes = 10000000/max_memtable_bytes = 30000000/g' /opt/splunk/etc/system/local/limits.conf
+
     # Skip Splunk Tour and Change Password Dialog
     touch /opt/splunk/etc/.ui_login
     # Enable SSL Login for Splunk

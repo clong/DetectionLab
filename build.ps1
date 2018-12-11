@@ -108,37 +108,37 @@ function check_vagrant {
 
 # Returns false if not installed or true if installed
 function check_virtualbox_installed {
-  Write-Verbose '[check_virtualbox_installed] Running..'
+  Write-Host '[check_virtualbox_installed] Running..'
   if (install_checker -Name "VirtualBox") {
-    Write-Verbose '[check_virtualbox_installed] Virtualbox found.'
+    Write-Host '[check_virtualbox_installed] Virtualbox found.'
     return $true
   }
   else {
-    Write-Verbose '[check_virtualbox_installed] Virtualbox not found.'
+    Write-Host '[check_virtualbox_installed] Virtualbox not found.'
     return $false
   }
 }
 function check_vmware_workstation_installed {
-  Write-Verbose '[check_vmware_workstation_installed] Running..'
+  Write-Host '[check_vmware_workstation_installed] Running..'
   if (install_checker -Name "VMware Workstation") {
-    Write-Verbose '[check_vmware_workstation_installed] VMware Workstation found.'
+    Write-Host '[check_vmware_workstation_installed] VMware Workstation found.'
     return $true
   }
   else {
-    Write-Verbose '[check_vmware_workstation_installed] VMware Workstation not found.'
+    Write-Host '[check_vmware_workstation_installed] VMware Workstation not found.'
     return $false
   }
 }
 
 function check_vmware_vagrant_plugin_installed {
-  Write-Verbose '[check_vmware_vagrant_plugin_installed] Running..'
+  Write-Host '[check_vmware_vagrant_plugin_installed] Running..'
   if (vagrant plugin list | Select-String 'vagrant-vmware-desktop') {
-    Write-Verbose 'The vagrant VMware Workstation plugin is no longer supported.'
-    Write-Verbose 'Please upgrade to the VMware Desktop plugin: https://www.vagrantup.com/docs/vmware/installation.html'
+    Write-Host 'The vagrant VMware Workstation plugin is no longer supported.'
+    Write-Host 'Please upgrade to the VMware Desktop plugin: https://www.vagrantup.com/docs/vmware/installation.html'
     return $false
   }
   if (vagrant plugin list | Select-String 'vagrant-vmware-desktop') {
-    Write-Verbose '[check_vmware_vagrant_plugin_installed] Vagrant VMware Desktop plugin found.'
+    Write-Host '[check_vmware_vagrant_plugin_installed] Vagrant VMware Desktop plugin found.'
     return $true
   }
   else {
@@ -178,7 +178,7 @@ function list_providers {
 }
 
 function download_boxes {
-  Write-Verbose '[download_boxes] Running..'
+  Write-Host '[download_boxes] Running..'
   if ($PackerProvider -eq 'virtualbox') {
     $win10Hash = '94c1ff7264e67af3d7df6d19275086ac'
     $win2016Hash = '2a0b5dbc432e27a0223da026cc1f378b'
@@ -192,9 +192,9 @@ function download_boxes {
   $win2016Filename = "windows_2016_$PackerProvider.box"
 
   $wc = New-Object System.Net.WebClient
-  Write-Verbose "[download_boxes] Downloading $win10Filename"
+  Write-Host "[download_boxes] Downloading $win10Filename"
   $wc.DownloadFile("https://www.detectionlab.network/$win10Filename", "$DL_DIR\Boxes\$win10Filename")
-  Write-Verbose "[download_boxes] Downloading $win2016Filename"
+  Write-Host "[download_boxes] Downloading $win2016Filename"
   $wc.DownloadFile("https://www.detectionlab.network/$win2016Filename", "$DL_DIR\Boxes\$win2016Filename")
   $wc.Dispose()
 
@@ -207,12 +207,12 @@ function download_boxes {
     break
   }
 
-  Write-Verbose "[download_boxes] Getting filehash for: $win10Filename"
+  Write-Host "[download_boxes] Getting filehash for: $win10Filename"
   $win10Filehash = (Get-FileHash -Path "$DL_DIR\Boxes\$win10Filename" -Algorithm MD5).Hash
-  Write-Verbose "[download_boxes] Getting filehash for: $win2016Filename"
+  Write-Host "[download_boxes] Getting filehash for: $win2016Filename"
   $win2016Filehash = (Get-FileHash -Path "$DL_DIR\Boxes\$win2016Filename" -Algorithm MD5).Hash
 
-  Write-Verbose '[download_boxes] Checking Filehashes..'
+  Write-Host '[download_boxes] Checking Filehashes..'
   if ($win10hash -ne $win10Filehash) {
     Write-Error 'Hash mismatch on windows_10_virtualbox.box'
     break
@@ -221,18 +221,18 @@ function download_boxes {
     Write-Error 'Hash mismatch on windows_2016_virtualbox.box'
     break
   }
-  Write-Verbose '[download_boxes] Finished.'
+  Write-Host '[download_boxes] Finished.'
 }
 
 function preflight_checks {
-  Write-Verbose '[preflight_checks] Running..'
+  Write-Host '[preflight_checks] Running..'
   # Check to see that no boxes exist
   if (-Not ($VagrantOnly)) {
-    Write-Verbose '[preflight_checks] Checking if Packer is installed'
+    Write-Host '[preflight_checks] Checking if Packer is installed'
     check_packer
 
     # Check Packer Version against known bad
-    Write-Verbose '[preflight_checks] Checking for bad packer version..'
+    Write-Host '[preflight_checks] Checking for bad packer version..'
     [System.Version]$PackerVersion = $(& $PackerPath "--version")
     [System.Version]$PackerKnownBad = 1.1.2
 
@@ -241,16 +241,16 @@ function preflight_checks {
       break
     }
   }
-  Write-Verbose '[preflight_checks] Checking if Vagrant is installed'
+  Write-Host '[preflight_checks] Checking if Vagrant is installed'
   check_vagrant
 
-  Write-Verbose '[preflight_checks] Checking for pre-existing boxes..'
+  Write-Host '[preflight_checks] Checking for pre-existing boxes..'
   if ((Get-ChildItem "$DL_DIR\Boxes\*.box").Count -gt 0) {
     Write-Host 'You seem to have at least one .box file present in the Boxes directory already. If you would like fresh boxes downloaded, please remove all files from the Boxes directory and re-run this script.'
   }
 
   # Check to see that no vagrant instances exist
-  Write-Verbose '[preflight_checks] Checking for vagrant instances..'
+  Write-Host '[preflight_checks] Checking for vagrant instances..'
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Vagrant"
   if (($(vagrant status) | Select-String -Pattern "not[ _]created").Count -ne 4) {
@@ -260,7 +260,7 @@ function preflight_checks {
   Set-Location $CurrentDir
 
   # Check available disk space. Recommend 80GB free, warn if less
-  Write-Verbose '[preflight_checks] Checking disk space..'
+  Write-Host '[preflight_checks] Checking disk space..'
   $drives = Get-PSDrive | Where-Object {$_.Provider -like '*FileSystem*'}
   $drivesList = @()
 
@@ -279,7 +279,7 @@ function preflight_checks {
   }
 
   # Ensure the vagrant-reload plugin is installed
-  Write-Verbose '[preflight_checks] Checking if vagrant-reload is installed..'
+  Write-Host '[preflight_checks] Checking if vagrant-reload is installed..'
   if (-Not (vagrant plugin list | Select-String 'vagrant-reload')) {
     Write-Output 'The vagrant-reload plugin is required and not currently installed. This script will attempt to install it now.'
     (vagrant plugin install 'vagrant-reload')
@@ -288,7 +288,7 @@ function preflight_checks {
       break
     }
   }
-  Write-Verbose '[preflight_checks] Finished.'
+  Write-Host '[preflight_checks] Finished.'
 }
 
 function packer_build_box {
@@ -296,12 +296,12 @@ function packer_build_box {
     [string]$Box
   )
 
-  Write-Verbose "[packer_build_box] Running for $Box"
+  Write-Host "[packer_build_box] Running for $Box"
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Packer"
   Write-Output "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware."
   &$PackerPath @('build', "--only=$PackerProvider-iso", "$box.json")
-  Write-Verbose "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE"
+  Write-Host "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE"
 
   if ($LASTEXITCODE -ne 0) {
     Write-Error "Something went wrong while attempting to build the $BOX box."
@@ -312,7 +312,7 @@ function packer_build_box {
 }
 
 function move_boxes {
-  Write-Verbose "[move_boxes] Running.."
+  Write-Host "[move_boxes] Running.."
   Move-Item -Path $DL_DIR\Packer\*.box -Destination $DL_DIR\Boxes
   if (-Not (Test-Path "$DL_DIR\Boxes\windows_10_$PackerProvider.box")) {
     Write-Error "Windows 10 box is missing from the Boxes directory. Qutting."
@@ -322,20 +322,21 @@ function move_boxes {
     Write-Error "Windows 2016 box is missing from the Boxes directory. Qutting."
     break
   }
-  Write-Verbose "[move_boxes] Finished."
+  Write-Host "[move_boxes] Finished."
 }
 
 function vagrant_up_host {
   param(
     [string]$VagrantHost
   )
-  Write-Verbose "[vagrant_up_host] Running for $VagrantHost"
+  Write-Host "[vagrant_up_host] Running for $VagrantHost"
   Write-Host "Attempting to bring up the $VagrantHost host using Vagrant"
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Vagrant"
-  &vagrant.exe @('up', $VagrantHost, '--provider', "$ProviderName")
+  set VAGRANT_LOG=info
+  &vagrant.exe @('up', $VagrantHost, '--provider', "$ProviderName") 2>&1 | Out-File -FilePath ".\vagrant_up_$VagrantHost.log"
   Set-Location $CurrentDir
-  Write-Verbose "[vagrant_up_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE"
+  Write-Host "[vagrant_up_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE"
   return $LASTEXITCODE
 }
 
@@ -343,12 +344,12 @@ function vagrant_reload_host {
   param(
     [string]$VagrantHost
   )
-  Write-Verbose "[vagrant_reload_host] Running for $VagrantHost"
+  Write-Host "[vagrant_reload_host] Running for $VagrantHost"
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Vagrant"
-  &vagrant.exe @('reload', $VagrantHost, '--provision') | Out-Null
+  &vagrant.exe @('reload', $VagrantHost, '--provision') 2>&1 | Out-File -FilePath ".\vagrant_up_$VagrantHost.log" -Append
   Set-Location $CurrentDir
-  Write-Verbose "[vagrant_reload_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE"
+  Write-Host "[vagrant_reload_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE"
   return $LASTEXITCODE
 }
 
@@ -359,7 +360,7 @@ function download {
     [switch]$SuccessOn401
 
   )
-  Write-Verbose "[download] Running for $URL, looking for $PatternToMatch"
+  Write-Host "[download] Running for $URL, looking for $PatternToMatch"
   [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
   [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
@@ -368,11 +369,11 @@ function download {
   {
     $result = $wc.DownloadString($URL)
     if ($result -like "*$PatternToMatch*") {
-      Write-Verbose "[download] Found $PatternToMatch at $URL"
+      Write-Host "[download] Found $PatternToMatch at $URL"
       return $true
     }
     else {
-      Write-Verbose "[download] Could not find $PatternToMatch at $URL"
+      Write-Host "[download] Could not find $PatternToMatch at $URL"
       return $false
     }
   }
@@ -384,7 +385,7 @@ function download {
     }
     else
     {
-      Write-Verbose "Error occured on webrequest: $_"
+      Write-Host "Error occured on webrequest: $_"
       return $false
     }
 
@@ -393,21 +394,21 @@ function download {
 
 function post_build_checks {
 
-  Write-Verbose '[post_build_checks] Running Caldera Check.'
+  Write-Host '[post_build_checks] Running Caldera Check.'
   $CALDERA_CHECK = download -URL 'https://192.168.38.105:8888' -PatternToMatch '<title>CALDERA</title>'
-  Write-Verbose "[post_build_checks] Cladera Result: $CALDERA_CHECK"
+  Write-Host "[post_build_checks] Cladera Result: $CALDERA_CHECK"
 
-  Write-Verbose '[post_build_checks] Running Splunk Check.'
+  Write-Host '[post_build_checks] Running Splunk Check.'
   $SPLUNK_CHECK = download -URL 'https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
-  Write-Verbose "[post_build_checks] Splunk Result: $SPLUNK_CHECK"
+  Write-Host "[post_build_checks] Splunk Result: $SPLUNK_CHECK"
 
-  Write-Verbose '[post_build_checks] Running Fleet Check.'
+  Write-Host '[post_build_checks] Running Fleet Check.'
   $FLEET_CHECK = download -URL 'https://192.168.38.105:8412' -PatternToMatch 'Kolide Fleet'
-  Write-Verbose "[post_build_checks] Fleet Result: $FLEET_CHECK"
+  Write-Host "[post_build_checks] Fleet Result: $FLEET_CHECK"
 
-  Write-Verbose '[post_build_checks] Running MS ATA Check.'
+  Write-Host '[post_build_checks] Running MS ATA Check.'
   $ATA_CHECK = download -URL 'https://192.168.38.103' -SuccessOn401
-  Write-Verbose "[post_build_checks] ATA Result: $ATA_CHECK"
+  Write-Host "[post_build_checks] ATA Result: $ATA_CHECK"
 
 
   if ($CALDERA_CHECK -eq $false) {
@@ -455,26 +456,26 @@ else {
 
 # Vagrant up each box and attempt to reload one time if it fails
 forEach ($VAGRANT_HOST in $LAB_HOSTS) {
-  Write-Verbose "[main] Running vagrant_up_host for: $VAGRANT_HOST"
+  Write-Host "[main] Running vagrant_up_host for: $VAGRANT_HOST"
   $result = vagrant_up_host -VagrantHost $VAGRANT_HOST
-  Write-Verbose "[main] vagrant_up_host finished. Exitcode: $result"
+  Write-Host "[main] vagrant_up_host finished. Exitcode: $result"
   if ($result -eq '0') {
     Write-Output "Good news! $VAGRANT_HOST was built successfully!"
   }
   else {
     Write-Warning "Something went wrong while attempting to build the $VAGRANT_HOST box."
     Write-Output "Attempting to reload and reprovision the host..."
-    Write-Verbose "[main] Running vagrant_reload_host for: $VAGRANT_HOST"
+    Write-Host "[main] Running vagrant_reload_host for: $VAGRANT_HOST"
     $retryResult = vagrant_reload_host -VagrantHost $VAGRANT_HOST
     if ($retryResult -ne 0) {
       Write-Error "Failed to bring up $VAGRANT_HOST after a reload. Exiting"
       break
     }
   }
-  Write-Verbose "[main] Finished for: $VAGRANT_HOST"
+  Write-Host "[main] Finished for: $VAGRANT_HOST"
 }
 
 
-Write-Verbose "[main] Running post_build_checks"
+Write-Host "[main] Running post_build_checks"
 post_build_checks
-Write-Verbose "[main] Finished post_build_checks"
+Write-Host "[main] Finished post_build_checks"

@@ -41,11 +41,12 @@ Write-Host "Downloading Tcpview.exe..."
 (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Tcpview.exe', $tcpviewPath)
 Copy-Item $sysmonPath $sysmonDir
 
-# Download SwiftOnSecurity's Sysmon config
-Write-Host "Downloading SwiftOnSecurity's Sysmon config..."
-(New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml', "$sysmonConfigPath")
-# Alternative: Download Olaf Hartongs Sysmon config (more CPU intensive)
-# (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/olafhartong/sysmon-modular/master/sysmonconfig.xml, "$sysmonConfigPath"
+# Download Olaf Hartongs Sysmon config
+Write-Host "Downloading Olaf Hartong's Sysmon config..."
+(New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/olafhartong/sysmon-modular/master/sysmonconfig.xml', "$sysmonConfigPath")
+# Alternative: Download SwiftOnSecurity's Sysmon config
+# Write-Host "Downloading SwiftOnSecurity's Sysmon config..."
+# (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml', "$sysmonConfigPath")
 
 # Start Sysmon
 Write-Host "Starting Sysmon..."
