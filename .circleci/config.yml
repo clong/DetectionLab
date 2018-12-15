@@ -2,6 +2,9 @@ version: 2
 
 jobs:
   build:
+    branches:
+      ignore:
+        - master
     machine: true
     working_directory: ~/repo
 
