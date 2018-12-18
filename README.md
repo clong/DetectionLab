@@ -66,10 +66,10 @@ Windows users will want to use the following script:
 
 Provider | Box  | URL | MD5 | Size
 ------------|-----|-----|----|----
-Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | 2a0b5dbc432e27a0223da026cc1f378b | 6.4GB
-Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | 94c1ff7264e67af3d7df6d19275086ac | 5.8GB
-VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | 634628e04a1c6c94b4036b76d0568948 | 6.7GB
-VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | 7d26d3247162dfbf6026fd5bab6a21ee | 6.0GB
+Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | 231b54077d4396cad01e4cd60651b1e0 | 7.9GB
+Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | 54b9c596486a47f208d952337748079b | 6.4GB
+VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | 2bbaf5a1177e0499dc3aacdb0246eb38 | 8.2GB
+VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | e754a214c548312746632c870cc40c24 | 5.9GB
 
 If you choose to download the boxes, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
 
