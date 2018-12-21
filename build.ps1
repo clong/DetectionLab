@@ -215,10 +215,12 @@ function download_boxes {
   Write-Host '[download_boxes] Checking Filehashes..'
   if ($win10hash -ne $win10Filehash) {
     Write-Error 'Hash mismatch on windows_10_virtualbox.box'
+    Write-Error 'The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.'
     break
   }
   if ($win2016hash -ne $win2016Filehash) {
     Write-Error 'Hash mismatch on windows_2016_virtualbox.box'
+    Write-Error 'The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.'
     break
   }
   Write-Host '[download_boxes] Finished.'

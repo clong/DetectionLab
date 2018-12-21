@@ -118,7 +118,7 @@ Vagrant commands must be run from the "Vagrant" folder.
 ## Lab Information
 * Domain Name: windomain.local
 * Admininstrator login: vagrant:vagrant
-* Fleet login: https://192.168.38.105:8412 - admin:admin123#
+* Fleet login: https://192.168.38.105:8412 - admin@detectionlab.network:admin123#
 * Splunk login: https://192.168.38.105:8000 - admin:changeme
 * Caldera login: https://192.168.38.105:8888 - admin:caldera
 * MS ATA login: https://192.168.38.103 - wef\vagrant:vagrant

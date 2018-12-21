@@ -10,8 +10,8 @@ If (-not ($service)) {
   Write-Host "Setting osquery to run as a service"
   Start-Process -FilePath "c:\programdata\osquery\osqueryd\osqueryd.exe" -ArgumentList "--install" -Wait
   # Copy over the config and packs from the Palantir repo
-  Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Endpoints\Windows\*" "c:\ProgramData\osquery"
-  Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Endpoints\packs" -Path "c:\ProgramData\osquery"
+  Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Classic\Endpoints\Windows\*" "c:\ProgramData\osquery"
+  Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Classic\Endpoints\packs" -Path "c:\ProgramData\osquery"
 
   ## Use the TLS config by default. Un-comment the line below to use the local configuration and avoid connecting to Fleet.
   # Copy-Item "c:\ProgramData\osquery\osquery_no_tls.flags" -Path "c:\ProgramData\osquery\osquery.flags" -Force
