@@ -1,16 +1,14 @@
 version: 2
-
 jobs:
+  hold:
+    machine: true
+    steps:
+      - run: echo "This build requires approval to continue..."
   build:
-    branches:
-      ignore:
-        - master
     machine: true
     working_directory: ~/repo
-
     steps:
       - checkout
-
       - run:
           name: Choose which test suite to run based on which files were modified
           command: |
@@ -76,3 +74,32 @@ jobs:
 
       - store_artifacts:
           path: /tmp/artifacts
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - hold:
+          type: approval
+          filters:
+            branches:
+              # Don't rebuild the PR after it has been merged into master
+              # Users cannot push directly to master as it is a protected branch
+              ignore: master
+      - build:
+          requires:
+            - hold
+          filters:
+            branches:
+              # Don't rebuild the PR after it has been merged into master
+              ignore: master
+  weekly-build:
+    jobs:
+      - build
+    triggers:
+      - schedule:
+          cron: "0 0 * * 0"
+          filters:
+            branches:
+              # Automatically re-build the contents of master once per week
+              only: master
