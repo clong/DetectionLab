@@ -34,8 +34,8 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 ## Requirements
 * 55GB+ of free disk space
 * 16GB+ of RAM
-* Packer 1.0.0 or newer
-* Vagrant 1.9.2 or newer
+* Packer 1.3.2 or newer
+* Vagrant 2.2.2 or newer
 * Virtualbox or VMWare Fusion/Workstation
 
 
