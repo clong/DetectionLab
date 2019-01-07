@@ -9,8 +9,8 @@
             "s3:ListBucket"
          ],
          "Resource":[
-            "arn:aws:s3:::BUCKET_NAME_GOES_HERE",
-            "arn:aws:s3:::BUCKET_NAME_GOES_HERE/*"
+            "arn:aws:s3:::YOUR_BUCKET_GOES_HERE",
+            "arn:aws:s3:::YOUR_BUCKET_GOES_HERE/*"
          ]
       },
       {
