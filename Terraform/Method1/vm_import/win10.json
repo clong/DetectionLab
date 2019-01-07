@@ -1,0 +1,10 @@
+[
+  {
+    "Description": "win10",
+    "DeviceName": "win10",
+    "Format": "ova",
+    "UserBucket": {
+        "S3Bucket": "YOUR_BUCKET_GOES_HERE",
+        "S3Key": "win10.ova"
+    }
+}]
