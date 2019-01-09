@@ -12,7 +12,7 @@ variable "key_name" {
   default = "id_terraform"
 }
 variable "public_key_path" {
-  type = string
+  type = "string"
 }
 variable "ip_whitelist" {
   type = "list"
