@@ -364,7 +364,7 @@ function download {
   )
   Write-Host "[download] Running for $URL, looking for $PatternToMatch"
   [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
-  [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
   $wc = New-Object System.Net.WebClient
   try
