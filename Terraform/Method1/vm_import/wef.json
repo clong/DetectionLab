@@ -1,7 +1,6 @@
 [
   {
     "Description": "wef",
-    "DeviceName": "wef",
     "Format": "ova",
     "UserBucket": {
         "S3Bucket": "YOUR_BUCKET_GOES_HERE",

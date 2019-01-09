@@ -1,7 +1,6 @@
 [
   {
     "Description": "logger",
-    "DeviceName": "logger",
     "Format": "ova",
     "UserBucket": {
         "S3Bucket": "YOUR_BUCKET_GOES_HERE",
