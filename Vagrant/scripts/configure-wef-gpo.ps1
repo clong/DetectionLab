@@ -1,7 +1,7 @@
 # Purpose: Installs the GPOs needed to specify a Windows Event Collector and makes certain event channels readable by Event Logger
 Write-Host "Importing the GPO to specify the WEF collector"
 $GPOName = 'Windows Event Forwarding Server'
-Import-GPO -BackupGpoName $GPOName -Path "c:\vagrant\resources\GPO\wef_configuration" -TargetName $GPOName -CreateIfNeeded
+Import-GPO -BackupGpoName $GPOName -Path "\\vboxsrv\vagrant\resources\GPO\wef_configuration" -TargetName $GPOName -CreateIfNeeded
 $gpLinks = $null
 $OU = "OU=Servers,dc=windomain,dc=local"
 $gPLinks = Get-ADOrganizationalUnit -Identity $OU -Properties name,distinguishedName, gPLink, gPOptions
@@ -36,7 +36,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 Write-Host "Importing the GPO to modify ACLs on Custom Event Channels"
 
 $GPOName = 'Custom Event Channel Permissions'
-Import-GPO -BackupGpoName $GPOName -Path "c:\vagrant\resources\GPO\wef_configuration" -TargetName $GPOName -CreateIfNeeded
+Import-GPO -BackupGpoName $GPOName -Path "\\vboxsrv\vagrant\resources\GPO\wef_configuration" -TargetName $GPOName -CreateIfNeeded
 $gpLinks = $null
 $OU = "OU=Servers,dc=windomain,dc=local"
 $gPLinks = Get-ADOrganizationalUnit -Identity $OU -Properties name,distinguishedName, gPLink, gPOptions

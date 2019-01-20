@@ -4,7 +4,7 @@ Write-Host "Setting up Splunk Inputs for Sysmon & osquery"
 
 $inputsPath = "C:\Program Files\SplunkUniversalForwarder\etc\apps\SplunkUniversalForwarder\local\inputs.conf"
 $currentContent = get-content $inputsPath
-$targetContent = get-content c:\vagrant\resources\splunk_forwarder\inputs.conf
+$targetContent = get-content \\vboxsrv\vagrant\resources\splunk_forwarder\inputs.conf
 
 if ($currentContent -ne $targetContent)
 {
@@ -15,7 +15,7 @@ if ($currentContent -ne $targetContent)
     Remove-Item $inputsPath
 
     Write-Host "Copying over the custom configuration"
-    Copy-Item c:\vagrant\resources\splunk_forwarder\inputs.conf $inputsPath
+    Copy-Item \\vboxsrv\vagrant\resources\splunk_forwarder\inputs.conf $inputsPath
 
     Write-Host "Starting the Splunk forwarder"
     Start-Service splunkforwarder

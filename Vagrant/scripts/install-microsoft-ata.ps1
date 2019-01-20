@@ -58,7 +58,7 @@ if (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center
     $Install = Start-Process -Wait -FilePath ($Volume.DriveLetter + ":\Microsoft ATA Center Setup.exe") -ArgumentList "/q --LicenseAccepted NetFrameworkCommandLineArguments=`"/q`" --EnableMicrosoftUpdate" -PassThru
     $Install
     $Mount | Dismount-DiskImage -Confirm:$false
-    $body = get-content "C:\vagrant\resources\microsoft_ata\microsoft-ata-config.json"
+    $body = get-content "\\vboxsrv\vagrant\resources\microsoft_ata\microsoft-ata-config.json"
     
     $req = [System.Net.WebRequest]::CreateHttp("https://wef")
     try 

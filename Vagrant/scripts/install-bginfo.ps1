@@ -17,6 +17,6 @@ objShell.Run("""c:\Program Files\sysinternals\bginfo.exe"" /accepteula ""c:\Prog
 
 $vbsScript | Out-File 'c:\Program Files\sysinternals\bginfo.vbs'
 
-Copy-Item "C:\vagrant\scripts\bginfo.bgi" 'c:\Program Files\sysinternals\bginfo.bgi'
+Copy-Item "\\vboxsrv\vagrant\scripts\bginfo.bgi" 'c:\Program Files\sysinternals\bginfo.bgi'
 
 Set-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name bginfo -Value 'wscript "c:\Program Files\sysinternals\bginfo.vbs"'

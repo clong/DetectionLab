@@ -28,7 +28,7 @@ If (-not ($service)) {
   ## Change path to secrets
   (Get-Content c:\ProgramData\osquery\osquery.flags) -replace 'path\\to\\file\\containing\\secret.txt', 'ProgramData\osquery\kolide_secret.txt' | Set-Content c:\ProgramData\osquery\osquery.flags
   ## Add certfile.crt
-  Copy-Item "c:\vagrant\resources\fleet\server.crt" "c:\ProgramData\osquery\certfile.crt"
+  Copy-Item "\\vboxsrv\vagrant\resources\fleet\server.crt" "c:\ProgramData\osquery\certfile.crt"
   ### --- TLS CONFIG ENDS ---
 
   Stop-service osqueryd

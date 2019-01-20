@@ -1,6 +1,6 @@
 # Purpose: Install the GPO that specifies the WEF collector
 Write-Host "Importing the GPO to enable Powershell Module, ScriptBlock and Transcript logging..."
-Import-GPO -BackupGpoName 'Powershell Logging' -Path "c:\vagrant\resources\GPO\powershell_logging" -TargetName 'Powershell Logging' -CreateIfNeeded
+Import-GPO -BackupGpoName 'Powershell Logging' -Path "\\vboxsrv\vagrant\resources\GPO\powershell_logging" -TargetName 'Powershell Logging' -CreateIfNeeded
 $OU = "ou=Workstations,dc=windomain,dc=local" 
 $gPLinks = $null
 $gPLinks = Get-ADOrganizationalUnit -Identity $OU -Properties name,distinguishedName, gPLink, gPOptions
