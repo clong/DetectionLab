@@ -16,7 +16,7 @@ install_securityonion() {
     cp /vagrant/resources/securityonion/daemon.json /etc/docker/daemon.json
   fi
   sed -i '1 s|^|# Added for Security Onion\n|' /etc/network/interfaces
-  echo "yes" | sosetup -f /vagrant/scripts/sosetup.conf
+  echo "yes" | sosetup -f /vagrant/resources/securityonion/sosetup.conf
   echo "" | so-desktop-gnome
 }
 
