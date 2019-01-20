@@ -3,7 +3,9 @@ CircleCI: [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.sv
 
 #### Donate to the project:
 
-All of the infrastructure, building, and testing of DetectionLab is currently funded by myself in my spare time. If you find this project useful, feel free to buy me a coffee using one of the buttons below!
+All of the infrastructure, building, and testing of DetectionLab is currently funded by Chris Long in his spare time. If you find this project useful, feel free to buy him a coffee using one of the buttons below!
+
+I have simply added Security Onion to his exemplary work to show visualizations and give alternative methods of logging, alerting, pcap retention, etc.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](paypal.me/clong0)
 [![Donate](https://img.shields.io/badge/Donate-Crypto-blue.svg)](https://commerce.coinbase.com/checkout/838ac7a2-7b9d-4d40-b475-fd1015fdaacd)
@@ -32,8 +34,8 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 
 
 ## Requirements
-* 55GB+ of free disk space
-* 16GB+ of RAM
+* 75GB+ of free disk space
+* 24GB+ of RAM
 * Packer 1.3.2 or newer
 * Vagrant 2.2.2 or newer
 * Virtualbox or VMWare Fusion/Workstation
@@ -122,6 +124,7 @@ Vagrant commands must be run from the "Vagrant" folder.
 * Splunk login: https://192.168.38.105:8000 - admin:changeme
 * Caldera login: https://192.168.38.105:8888 - admin:caldera
 * MS ATA login: https://192.168.38.103 - wef\vagrant:vagrant
+* Security Onion login: https://192.168.38.106 admin:onion
 
 ## Lab Hosts
 * DC - Windows 2016 Domain Controller
@@ -154,6 +157,16 @@ Vagrant commands must be run from the "Vagrant" folder.
   * Mitre's Caldera Server
   * Bro
   * Suricata
+* Security Onion - Ubuntu 16.04
+  * ElasticStack
+  * Bro
+  * Suricata
+  * Sguil
+  * Squert
+  * Full PCAP
+  * ElastAlert
+  * CapMe
+  * Wireshark
 
 ## Splunk Indexes
 Index Name | Description
@@ -240,6 +253,7 @@ Requests for tools and features will be reviewed on a case by case basis, but I 
 A sizable percentage of this code was borrowed and adapted from [Stefan Scherer](https://twitter.com/stefscherer)'s [packer-windows](https://github.com/StefanScherer/packer-windows) and [adfs2](https://github.com/StefanScherer/adfs2) Github repos. A huge thanks to him for building the foundation that allowed me to design this lab environment.
 
 # Acknowledgements
+* [CLong] (https://github.com/clong/DetectionLab)
 * [Microsoft Advanced Threat Analytics](https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics)
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)
