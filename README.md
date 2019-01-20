@@ -253,7 +253,7 @@ Requests for tools and features will be reviewed on a case by case basis, but I 
 A sizable percentage of this code was borrowed and adapted from [Stefan Scherer](https://twitter.com/stefscherer)'s [packer-windows](https://github.com/StefanScherer/packer-windows) and [adfs2](https://github.com/StefanScherer/adfs2) Github repos. A huge thanks to him for building the foundation that allowed me to design this lab environment.
 
 # Acknowledgements
-* [CLong] (https://github.com/clong/DetectionLab)
+* [CLong](https://github.com/clong/DetectionLab)
 * [Microsoft Advanced Threat Analytics](https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics)
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)
