@@ -6,7 +6,7 @@ install_securityonion() {
   fi
   rm -rf /var/lib/apt/lists/*
   apt update -y
-  apt-get install -y software-properties-common linux-headers-$(uname -r)
+  apt-get install -y software-properties-common linux-headers-$(uname -r) bash-completion
   add-apt-repository -y ppa:securityonion/stable
   apt-get update -y
   apt-get -y install securityonion-iso syslog-ng
@@ -17,6 +17,7 @@ install_securityonion() {
   fi
   sed -i '1 s|^|# Added for Security Onion\n|' /etc/network/interfaces
   echo "yes" | sosetup -f /vagrant/resources/securityonion/sosetup.conf
+  ufw allow proto tcp from 192.168.38.1 to any port 22,443,7734
   echo "" | so-desktop-gnome
 }
 
