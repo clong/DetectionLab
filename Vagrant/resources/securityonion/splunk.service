@@ -1,0 +1,14 @@
+[Unit]
+Description=Splunk Forwarder
+After=network.target
+
+[Service]
+ExecStart=/opt/splunkforwarder/bin/splunk start
+ExecStop=/opt/splunkforwarder/bin/splunk stop
+RestartSec=10s
+Type=simple
+RemainAfterExit=yes
+TimeoutStopSec=600
+
+[Install]
+WantedBy=multi-user.target
