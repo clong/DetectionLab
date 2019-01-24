@@ -336,8 +336,8 @@ main() {
   download_palantir_osquery_config
   import_osquery_config_into_fleet
   install_caldera
-  install_suricata
-  install_bro
+  #install_suricata
+  #install_bro
 }
 
 main
