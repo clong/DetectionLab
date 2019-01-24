@@ -5,7 +5,7 @@ CircleCI: [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.sv
 
 All of the infrastructure, building, and testing of DetectionLab is currently funded by Chris Long in his spare time. If you find this project useful, feel free to buy him a coffee using one of the buttons below!
 
-I have simply added Security Onion to his exemplary work to show visualizations and give alternative methods of logging, alerting, pcap retention, etc. Also, Suricata and Bro will be removed from Logger in a future release of this fork to reduce duplicity.
+I have simply added Security Onion to his exemplary work to show visualizations and give alternative methods of logging, alerting, pcap retention, etc. Suricata and Bro have been removed from Logger to reduce duplicity. Splunk's Universal Forwarder has been installed on Security Onion to forward logs to Splunk on Logger
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](paypal.me/clong0)
 [![Donate](https://img.shields.io/badge/Donate-Crypto-blue.svg)](https://commerce.coinbase.com/checkout/838ac7a2-7b9d-4d40-b475-fd1015fdaacd)
