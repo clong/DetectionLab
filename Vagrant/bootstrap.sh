@@ -1,5 +1,7 @@
 #! /bin/bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 install_mongo_db_apt_key() {
   # Install key and apt source for MongoDB
   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
