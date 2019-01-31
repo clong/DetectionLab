@@ -141,7 +141,7 @@ check_vagrant_instances_exist() {
   cd "$DL_DIR"/Vagrant/ || exit 1
   # Vagrant status has the potential to return a non-zero error code, so we work around it with "|| true"
   VAGRANT_BUILT=$(vagrant status | grep -c 'not created') || true
-  if [ "$VAGRANT_BUILT" -ne 4 ]; then
+  if [ "$VAGRANT_BUILT" -ne 5 ]; then
     (echo >&2 "You appear to have already created at least one Vagrant instance. This script does not support pre-created instances. Please either destroy the existing instances or follow the build steps in the README to continue.")
     exit 1
   fi
