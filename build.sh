@@ -425,7 +425,7 @@ download_boxes() {
 }
 
 build_vagrant_hosts() {
-  LAB_HOSTS=("logger" "dc" "wef" "win10")
+  LAB_HOSTS=("logger" "dc" "wef" "win10" "securityonion")
 
   # Vagrant up each box and attempt to reload one time if it fails
   for VAGRANT_HOST in "${LAB_HOSTS[@]}"; do

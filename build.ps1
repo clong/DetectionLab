@@ -52,7 +52,7 @@ Param(
 )
 
 $DL_DIR = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-$LAB_HOSTS = ('logger', 'dc', 'wef', 'win10')
+$LAB_HOSTS = ('logger', 'dc', 'wef', 'win10','securityonion')
 
 # Register-EngineEvent PowerShell.Exiting -SupportEvent -Action {
 #   Set-Location $DL_DIR
