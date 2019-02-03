@@ -199,11 +199,11 @@ function download_boxes {
   $wc.Dispose()
 
   if (-Not (Test-Path "$DL_DIR\Boxes\$win2016Filename")) {
-    Write-Error 'Windows 2016 box is missing from the Boxes directory. Qutting.'
+    Write-Error 'Windows 2016 box is missing from the Boxes directory. Quitting.'
     break
   }
   if (-Not (Test-Path "$DL_DIR\Boxes\$win10Filename")) {
-    Write-Error 'Windows 10 box is missing from the Boxes directory. Qutting.'
+    Write-Error 'Windows 10 box is missing from the Boxes directory. Quitting.'
     break
   }
 
@@ -297,31 +297,36 @@ function packer_build_box {
   param(
     [string]$Box
   )
+  # Check if boxes exist
+  if (-Not (Test-Path "$DL_DIR\Boxes\$Box`_$PackerProvider.box")) {
+    Write-Host "[packer_build_box] Running for $Box"
+    $CurrentDir = Get-Location
+    Set-Location "$DL_DIR\Packer"
+    Write-Output "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware."
+    &$PackerPath @('build', "--only=$PackerProvider-iso", "$box.json")
+    Write-Host "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE"
 
-  Write-Host "[packer_build_box] Running for $Box"
-  $CurrentDir = Get-Location
-  Set-Location "$DL_DIR\Packer"
-  Write-Output "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware."
-  &$PackerPath @('build', "--only=$PackerProvider-iso", "$box.json")
-  Write-Host "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE"
-
-  if ($LASTEXITCODE -ne 0) {
-    Write-Error "Something went wrong while attempting to build the $BOX box."
-    Write-Output "To file an issue, please visit https://github.com/clong/DetectionLab/issues/"
-    break
+    if ($LASTEXITCODE -ne 0) {
+      Write-Error "Something went wrong while attempting to build the $BOX box."
+      Write-Output "To file an issue, please visit https://github.com/clong/DetectionLab/issues/"
+      break
+    }
+    Set-Location $CurrentDir
   }
-  Set-Location $CurrentDir
+  else {
+    Write-Host "Existing box found in $DL_DIR\Boxes\$Box`_$PackerProvider.box. If you would like fresh boxes built, please remove all files from the Boxes directory and re-run this script."
+  }
 }
 
 function move_boxes {
   Write-Host "[move_boxes] Running.."
   Move-Item -Path $DL_DIR\Packer\*.box -Destination $DL_DIR\Boxes
   if (-Not (Test-Path "$DL_DIR\Boxes\windows_10_$PackerProvider.box")) {
-    Write-Error "Windows 10 box is missing from the Boxes directory. Qutting."
+    Write-Error "Windows 10 box is missing from the Boxes directory. Quitting."
     break
   }
   if (-Not (Test-Path "$DL_DIR\Boxes\windows_2016_$PackerProvider.box")) {
-    Write-Error "Windows 2016 box is missing from the Boxes directory. Qutting."
+    Write-Error "Windows 2016 box is missing from the Boxes directory. Quitting."
     break
   }
   Write-Host "[move_boxes] Finished."

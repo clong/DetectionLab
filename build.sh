@@ -212,10 +212,14 @@ preflight_checks() {
 # Builds a box using Packer
 packer_build_box() {
   BOX="$1"
-  cd "$DL_DIR/Packer" || exit 1
-  (echo >&2 "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware.")
-  PACKER_LOG=1 PACKER_LOG_PATH="$DL_DIR/Packer/packer_build.log" $(which packer) build --only="$PACKER_PROVIDER-iso" "$BOX".json >&2
-  echo "$?"
+  if [ ! -f "$DL_DIR/Boxes/$BOX_$PACKER_PROVIDER.box" ]; then
+    cd "$DL_DIR/Packer" || exit 1
+    (echo >&2 "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware.")
+    PACKER_LOG=1 PACKER_LOG_PATH="$DL_DIR/Packer/packer_build.log" $(which packer) build --only="$PACKER_PROVIDER-iso" "$BOX".json >&2
+    echo "$?"
+  else
+    (echo "Existing box found in $DL_DIR/Boxes/$BOX_$PACKER_PROVIDER.box. If you would like fresh boxes built, please remove all files from the Boxes directory and re-run this script.")
+  fi
 }
 
 # Moves the boxes from the Packer directory to the Boxes directory
@@ -223,12 +227,12 @@ move_boxes() {
   mv "$DL_DIR"/Packer/*.box "$DL_DIR"/Boxes
   # Ensure Windows 10 box exists
   if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box ]; then
-    (echo >&2 "Windows 10 box is missing from the Boxes directory. Qutting.")
+    (echo >&2 "Windows 10 box is missing from the Boxes directory. Quitting.")
     exit 1
   fi
   # Ensure Windows 2016 box exists
   if [ ! -f "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box ]; then
-    (echo >&2 "Windows 2016 box is missing from the Boxes directory. Qutting.")
+    (echo >&2 "Windows 2016 box is missing from the Boxes directory. Quitting.")
     exit 1
   fi
 }
@@ -391,12 +395,12 @@ download_boxes() {
 
   # Ensure Windows 10 box exists
   if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box ]; then
-    (echo >&2 "Windows 10 box is missing from the Boxes directory. Qutting.")
+    (echo >&2 "Windows 10 box is missing from the Boxes directory. Quitting.")
     exit 1
   fi
   # Ensure Windows 2016 box exists
   if [ ! -f "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box ]; then
-    (echo >&2 "Windows 2016 box is missing from the Boxes directory. Qutting.")
+    (echo >&2 "Windows 2016 box is missing from the Boxes directory. Quitting.")
     exit 1
   fi
   # Verify hashes of VirtualBox boxes
