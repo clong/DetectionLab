@@ -7,7 +7,7 @@ If (-not (Test-Path "C:\ProgramData\chocolatey")) {
   Write-Host "Chocolatey is already installed."
 }
 
-Write-Host "Installing Notepad++, Chrome, WinRar, PowerSploit and Mimikatz."
+Write-Host "Installing Notepad++, Chrome, WinRar, Microsoft Analyzer, Wireshark, PowerSploit and Mimikatz."
 If ($(hostname) -eq "win10") {
   # Because the Windows10 start menu sucks
   choco install -y classic-shell -installArgs ADDLOCAL=ClassicStartMenu
@@ -15,6 +15,8 @@ If ($(hostname) -eq "win10") {
 choco install -y NotepadPlusPlus
 choco install -y GoogleChrome
 choco install -y WinRar
+choco install -y microsoft-message-analyzer
+choco install -y wireshark
 
 # Disable Windows Defender realtime scanning before downloading Mimikatz and drop the firewall
 If ($env:computername -eq "win10") {
