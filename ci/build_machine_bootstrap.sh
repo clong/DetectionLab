@@ -53,7 +53,7 @@ if [ "$PACKER_ONLY" -eq 0 ]; then
   # Install Vagrant
   mkdir /opt/vagrant
   cd /opt/vagrant || exit 1
-  wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.3_x86_64.deb
+  wget https://releases.hashicorp.com/vagrant/2.2.3/vagrant_2.2.3_x86_64.deb
   dpkg -i vagrant_2.2.3_x86_64.deb
   vagrant plugin install vagrant-reload
 
