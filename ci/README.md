@@ -74,12 +74,12 @@ The CircleCI worker will evaluate which files have been modified and set environ
               |                                     v
               |                    +----------------+--------------+
 Circle Worker |                    | packer_and_vagrant_changes.sh |
-quries for    |                    | vagrant_changes.sh            |
+queries for    |                   | vagrant_changes.sh            |
 build results |                    | packer_changes.sh             |        
               |                    +----------------+--------------+             
               |                                     |
               |                                     |
-              |          |                          |
+              |                                     |
               |                                     |
               |                                     |
               |                                     |

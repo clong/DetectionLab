@@ -4,3 +4,5 @@ Packer/packer_cache/*
 Packer/packer_build.log
 Boxes/*
 .DS_Store
+Terraform/*/*.tfstate
+Terraform/*/.terraform

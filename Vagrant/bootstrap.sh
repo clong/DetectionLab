@@ -1,6 +1,7 @@
 #! /bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
+sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
 
 install_mongo_db_apt_key() {
   # Install key and apt source for MongoDB
