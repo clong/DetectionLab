@@ -177,10 +177,11 @@ suricata | Suricata IDS logs
   * Process Explorer
   * PsExec
   * TCPView
+  * Notepad++
   * Google Chrome
-  * Atom editor
   * WinRar
   * Mimikatz
+  * Wireshark
 
 ## Applied GPOs
 * [Custom Event Channel Permissions](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Custom%20Event%20Channel%20Permissions.htm)
