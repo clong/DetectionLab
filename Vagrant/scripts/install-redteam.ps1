@@ -1,5 +1,8 @@
 # Purpose: Installs Mimikatz and Powersploit into c:\Tools\Mimikatz. Used to install redteam related tooling.
 
+Write-Host "Installing Red Team Tooling..."
+
+
 # Disable Windows Defender realtime scanning before downloading Mimikatz and drop the firewall
 If ($env:computername -eq "win10") {
   If (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender")
@@ -7,6 +10,7 @@ If ($env:computername -eq "win10") {
     Remove-Item "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Recurse -Force
   }
   gpupdate /force | Out-String
+  Write-Host "Disabling Windows Defender Realtime Monitoring..."
   Set-MpPreference -ExclusionPath C:\commander.exe, C:\Tools
   set-MpPreference -DisableRealtimeMonitoring $true
   Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
@@ -42,3 +46,5 @@ if (-not (Test-Path $powersploitRepoPath)) {
 } else {
   Write-Host "PowerSploit was already installed. Moving On."
 }
+
+Write-Host "Red Team tooling installation complete!"
