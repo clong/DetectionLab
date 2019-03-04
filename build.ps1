@@ -180,11 +180,11 @@ function list_providers {
 function download_boxes {
   Write-Host '[download_boxes] Running..'
   if ($PackerProvider -eq 'virtualbox') {
-    $win10Hash = '54b9c596486a47f208d952337748079b'
+    $win10Hash = 'c03f10f21b8d79e6acca2b2965b23046'
     $win2016Hash = '231b54077d4396cad01e4cd60651b1e0'
   }
   if ($PackerProvider -eq 'vmware') {
-    $win10Hash = 'e754a214c548312746632c870cc40c24'
+    $win10Hash = 'b334c3ba5be3b29840567ffe368db5fe'
     $win2016Hash = '2bbaf5a1177e0499dc3aacdb0246eb38'
   }
 

@@ -401,7 +401,7 @@ download_boxes() {
   fi
   # Verify hashes of VirtualBox boxes
   if [ "$PACKER_PROVIDER" == "virtualbox" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "54b9c596486a47f208d952337748079b" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "c03f10f21b8d79e6acca2b2965b23046" ]; then
       (echo >&2 "Hash mismatch on windows_10_virtualbox.box")
       (echo >&2 "The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.")
     fi
@@ -411,7 +411,7 @@ download_boxes() {
     fi
     # Verify hashes of VMware boxes
   elif [ "$PACKER_PROVIDER" == "vmware" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "e754a214c548312746632c870cc40c24" ]; then
+    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "b334c3ba5be3b29840567ffe368db5fe" ]; then
       (echo >&2 "Hash mismatch on windows_10_vmware.box")
       (echo >&2 "The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.")
       exit 1
