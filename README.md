@@ -1,7 +1,5 @@
 # Detection Lab
-DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to ensure that builds are passing.
-
-CircleCI: [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.svg?style=svg)](https://circleci.com/gh/clong/DetectionLab/tree/master)
+DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to ensure that builds are passing.  (almost)
 
 #### Donate to the project:
 
