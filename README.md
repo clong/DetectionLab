@@ -1,4 +1,6 @@
 # Detection Lab
+DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to ensure that builds are passing.
+
 CircleCI: [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.svg?style=svg)](https://circleci.com/gh/clong/DetectionLab/tree/master)
 
 #### Donate to the project:
@@ -55,8 +57,8 @@ There is a single build script that supports 3 different options:
 - `./build.sh <virtualbox|vmware_desktop> --packer-only` - This option only builds the Packer boxes and will not use Vagrant to start up the lab.
 
 Windows users will want to use the following script:
-- `./build.ps1 -ProviderName=<virtualbox|vmware_desktop>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
-- `./build.ps1 -ProviderName=<virtualbox|vmware_desktop> -VagrantOnly` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
+- `./build.ps1 -ProviderName <virtualbox|vmware_desktop>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
+- `./build.ps1 -ProviderName <virtualbox|vmware_desktop> -VagrantOnly` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
 
 ---
 
@@ -69,9 +71,9 @@ Windows users will want to use the following script:
 Provider | Box  | URL | MD5 | Size
 ------------|-----|-----|----|----
 Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | 231b54077d4396cad01e4cd60651b1e0 | 7.9GB
-Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | 54b9c596486a47f208d952337748079b | 6.4GB
+Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | c03f10f21b8d79e6acca2b2965b23046 | 6.4GB
 VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | 2bbaf5a1177e0499dc3aacdb0246eb38 | 8.2GB
-VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | e754a214c548312746632c870cc40c24 | 5.9GB
+VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | b334c3ba5be3b29840567ffe368db5fe | 5.9GB
 
 If you choose to download the boxes, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
 
@@ -188,10 +190,11 @@ suricata | Suricata IDS logs
   * Process Explorer
   * PsExec
   * TCPView
+  * Notepad++
   * Google Chrome
-  * Atom editor
   * WinRar
   * Mimikatz
+  * Wireshark
 
 ## Applied GPOs
 * [Custom Event Channel Permissions](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Custom%20Event%20Channel%20Permissions.htm)
@@ -234,7 +237,7 @@ Vagrant has been particularly flaky with VMWare and I encountered many issues wh
 $ docker stop $(docker ps -aq)
 $ service docker restart
 $ cd /home/vagrant/kolide-quickstart
-$ docker-compose up -d
+$ docker-compose start -d
 ```
 
 ---
@@ -246,8 +249,14 @@ $ docker-compose up -d
 ---
 
 ## Contributing
-Please do all of your development in a feature branch on your own fork of detectionlab.
-Requests for tools and features will be reviewed on a case by case basis, but I will always accept fixes and improvements.
+Please do all of your development in a feature branch on your own fork of DetectionLab.
+Contribution guidelines can be found here: [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## In the Media
+* [DetectionLab, Chris Long – Paul’s Security Weekly #593](https://securityweekly.com/2019/02/08/detectionlab-chris-long-pauls-security-weekly-593/)
+* [TaoSecurity - Trying DetectionLab](https://taosecurity.blogspot.com/2019/01/trying-detectionlab.html)
+* [Setting up Chris Long's DetectionLab](https://www.psattack.com/articles/20171218/setting-up-chris-longs-detectionlab/)
+* [Detection Lab: Visibility & Introspection for Defenders](https://isc.sans.edu/forums/diary/Detection+Lab+Visibility+Introspection+for+Defenders/23135/)
 
 ## Credits/Resources
 A sizable percentage of this code was borrowed and adapted from [Stefan Scherer](https://twitter.com/stefscherer)'s [packer-windows](https://github.com/StefanScherer/packer-windows) and [adfs2](https://github.com/StefanScherer/adfs2) Github repos. A huge thanks to him for building the foundation that allowed me to design this lab environment.
@@ -271,3 +280,5 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [Autoruns](https://www.microsoftpressstore.com/articles/article.aspx?p=2762082)
 * [TA-microsoft-sysmon](https://github.com/splunk/TA-microsoft-sysmon)
 * [SwiftOnSecurity - Sysmon Config](https://github.com/SwiftOnSecurity/sysmon-config)
+* [ThreatHunting](https://github.com/olafhartong/ThreatHunting)
+* [sysmon-modular](https://github.com/olafhartong/sysmon-modular)

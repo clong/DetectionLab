@@ -1,6 +1,7 @@
 #! /bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
+sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
 
 install_mongo_db_apt_key() {
   # Install key and apt source for MongoDB
@@ -75,11 +76,11 @@ install_splunk() {
     /opt/splunk/bin/splunk add index threathunting -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_500.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_800.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_012.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_100.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/force-directed-app-for-splunk_200.tgz  -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz  -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz  -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_11.tgz  -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_12.tgz  -auth 'admin:changeme'
     # Add custom Macro definitions for ThreatHunting App
     cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/local
 

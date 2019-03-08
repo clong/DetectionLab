@@ -26,3 +26,15 @@ Write-Host "Disabling automatic screen turnoff in order to prevent screen lockin
 powercfg -change -monitor-timeout-ac 0
 powercfg -change -standby-timeout-ac 0
 powercfg -change -hibernate-timeout-ac 0
+
+# Download and install ShutUp10
+Write-Host "Downloading ShutUp10..."
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
+$shutUp10DownloadUrl = "https://dl5.oo-software.com/files/ooshutup10/OOSU10.exe"
+$shutUp10RepoPath = "C:\Users\vagrant\AppData\Local\Temp\OOSU10.exe"
+if (-not (Test-Path $shutUp10RepoPath)) {
+  Invoke-WebRequest -Uri "$shutUp10DownloadUrl" -OutFile $shutUp10RepoPath
+  . $shutUp10RepoPath c:\vagrant\resources\windows\shutup10.cfg /quiet /force
+} else {
+  Write-Host "ShutUp10 was already installed. Moving On."
+}
