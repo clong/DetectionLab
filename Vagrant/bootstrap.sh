@@ -1,7 +1,7 @@
 #! /bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
-sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
+sed -i 's#http://archive.ubuntu.com#http://us.archive.ubuntu.com#g' /etc/apt/sources.list
 
 install_mongo_db_apt_key() {
   # Install key and apt source for MongoDB
@@ -9,10 +9,17 @@ install_mongo_db_apt_key() {
   echo "deb http://repo.mongodb.org/apt/ubuntu $(lsb_release -sc)/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 }
 
+install_python_apt_source() {
+  # Install apt source for Python3.6
+  add-apt-repository -y ppa:jonathonf/python-3.6
+}
+
 apt_install_prerequisites() {
   # Install prerequisites and useful tools
   apt-get update
-  apt-get install -y jq whois build-essential git docker docker-compose unzip mongodb-org
+  apt-get install -y jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
+  # Install pip for Python 3.6
+  curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
 }
 
 fix_eth1_static_ip() {
@@ -40,17 +47,15 @@ fix_eth1_static_ip() {
   fi
 }
 
-install_python() {
-  # Install Python 3.6.4
-  if ! which /usr/local/bin/python3.6 > /dev/null; then
-    echo "Installing Python v3.6.4..."
-    wget https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tgz
-    tar -xvf Python-3.6.4.tgz
-    cd Python-3.6.4 || exit
-    ./configure && make && make install
+install_golang() {
+  if ! which go > /dev/null; then
+    echo "Installing Golang v.1.12..."
     cd /home/vagrant || exit
+    wget https://dl.google.com/go/go1.12.linux-amd64.tar.gz
+    tar -C /usr/local -xzf go1.12.linux-amd64.tar.gz
+    mkdir /root/go
   else
-    echo "Python seems to be downloaded already.. Skipping."
+    echo "Golang seems to be installed already. Skipping."
   fi
 }
 
@@ -271,7 +276,7 @@ install_suricata() {
   # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
 
   # Install yq to maniuplate the suricata.yaml inline
-  /usr/bin/go get -u  github.com/mikefarah/yq
+  /usr/local/go/bin/go get -u  github.com/mikefarah/yq
   # Install suricata
   add-apt-repository -y ppa:oisf/suricata-stable
   apt-get -qq -y update && apt-get -qq -y install suricata crudini
@@ -331,9 +336,10 @@ install_suricata() {
 
 main() {
   install_mongo_db_apt_key
+  install_python_apt_source
   apt_install_prerequisites
   fix_eth1_static_ip
-  install_python
+  install_golang
   install_splunk
   install_fleet
   download_palantir_osquery_config
