@@ -9,6 +9,6 @@ Terraform/*/.terraform
 Terraform/*/*.tfvars
 Terraform/*/*.lock.info
 Terraform/*.tfstate
-Terraform/.terraform
+Terraform/*.terraform
 Terraform/*.tfvars
 Terraform/*.lock.info
