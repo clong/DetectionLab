@@ -6,3 +6,5 @@ Boxes/*
 .DS_Store
 Terraform/*/*.tfstate
 Terraform/*/.terraform
+Terraform/*/*.tfvars
+Terraform/*/*.lock.info
