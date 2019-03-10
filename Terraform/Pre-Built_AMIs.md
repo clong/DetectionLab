@@ -1,4 +1,4 @@
-# Method 1 - Build Locally and Import to AWS
+# Method 2 - Use Pre-Built AMIs
 
 This method uses Terraform to bring DetectionLab infrastructure online by using pre-built shared AMIs.
 
