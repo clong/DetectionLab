@@ -12,7 +12,7 @@ try {
       Write-Host "Servers OU already exists. Moving On."
   }
 } catch {
-  New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"}
+  New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
 }
 
 Write-Host "Creating Workstations OU"
