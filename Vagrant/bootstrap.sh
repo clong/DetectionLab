@@ -68,8 +68,8 @@ install_splunk() {
     # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
     dig @8.8.8.8 splunk.com
     # Download Splunk
-    wget --progress=bar:force -O splunk-7.2.1-be11b2c46e23-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.1&product=splunk&filename=splunk-7.2.1-be11b2c46e23-linux-2.6-amd64.deb&wget=true'
-    dpkg -i splunk-7.2.1-be11b2c46e23-linux-2.6-amd64.deb
+    wget --progress=bar:force -O splunk-7.2.4.2-fb30470262e3-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.4.2&product=splunk&filename=splunk-7.2.4.2-fb30470262e3-linux-2.6-amd64.deb&wget=true'
+    dpkg -i splunk-7.2.4.2-fb30470262e3-linux-2.6-amd64.deb
     /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
     /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
@@ -87,7 +87,9 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz  -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_12.tgz  -auth 'admin:changeme'
     # Add custom Macro definitions for ThreatHunting App
-    cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/local
+    cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
+    # Fix Force Directed App until 2.0.1 is released (https://answers.splunk.com/answers/668959/invalid-key-in-stanza-default-value-light.html#answer-669418)
+    rm /opt/splunk/etc/apps/force_directed_viz/default/savedsearches.conf
 
     # Add a Splunk TCP input on port 9997
     echo -e "[splunktcp://9997]\nconnection_host = ip" > /opt/splunk/etc/apps/search/local/inputs.conf
