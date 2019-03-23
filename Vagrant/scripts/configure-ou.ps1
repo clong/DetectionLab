@@ -1,4 +1,11 @@
 # Purpose: Sets up the Server and Workstations OUs
+Write-Host "Checking DNS Settings before starting..."
+Get-DnsClientServerAddress | Select-Object –ExpandProperty ServerAddresses
+Write-Host "Hardcoding windomain.local as localhost via the hosts file"
+echo -e "\n127.0.0.1       windomain.local" >> /etc/hosts
+Write-Host "Checking AD services status..."
+$svcs = "adws","dns","kdc","netlogon"
+Get-Service -name $svcs -ComputerName localhost | Select Machinename,Name,Status
 Write-Host "Creating Server and Workstation OUs..."
 Write-Host "Creating Servers OU..."
 Write-Host "DEBUG: $env:computername.$env:userdnsdomain"
