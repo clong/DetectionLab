@@ -1,19 +1,20 @@
 # Purpose: Sets up the Server and Workstations OUs
-Write-Host "Checking DNS Settings before starting..."
-Get-DnsClientServerAddress | Select-Object –ExpandProperty ServerAddresses
-Write-Host "Hardcoding windomain.local via the hosts file"
-Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.102    windomain.local"
-Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.102         dc.windomain.local"
+
 Write-Host "Checking AD services status..."
 $svcs = "adws","dns","kdc","netlogon"
 Get-Service -name $svcs -ComputerName localhost | Select Machinename,Name,Status
+
+# Force DNS resolution of the domain
+ping /n 1 dc.windomain.local
+ping /n 1 windomain.local
+
 Write-Host "Creating Server and Workstation OUs..."
 Write-Host "Creating Servers OU..."
-Write-Host "DEBUG: $env:computername.$env:userdnsdomain"
+
 try {
   if (!([ADSI]::Exists("LDAP://OU=Servers,DC=windomain,DC=local")))
   {
-    New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"   
+    New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
   }
   else
   {
@@ -33,7 +34,7 @@ try {
   {
     Write-Host "Workstations OU already exists. Moving On."
   }
-} catch { 
+} catch {
   New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
 }
 
