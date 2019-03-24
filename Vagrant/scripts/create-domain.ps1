@@ -45,7 +45,7 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
     -SysvolPath "C:\Windows\SYSVOL" `
     -Force:$true
 
-  $newDNSServers = "8.8.8.8", "4.4.4.4"
+  $newDNSServers = "127.0.0.1", "8.8.8.8", "4.4.4.4"
   $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -And ($_.IPAddress).StartsWith($subnet) }
   if ($adapters) {
     Write-Host Setting DNS
