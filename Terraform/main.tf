@@ -26,7 +26,19 @@ resource "aws_route" "internet_access" {
 resource "aws_subnet" "default" {
   vpc_id                  = "${aws_vpc.default.id}"
   cidr_block              = "192.168.38.0/24"
+  availability_zone = "${var.availability_zone}"
   map_public_ip_on_launch = true
+}
+
+# Adjust VPC DNS settings to not conflict with lab
+resource "aws_vpc_dhcp_options" "default" {
+  domain_name          = "windomain.local"
+  domain_name_servers  = ["${aws_instance.dc.private_ip}", "${var.external_dns_servers}"]
+  netbios_name_servers = ["${aws_instance.dc.private_ip}"]
+}
+resource "aws_vpc_dhcp_options_association" "default" {
+  vpc_id          = "${aws_vpc.default.id}"
+  dhcp_options_id = "${aws_vpc_dhcp_options.default.id}"
 }
 
 # Our default security group for the logger host
@@ -185,18 +197,6 @@ resource "aws_instance" "dc" {
   subnet_id = "${aws_subnet.default.id}"
   vpc_security_group_ids = ["${aws_security_group.windows.id}"]
   private_ip = "192.168.38.102"
-  provisioner "remote-exec" {
-    connection = {
-      type     = "winrm"
-      user     = "vagrant"
-      password = "vagrant"
-      agent    = "false"
-      insecure = "true"
-    }
-    inline = [
-      "powershell -command \"$newDNSServers = @('192.168.38.102','8.8.8.8'); $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match '192.168.38.'}; $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}\"",
-    ]
-  }
   root_block_device {
     delete_on_termination = true
   }
@@ -211,18 +211,6 @@ resource "aws_instance" "wef" {
   subnet_id = "${aws_subnet.default.id}"
   vpc_security_group_ids = ["${aws_security_group.windows.id}"]
   private_ip = "192.168.38.103"
-  provisioner "remote-exec" {
-    connection = {
-      type     = "winrm"
-      user     = "vagrant"
-      password = "vagrant"
-      agent    = "false"
-      insecure = "true"
-    }
-    inline = [
-      "powershell -command \"$newDNSServers = @('192.168.38.102','8.8.8.8'); $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match '192.168.38.'}; $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}\"",
-    ]
-  }
   root_block_device {
     delete_on_termination = true
   }
@@ -237,18 +225,6 @@ resource "aws_instance" "win10" {
   subnet_id = "${aws_subnet.default.id}"
   vpc_security_group_ids = ["${aws_security_group.windows.id}"]
   private_ip = "192.168.38.104"
-  provisioner "remote-exec" {
-    connection = {
-      type     = "winrm"
-      user     = "vagrant"
-      password = "vagrant"
-      agent    = "false"
-      insecure = "true"
-    }
-    inline = [
-      "powershell -command \"$newDNSServers = @('192.168.38.102','8.8.8.8'); $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match '192.168.38.'}; $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}\"",
-    ]
-  }
   root_block_device {
     delete_on_termination = true
   }
