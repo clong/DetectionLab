@@ -35,60 +35,22 @@ variable "external_dns_servers" {
   default = ["8.8.8.8"]
 }
 
-# The logger host will provision itself and does not use a pre-built AMI
-
-# Use Data Sources to resolve the AMI-ID for the pre-built DC host
-data "aws_ami" "dc_ami" {
-  owners = ["505638924199"]
-  filter {
-    name = "tag:Name"
-    values = ["dc"]
-  }
-  filter {
-    name = "image-id"
-    values = ["${var.dc_ami}"]
-  }
-}
-
-# Use Data Sources to resolve the AMI-ID for the pre-built WEF host
-data "aws_ami" "wef_ami" {
-  owners = ["505638924199"]
-  most_recent = true
-  filter {
-    name = "tag:Name"
-    values = ["wef"]
-  }
-  filter {
-    name = "image-id"
-    values = ["${var.wef_ami}"]
-  }
-}
-
-# Use Data Sources to resolve the AMI-ID for the pre-built Win10 host
-data "aws_ami" "win10_ami" {
-  owners = ["505638924199"]
-  most_recent = true
-  filter {
-    name = "tag:Name"
-    values = ["win10"]
-  }
-  filter {
-    name = "image-id"
-    values = ["${var.win10_ami}"]
-  }
-}
-
+# The logger host uses the Amazon Ubuntu 16.04 image
 # If you are building your own AMIs, replace the default values below with
 # the AMI IDs
 variable "logger_ami" {
-  default = "*"
+  type = "string"
+  default = "ami-0693b32d066fade8a"
 }
 variable "dc_ami" {
-  default = "*"
+  type = "string"
+  default = "ami-0fcdb93aba16008ad"
 }
 variable "wef_ami" {
-  default = "*"
+  type = "string"
+  default = "ami-0bb08349b4ddd2816"
 }
 variable "win10_ami" {
-  default = "*"
+  type = "string"
+  default = "ami-00ae1022c8a735d81"
 }
