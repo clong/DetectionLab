@@ -190,7 +190,7 @@ resource "aws_instance" "logger" {
 
 resource "aws_instance" "dc" {
   instance_type = "t2.medium"
-  ami = "${data.aws_ami.dc_ami.image_id}"
+  ami = "${var.dc_ami}"
   tags {
     Name = "dc.windomain.local"
   }
@@ -204,7 +204,7 @@ resource "aws_instance" "dc" {
 
 resource "aws_instance" "wef" {
   instance_type = "t2.medium"
-  ami = "${data.aws_ami.wef_ami.image_id}"
+  ami = "${var.wef_ami}"
   tags {
     Name = "wef.windomain.local"
   }
@@ -218,7 +218,7 @@ resource "aws_instance" "wef" {
 
 resource "aws_instance" "win10" {
   instance_type = "t2.medium"
-  ami = "${data.aws_ami.win10_ami.image_id}"
+  ami = "${var.win10_ami}"
   tags {
     Name = "win10.windomain.local"
   }
