@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 Type=idle
 WorkingDirectory=/home/vagrant/caldera/caldera
-ExecStart=/usr/local/bin/python3.6 caldera.py
+ExecStart=/usr/bin/python3.6 caldera.py
 
 [Install]
 WantedBy=multi-user.target

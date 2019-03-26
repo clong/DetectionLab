@@ -28,6 +28,8 @@ fi
 
 echo "Args: $ARGS"
 
+sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
+
 if [[ "$VAGRANT_ONLY" -eq 1 ]] && [[ "$PACKER_ONLY" -eq 1 ]]; then
   echo "Somehow this build is configured as both packer-only and vagrant-only. This means something has gone horribly wrong."
   exit 1
@@ -51,8 +53,8 @@ if [ "$PACKER_ONLY" -eq 0 ]; then
   # Install Vagrant
   mkdir /opt/vagrant
   cd /opt/vagrant || exit 1
-  wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
-  dpkg -i vagrant_2.2.2_x86_64.deb
+  wget https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
+  dpkg -i vagrant_2.2.4_x86_64.deb
   vagrant plugin install vagrant-reload
 
   # Make the Vagrant instances headless
