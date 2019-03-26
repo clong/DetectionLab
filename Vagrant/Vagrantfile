@@ -8,7 +8,31 @@ Vagrant.configure("2") do |config|
 	cfg.vm.provision :shell, path: "bootstrap.sh"
     cfg.vm.network :private_network, ip: "192.168.38.105", gateway: "192.168.38.1", dns: "8.8.8.8"
 
-    cfg.vm.provider :vmware_esxi do |esxi, v, override| 
+    cfg.vm.provider "vmware_fusion" do |v, override|
+      v.vmx["displayname"] = "logger"
+      v.memory = 2048
+      v.cpus = 1
+      v.gui = true
+    end
+
+    cfg.vm.provider "vmware_desktop" do |v, override|
+      v.vmx["displayname"] = "logger"
+      v.memory = 4096
+      v.cpus = 2
+      v.gui = true
+    end
+
+    cfg.vm.provider "virtualbox" do |vb, override|
+      vb.gui = true
+      vb.name = "logger"
+      vb.customize ["modifyvm", :id, "--memory", 4096]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
+      vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+    end
+      cfg.vm.provider :vmware_esxi do |esxi, v, override| 
 	  esxi.esxi_hostname = 'ESXi_IP'
 	  esxi.esxi_username = 'ESXi_Username'
 	  esxi.esxi_password = 'ESXi_Password'
@@ -21,19 +45,30 @@ Vagrant.configure("2") do |config|
       #v.gui = true
     end
   end
-
+  
 
   config.vm.define "dc" do |cfg|
-    cfg.vm.box = "../Boxes/windows_2016_vmware.box"
+    cfg.vm.box = "../Boxes/windows_2016_virtualbox.box"
+		# Possible way to fix the SMB sharing:
+		# Change your SMB IP machine in the "smb_host" parameter
+		#cfg.vm.synced_folder '.', '/Vagrantfiles', type: 'smb', smb_password: 'vagrant',smb_username: 'vagrant', smb_host: 'IP', mount_options: ['username=vagrant','password=vagrant']
+	
 	config.vm.synced_folder ".", "/Vagrantfiles", type: "smb",
 	    smb_password: "vagrant", smb_username: "vagrant",
 		mount_options: ["username=vagrant","password=vagrant"]
     cfg.vm.hostname = "dc"
-	config.vm.guest = :windows
+		cfg.vm.guest = :windows
     cfg.vm.boot_timeout = 600
-    cfg.winrm.transport = :plaintext
+    # use the plaintext WinRM transport and force it to use basic authentication.
+    # NB this is needed because the default negotiate transport stops working
+    #    after the domain controller is installed.
+    #    see https://groups.google.com/forum/#!topic/vagrant-up/sZantuCM0q4
+
     cfg.vm.communicator = "winrm"
+		cfg.winrm.transport = :plaintext
     cfg.winrm.basic_auth_only = true
+		cfg.winrm.username = "vagrant"
+		cfg.winrm.password = "vagrant"
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
     cfg.vm.network :private_network, ip: "192.168.38.102", gateway: "192.168.38.1", auto_config: false
@@ -60,78 +95,56 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
 
+    cfg.vm.provider "vmware_fusion" do |v, override|
+      override.vm.box = "../Boxes/windows_2016_vmware.box"
+      v.vmx["displayname"] = "dc.windomain.local"
+      v.memory = 2560
+      v.cpus = 2
+      v.gui = true
+    end
 
+    cfg.vm.provider "vmware_desktop" do |v, override|
+      override.vm.box = "../Boxes/windows_2016_vmware.box"
+      v.vmx["displayname"] = "dc.windomain.local"
+      v.memory = 2560
+      v.cpus = 2
+      v.gui = true
+      v.enable_vmrun_ip_lookup = false
+    end
+
+    cfg.vm.provider "virtualbox" do |vb, override|
+      vb.gui = true
+      vb.name = "dc.windomain.local"
+      vb.default_nic_type = "82545EM"
+      vb.customize ["modifyvm", :id, "--memory", 2560]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
+      vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+    end
+	
 	cfg.vm.provider :vmware_esxi do |esxi, v, override| 
 	  esxi.esxi_hostname = 'ESXi_IP'
 	  esxi.esxi_username = 'ESXi_Username'
 	  esxi.esxi_password = 'ESXi_Password'
 	  esxi.guest_memsize = '2560'
 	  esxi.guest_name = 'dc.windomain.local'
-	  esxi.guest_numvcpus = '2'
+  	  esxi.guest_numvcpus = '2'
 	  #esxi.enable_vmrun_ip_lookup = 'False'
 	  esxi.guest_nic_type = 'vmxnet3'
 	  esxi_virtual_network = ['Corporate_LAN', 'INTERNET']
       esxi.guest_mac_address = ["00:50:56:3f:02:01", "00:50:56:3f:02:02"]
       #v.gui = true
-    end
+	end
   end
-  
-  config.vm.define "dhcp" do |cfg|
-    cfg.vm.box = "../Boxes/windows_2016_vmware.box"
-	config.vm.synced_folder ".", "/Vagrantfiles", type: "smb",
-	    smb_password: "vagrant", smb_username: "vagrant",
-		mount_options: ["username=vagrant","password=vagrant"]
-    cfg.vm.hostname = "dhcp"
-	config.vm.guest = :windows
-    cfg.vm.boot_timeout = 600
-    cfg.winrm.transport = :plaintext
-    cfg.vm.communicator = "winrm"
-    cfg.winrm.basic_auth_only = true
-    cfg.winrm.timeout = 300
-    cfg.winrm.retry_limit = 20
-
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "192.168.38.102"
-    cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
-    cfg.vm.provision "reload"
-    cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/install-inputsconf.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/install-caldera-agent.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/configure-ou.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/configure-wef-gpo.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/configure-powershelllogging.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/configure-AuditingPolicyGPOs.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
-    cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
-    cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
-
-
-	cfg.vm.provider :vmware_esxi do |esxi, v, override| 
-	  esxi.esxi_hostname = 'ESXi_IP'
-	  esxi.esxi_username = 'ESXi_Username'
-	  esxi.esxi_password = 'ESXi_Password'
-	  esxi.guest_memsize = '2560'
-	  esxi.guest_name = 'dhcp.windomain.local'
-	  esxi.guest_numvcpus = '2'
-	  esxi.guest_nic_type = 'vmxnet3'
-	  esxi_virtual_network = ['Corporate_LAN', 'INTERNET']
-      #v.gui = true
-    end
-  end
-
 
   config.vm.define "wef" do |cfg|
-    cfg.vm.box = "../Boxes/windows_2016_vmware.box"
-	config.vm.synced_folder ".", "/Vagrantfiles", type: "smb",
+    cfg.vm.box = "../Boxes/windows_2016_virtualbox.box"
+		config.vm.synced_folder ".", "/Vagrantfiles", type: "smb",
 	    smb_password: "vagrant", smb_username: "vagrant",
 		mount_options: ["username=vagrant","password=vagrant"]
     cfg.vm.hostname = "wef"
-	config.vm.guest = :windows
+		config.vm.guest = :windows
     cfg.vm.boot_timeout = 600
     cfg.vm.communicator = "winrm"
     cfg.winrm.basic_auth_only = true
@@ -161,6 +174,33 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-microsoft-ata.ps1", privileged: false
 
+    cfg.vm.provider "vmware_fusion" do |v, override|
+      override.vm.box = "../Boxes/windows_2016_vmware.box"
+      v.vmx["displayname"] = "wef.windomain.local"
+      v.memory = 2048
+      v.cpus = 2
+      v.gui = true
+    end
+
+    cfg.vm.provider "vmware_desktop" do |v, override|
+      override.vm.box = "../Boxes/windows_2016_vmware.box"
+      v.vmx["displayname"] = "wef.windomain.local"
+      v.memory = 2048
+      v.cpus = 2
+      v.gui = true
+      v.enable_vmrun_ip_lookup = false
+    end
+
+    cfg.vm.provider "virtualbox" do |vb, override|
+      vb.gui = true
+      vb.name = "wef.windomain.local"
+      vb.default_nic_type = "82545EM"
+      vb.customize ["modifyvm", :id, "--memory", 2048]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
+      vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+    end
 	
 	cfg.vm.provider :vmware_esxi do |esxi, v, override| 
 	  esxi.esxi_hostname = 'ESXi_IP'
@@ -172,18 +212,16 @@ Vagrant.configure("2") do |config|
 	  esxi.guest_nic_type = 'vmxnet3'
 	  esxi_virtual_network = ['Corporate_LAN', 'INTERNET']
       esxi.guest_mac_address = ["00:50:56:3f:03:01", "00:50:56:3f:03:02"]
-      #v.gui = true
-    end
+	end
   end
 
-
   config.vm.define "win10" do |cfg|
-    cfg.vm.box = "../Boxes/windows_10_vmware.box"
-	config.vm.synced_folder ".", "/Vagrantfiles", type: "smb",
+    cfg.vm.box = "../Boxes/windows_10_virtualbox.box"
+		config.vm.synced_folder ".", "/Vagrantfiles", type: "smb",
 	    smb_password: "vagrant", smb_username: "vagrant",
 		mount_options: ["username=vagrant","password=vagrant"]
     cfg.vm.hostname = "win10"
-	config.vm.guest = :windows
+		config.vm.guest = :windows
     cfg.vm.boot_timeout = 600
     cfg.vm.communicator = "winrm"
     cfg.winrm.basic_auth_only = true
@@ -209,18 +247,49 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
 
+    cfg.vm.provider "vmware_fusion" do |v, override|
+      override.vm.box = "../Boxes/windows_10_vmware.box"
+      v.vmx["displayname"] = "win10.windomain.local"
+      v.vmx["gui.fullscreenatpoweron"] = "FALSE"
+      v.vmx["gui.viewModeAtPowerOn"] = "windowed"
+      v.vmx["gui.fitguestusingnativedisplayresolution"] = "FALSE"
+      v.memory = 2048
+      v.cpus = 1
+      v.gui = true
+    end
 
+    cfg.vm.provider "vmware_desktop" do |v, override|
+      override.vm.box = "../Boxes/windows_10_vmware.box"
+      v.vmx["displayname"] = "win10.windomain.local"
+      v.vmx["gui.fullscreenatpoweron"] = "FALSE"
+      v.vmx["gui.viewModeAtPowerOn"] = "windowed"
+      v.memory = 2048
+      v.cpus = 1
+      v.gui = true
+      v.enable_vmrun_ip_lookup = false
+    end
+
+    cfg.vm.provider "virtualbox" do |vb, override|
+      vb.gui = true
+      vb.name = "win10.windomain.local"
+      vb.default_nic_type = "82545EM"
+      vb.customize ["modifyvm", :id, "--memory", 2048]
+      vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+    end
+	
 	cfg.vm.provider :vmware_esxi do |esxi, v, override| 
 	  esxi.esxi_hostname = 'ESXi_IP'
 	  esxi.esxi_username = 'ESXi_Username'
 	  esxi.esxi_password = 'ESXi_Password'
 	  esxi.guest_memsize = '2048'
-	  esxi.guest_name = 'win10.windomain.local'
+	  esxi.guest_name = 'wef.windomain.local'
 	  esxi.guest_numvcpus = '1'
 	  esxi.guest_nic_type = 'vmxnet3'
 	  esxi_virtual_network = ['Corporate_LAN', 'INTERNET']
       esxi.guest_mac_address = ["00:50:56:3f:04:01", "00:50:56:3f:04:02"]
-      #v.gui = true
-    end
+	end
   end
 end
