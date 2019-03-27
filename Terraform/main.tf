@@ -163,6 +163,7 @@ resource "aws_instance" "logger" {
       "sudo add-apt-repository universe && sudo apt-get update && sudo apt-get install -y git",
       "echo 'logger' | sudo tee /etc/hostname && sudo hostnamectl set-hostname logger",
       "sudo adduser --disabled-password --gecos \"\" vagrant && echo 'vagrant:vagrant' | sudo chpasswd",
+      "sudo mkdir /home/vagrant/.ssh && sudo cp /home/ubuntu/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys && sudo chown -R vagrant:vagrant /home/vagrant/.ssh",
       "echo 'vagrant    ALL=(ALL:ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers",
       "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
       "sudo sed -i \"s#sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list##g\" /opt/DetectionLab/Vagrant/bootstrap.sh",
@@ -174,7 +175,7 @@ resource "aws_instance" "logger" {
       "sudo apt-get update",
       "sudo /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo pip3.6 install --upgrade --force-reinstall pip==9.0.3 && sudo pip3.6 install -r /home/vagrant/caldera/caldera/requirements.txt && sudo pip3.6 install --upgrade pip",
-      "sudo service caldera stop && sudo service caldera start"
+      "sudo service caldera stop && sudo service caldera start",
     ]
     connection {
       type = "ssh"
