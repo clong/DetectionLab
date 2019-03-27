@@ -20,5 +20,5 @@ cert: |
   4xriKHV6WQ9ixFwOk9ROYg1M/OJ2lmOi23NFODKVP0LFPAqZEX7evKJatWQiJ2tF
   iUAm+4xvkGVJfPd6hShYEsXDjTJC+fVFgsPTWhaHGnLjiLORJLgvd/E6wIGGzvx7
   fIw1x7LxMmhlWa74yyGZKAMUOlMh4uBAYR3JhsVYl2LNSK9HwZYnfXc=
------END CERTIFICATE-----
+  -----END CERTIFICATE-----
 logging_level: debug
