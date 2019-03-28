@@ -189,6 +189,7 @@ install_caldera() {
     cd /home/vagrant/caldera || exit
     mkdir -p dep/crater/crater
     wget https://github.com/mitre/caldera-crater/releases/download/v0.1.0/CraterMainWin8up.exe -O /home/vagrant/caldera/dep/crater/crater/CraterMain.exe
+    cp /vagrant/resources/caldera/cert.pem /vagrant/resources/caldera/key.pem /vagrant/resources/caldera/settings.yml /home/vagrant/caldera/caldera/conf 
     service caldera start
     systemctl enable caldera.service
   fi

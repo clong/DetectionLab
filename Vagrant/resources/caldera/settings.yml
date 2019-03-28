@@ -1,0 +1,27 @@
+auth:
+  key: !!binary |
+    QfVQNdpJt0br69u4yGYgjJYr8mlKRb8nhkzxd+XkuBt7D/JKeCUmSafJuBFY3w7oXatwSqFYKdWn
+    ZhVklJsZAmoPy3BEr1maTwFFfJtfav6e6JUMfPKP2SXHFW0fsyF3mdxpXtMbRrMTwnQ4TrndAtCs
+    E0jWC9qM/ktTga5UweS3YkDlQpWQHktgPPRC8nLk2dtGkWLuam7lfFCW93mxrNyYAAlbNQPq8/ld
+    DvYD+eWB8tviOh5ZcntmST4tCXXZqk6pGByWV8m7EnBRK4ffIoNmgNV5K7UrWBPEI5ZbNbHx9rSl
+    GNqAiA9T020MJ5qyrCl9mgZTnbmKXiUOcgpr6g==
+crypto:
+  cert: conf/cert.pem
+  key: conf/key.pem
+database:
+  host: localhost
+  key: !!binary |
+    UXFoNGMzdU1kYWJzU195ZDEybUItWnBJbEg5UnNqYndmQWJpcC1xNjFNaz0=
+  port: 27017
+proxy:
+  default:
+    cert: ''
+    http: ''
+    https: ''
+server:
+  host: 0.0.0.0
+  https: true
+  port: 8888
+users:
+- name: admin
+  password: caldera
