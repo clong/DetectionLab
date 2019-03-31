@@ -1,7 +1,9 @@
 #! /bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
-sed -i 's#http://archive.ubuntu.com#http://us.archive.ubuntu.com#g' /etc/apt/sources.list
+echo "apt-fast apt-fast/maxdownloads string 10" | debconf-set-selections;
+echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections;
+sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
 
 install_mongo_db_apt_key() {
   # Install key and apt source for MongoDB
@@ -12,12 +14,14 @@ install_mongo_db_apt_key() {
 install_python_apt_source() {
   # Install apt source for Python3.6
   add-apt-repository -y ppa:jonathonf/python-3.6
+  add-apt-repository -y ppa:apt-fast/stable
 }
 
 apt_install_prerequisites() {
   # Install prerequisites and useful tools
   apt-get update
-  apt-get install -y jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
+  #apt-get install -y apt-fast
+  time apt-fast install -y jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
   # Install pip for Python 3.6
   curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
 }
