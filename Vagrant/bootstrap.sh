@@ -21,8 +21,7 @@ apt_install_prerequisites() {
   # Install prerequisites and useful tools
   apt-get update
   #apt-get install -y apt-fast
-  time apt-fast install -y jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
-  exit 0
+  apt-fast install -y jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
   # Install pip for Python 3.6
   curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
 }
