@@ -28,8 +28,6 @@ fi
 
 echo "Args: $ARGS"
 
-sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
-
 if [[ "$VAGRANT_ONLY" -eq 1 ]] && [[ "$PACKER_ONLY" -eq 1 ]]; then
   echo "Somehow this build is configured as both packer-only and vagrant-only. This means something has gone horribly wrong."
   exit 1
