@@ -37,7 +37,7 @@ else
 Write-Host "Downloading Powersploit..."
 # GitHub requires TLS 1.2 as of 2/27
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$powersploitDownloadUrl = "https://github.com/PowerShellMafia/PowerSploit/archive/master.zip"
+$powersploitDownloadUrl = "https://github.com/PowerShellMafia/PowerSploit/archive/dev.zip"
 $powersploitRepoPath = "C:\Users\vagrant\AppData\Local\Temp\powersploit.zip"
 if (-not (Test-Path $powersploitRepoPath)) {
   Invoke-WebRequest -Uri "$powersploitDownloadUrl" -OutFile $powersploitRepoPath
