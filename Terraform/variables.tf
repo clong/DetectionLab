@@ -44,13 +44,13 @@ variable "logger_ami" {
 }
 variable "dc_ami" {
   type = "string"
-  default = "ami-0fcdb93aba16008ad"
+  default = "ami-0f0f0aaba01986b10"
 }
 variable "wef_ami" {
   type = "string"
-  default = "ami-0bb08349b4ddd2816"
+  default = "ami-02566cd6ca3b7c6ae"
 }
 variable "win10_ami" {
   type = "string"
-  default = "ami-00ae1022c8a735d81"
+  default = "ami-06a8a101dac68a81a"
 }
