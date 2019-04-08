@@ -72,8 +72,8 @@ install_splunk() {
     # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
     dig @8.8.8.8 splunk.com
     # Download Splunk
-    wget --progress=bar:force -O splunk-7.2.4.2-fb30470262e3-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.4.2&product=splunk&filename=splunk-7.2.4.2-fb30470262e3-linux-2.6-amd64.deb&wget=true'
-    dpkg -i splunk-7.2.4.2-fb30470262e3-linux-2.6-amd64.deb
+    wget --progress=bar:force -O splunk-7.2.5.1-962d9a8e1586-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.5.1&product=splunk&filename=splunk-7.2.5.1-962d9a8e1586-linux-2.6-amd64.deb&wget=true'
+    dpkg -i splunk-7.2.5.1-962d9a8e1586-linux-2.6-amd64.deb
     /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
     /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
