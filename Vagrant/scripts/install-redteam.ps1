@@ -42,7 +42,7 @@ $powersploitRepoPath = "C:\Users\vagrant\AppData\Local\Temp\powersploit.zip"
 if (-not (Test-Path $powersploitRepoPath)) {
   Invoke-WebRequest -Uri "$powersploitDownloadUrl" -OutFile $powersploitRepoPath
   Expand-Archive -path "$powersploitRepoPath" -destinationpath 'c:\Tools\PowerSploit' -Force
-  Copy-Item "c:\Tools\PowerSploit\PowerSploit-master\*" "$Env:windir\System32\WindowsPowerShell\v1.0\Modules" -Recurse -Force
+  Copy-Item "c:\Tools\PowerSploit\PowerSploit-dev\*" "$Env:windir\System32\WindowsPowerShell\v1.0\Modules" -Recurse -Force
 } else {
   Write-Host "PowerSploit was already installed. Moving On."
 }
