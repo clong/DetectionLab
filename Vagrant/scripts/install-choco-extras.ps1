@@ -11,5 +11,6 @@ If (-not (Test-Path "C:\ProgramData\chocolatey")) {
 
 Write-Host "Installing Chocolatey extras..."
 choco install -y wireshark
+choco install -y winpcap
 
 Write-Host "Choco addons complete!"
