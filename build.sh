@@ -133,6 +133,19 @@ list_providers() {
   echo "$PROVIDER"
 }
 
+# Check to see if boxes exist in the "Boxes" directory already
+check_boxes_built() {
+  BOXES_BUILT=$(find "$DL_DIR"/Boxes -name "*.box" | wc -l)
+  if [ "$BOXES_BUILT" -gt 0 ]; then
+    if [ "$VAGRANT_ONLY" -eq 1 ]; then
+      (echo >&2 "WARNING: You seem to have at least one .box file present in $DL_DIR/Boxes already. If you would like fresh boxes downloaded, please remove all files from the Boxes directory and re-run this script.")
+    else
+      (echo >&2 "You seem to have at least one .box file in $DL_DIR/Boxes. This script does not support pre-built boxes. Please either delete the existing boxes or follow the build steps in the README to continue.")
+      exit 1
+    fi
+  fi
+}
+
 # Check to see if any Vagrant instances exist already
 check_vagrant_instances_exist() {
   cd "$DL_DIR"/Vagrant/ || exit 1
