@@ -407,9 +407,9 @@ test_suricata_prerequisites() {
 
   # One-off support for packages which aren't installed via dpkg
   echo "[TEST] Validating that yq is correctly installed..."
-  # Loop through each package using which
+  # Check if the binary exists
   if ! [ -f /root/go/bin/yq ]; then
-    # If which returns a non-zero return code, try to re-install the package
+    # If it doesn't exist, try to re-install the package
     echo "[-] yq was not found. Attempting to reinstall."
     /usr/local/go/bin/go get -u github.com/mikefarah/yq
     if ! [ -f /root/go/bin/yq ]; then
