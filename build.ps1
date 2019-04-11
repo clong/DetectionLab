@@ -385,7 +385,7 @@ else {
 preflight_checks
 
 # Build Packer Boxes
-if ! ($VagrantOnly) {
+if (!($VagrantOnly)) {
   packer_build_box -Box 'windows_2016'
   packer_build_box -Box 'windows_10'
   # Move Packer Boxes
