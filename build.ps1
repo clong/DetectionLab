@@ -26,7 +26,7 @@
   The full path to the packer executable. Default is C:\Hashicorp\packer.exe
 
 .PARAMETER VagrantOnly
-  This switch skips building packer boxes and instead downloads from www.detectionlab.network
+  This switch skips building packer boxes and instead downloads from Vagrant Cloud
 
 .EXAMPLE
   build.ps1 -ProviderName virtualbox
@@ -53,14 +53,6 @@ Param(
 
 $DL_DIR = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $LAB_HOSTS = ('logger', 'dc', 'wef', 'win10')
-
-# Register-EngineEvent PowerShell.Exiting -SupportEvent -Action {
-#   Set-Location $DL_DIR
-# }
-
-# Register-ObjectEvent -InputObject ([System.Console]) -EventName CancelKeyPress -Action {
-#   Set-Location $DL_DIR
-# }
 
 function install_checker {
   param(
@@ -175,55 +167,6 @@ function list_providers {
     }
   }
   return $ProviderName
-}
-
-function download_boxes {
-  Write-Host '[download_boxes] Running..'
-  if ($PackerProvider -eq 'virtualbox') {
-    $win10Hash = 'c03f10f21b8d79e6acca2b2965b23046'
-    $win2016Hash = '231b54077d4396cad01e4cd60651b1e0'
-  }
-  if ($PackerProvider -eq 'vmware') {
-    $win10Hash = 'b334c3ba5be3b29840567ffe368db5fe'
-    $win2016Hash = '2bbaf5a1177e0499dc3aacdb0246eb38'
-  }
-
-  $win10Filename = "windows_10_$PackerProvider.box"
-  $win2016Filename = "windows_2016_$PackerProvider.box"
-
-  $wc = New-Object System.Net.WebClient
-  Write-Host "[download_boxes] Downloading $win10Filename"
-  $wc.DownloadFile("https://www.detectionlab.network/$win10Filename", "$DL_DIR\Boxes\$win10Filename")
-  Write-Host "[download_boxes] Downloading $win2016Filename"
-  $wc.DownloadFile("https://www.detectionlab.network/$win2016Filename", "$DL_DIR\Boxes\$win2016Filename")
-  $wc.Dispose()
-
-  if (-Not (Test-Path "$DL_DIR\Boxes\$win2016Filename")) {
-    Write-Error 'Windows 2016 box is missing from the Boxes directory. Qutting.'
-    break
-  }
-  if (-Not (Test-Path "$DL_DIR\Boxes\$win10Filename")) {
-    Write-Error 'Windows 10 box is missing from the Boxes directory. Qutting.'
-    break
-  }
-
-  Write-Host "[download_boxes] Getting filehash for: $win10Filename"
-  $win10Filehash = (Get-FileHash -Path "$DL_DIR\Boxes\$win10Filename" -Algorithm MD5).Hash
-  Write-Host "[download_boxes] Getting filehash for: $win2016Filename"
-  $win2016Filehash = (Get-FileHash -Path "$DL_DIR\Boxes\$win2016Filename" -Algorithm MD5).Hash
-
-  Write-Host '[download_boxes] Checking Filehashes..'
-  if ($win10hash -ne $win10Filehash) {
-    Write-Error 'Hash mismatch on windows_10_virtualbox.box'
-    Write-Error 'The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.'
-    break
-  }
-  if ($win2016hash -ne $win2016Filehash) {
-    Write-Error 'Hash mismatch on windows_2016_virtualbox.box'
-    Write-Error 'The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.'
-    break
-  }
-  Write-Host '[download_boxes] Finished.'
 }
 
 function preflight_checks {
@@ -390,7 +333,6 @@ function download {
       Write-Host "Error occured on webrequest: $_"
       return $false
     }
-
   }
 }
 
@@ -412,7 +354,6 @@ function post_build_checks {
   $ATA_CHECK = download -URL 'https://192.168.38.103' -SuccessOn401
   Write-Host "[post_build_checks] ATA Result: $ATA_CHECK"
 
-
   if ($CALDERA_CHECK -eq $false) {
     Write-Warning 'Caldera failed post-build tests and may not be functioning correctly.'
   }
@@ -427,7 +368,6 @@ function post_build_checks {
   }
 }
 
-
 # If no ProviderName was provided, get a provider
 if ($ProviderName -eq $Null -or $ProviderName -eq "") {
   $ProviderName = list_providers
@@ -441,15 +381,11 @@ else {
   $PackerProvider = 'virtualbox'
 }
 
-
 # Run check functions
 preflight_checks
 
 # Build Packer Boxes
-if ($VagrantOnly) {
-  download_boxes
-}
-else {
+if ! ($VagrantOnly) {
   packer_build_box -Box 'windows_2016'
   packer_build_box -Box 'windows_10'
   # Move Packer Boxes
@@ -476,7 +412,6 @@ forEach ($VAGRANT_HOST in $LAB_HOSTS) {
   }
   Write-Host "[main] Finished for: $VAGRANT_HOST"
 }
-
 
 Write-Host "[main] Running post_build_checks"
 post_build_checks
