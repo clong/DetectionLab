@@ -3,7 +3,7 @@
 # This script is meant to be used with a fresh clone of DetectionLab and
 # will fail to run if boxes have already been created or any of the steps
 # from the README have already been run followed.
-# Only MacOS and Linux are supported.
+# Only MacOS and Linux are supported. Use build.ps1 for Windows.
 # If you encounter issues, feel free to open an issue at
 # https://github.com/clong/DetectionLab/issues
 
@@ -49,6 +49,16 @@ check_virtualbox_installed() {
 }
 
 # Returns 0 if not installed or 1 if installed
+# Check for VMWare Workstation on Linux
+check_vmware_workstation_installed() {
+  if which vmrun >/dev/null; then
+    echo "1"
+  else
+    echo "0"
+  fi
+}
+
+# Returns 0 if not installed or 1 if installed
 check_vmware_fusion_installed() {
   if [ -e "/Applications/VMware Fusion.app" ]; then
     echo "1"
@@ -68,15 +78,17 @@ check_vmware_desktop_vagrant_plugin_installed() {
   fi
   VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT="$(vagrant plugin list | grep -c 'vagrant-vmware-desktop')"
   if [ "$VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT" -eq 0 ]; then
-    (echo >&2 "VMWare Fusion is installed, but the vagrant-vmware-desktop plugin is not.")
+    (echo >&2 "VMWare Fusion or Workstation is installed, but the vagrant-vmware-desktop plugin is not.")
     (echo >&2 "If you are seeing this, you may have the deprecated vagrant-vmware-fusion plugin installed. Please remove it and install the vagrant-vmware-desktop plugin.")
     (echo >&2 "Visit https://www.hashicorp.com/blog/introducing-the-vagrant-vmware-desktop-plugin for more information on how to purchase and install it")
-    (echo >&2 "VMWare Fusion will not be listed as a provider until the vagrant-vmware-desktop plugin has been installed.")
+    (echo >&2 "VMWare Fusion or Workstation will not be listed as a provider until the vagrant-vmware-desktop plugin has been installed.")
     echo "0"
   else
     echo "$VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT"
   fi
 }
+
+
 
 # List the available Vagrant providers present on the system
 list_providers() {
@@ -87,10 +99,14 @@ list_providers() {
     # Detect Providers on OSX
     VBOX_PRESENT=$(check_virtualbox_installed)
     VMWARE_FUSION_PRESENT=$(check_vmware_fusion_installed)
+    VMWARE_WORKSTATION_PRESENT=0 # Workstation doesn't exists on Darwain-based OS
     VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=$(check_vmware_desktop_vagrant_plugin_installed)
   else
     # Assume the only other available provider is VirtualBox
     VBOX_PRESENT=$(check_virtualbox_installed)
+    VMWARE_WORKSTATION_PRESENT=$(check_vmware_workstation_installed)
+    VMWARE_FUSION_PRESENT=0 # Fusion doesn't exist on non-Darwin OS
+    VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=$(check_vmware_desktop_vagrant_plugin_installed)
   fi
 
   (echo >&2 "Available Providers:")
@@ -100,7 +116,10 @@ list_providers() {
   if [[ $VMWARE_FUSION_PRESENT -eq 1 ]] && [[ $VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT -eq 1 ]]; then
     (echo >&2 "vmware_desktop")
   fi
-  if [[ $VBOX_PRESENT -eq 0 ]] && [[ $VMWARE_FUSION_PRESENT -eq 0 ]]; then
+  if [[ $VMWARE_WORKSTATION_PRESENT -eq 1 ]] && [[ $VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT -eq 1 ]]; then
+    (echo >&2 "vmware_desktop")
+  fi
+  if [[ $VBOX_PRESENT -eq 0 ]] && [[ $VMWARE_FUSION_PRESENT -eq 0 ]] && [[ $VMWARE_WORKSTATION -eq 0 ]]; then
     (echo >&2 "You need to install a provider such as VirtualBox or VMware Fusion to continue.")
     exit 1
   fi
@@ -120,19 +139,10 @@ check_boxes_built() {
   if [ "$BOXES_BUILT" -gt 0 ]; then
     if [ "$VAGRANT_ONLY" -eq 1 ]; then
       (echo >&2 "WARNING: You seem to have at least one .box file present in $DL_DIR/Boxes already. If you would like fresh boxes downloaded, please remove all files from the Boxes directory and re-run this script.")
-      DOWNLOAD_BOXES=0
     else
       (echo >&2 "You seem to have at least one .box file in $DL_DIR/Boxes. This script does not support pre-built boxes. Please either delete the existing boxes or follow the build steps in the README to continue.")
       exit 1
     fi
-  fi
-}
-
-# Check to ensure either "md5" or "md5sum" is installed for verifying integrity of downloaded boxes
-check_md5_tool_exists() {
-  if ! which md5 > /dev/null && ! which md5sum > /dev/null; then
-    (echo >&2 "md5 or md5sum not found in PATH. Please install at least one of these utilities to continue.")
-    exit 1
   fi
 }
 
@@ -163,7 +173,7 @@ check_vagrant_reload_plugin() {
 check_disk_free_space() {
   FREE_DISK_SPACE=$(df -m "$HOME" | tr -s ' ' | grep '/' | cut -d ' ' -f 4)
   if [ "$FREE_DISK_SPACE" -lt 80000 ]; then
-    (echo >&2 -e "Warning: You appear to have less than 80GB of HDD space free on your primary partition. If you are using a separate parition, you may ignore this warning.\\n")
+    (echo >&2 -e "Warning: You appear to have less than 80GB of HDD space free on your primary partition. If you are using a separate parition, you may ignore this warning.\n")
     (df >&2 -m "$HOME")
     (echo >&2 "")
   fi
@@ -191,10 +201,6 @@ preflight_checks() {
   if [ "$VAGRANT_ONLY" -eq 0 ]; then
     check_packer_path
     check_packer_known_bad
-  else
-    # If it is a Vagrant-only build, set appropriate checks
-    DOWNLOAD_BOXES=1
-    check_md5_tool_exists
   fi
 
   # If it's not a Packer-only build, then run Vagrant-related checks
@@ -368,62 +374,6 @@ done
 fi
 }
 
-choose_md5_tool() {
-  if which md5; then
-    MD5TOOL="$(which md5)"
-    CUT_INDEX=4
-  else
-    MD5TOOL="$(which md5sum)"
-    CUT_INDEX=1
-  fi
-}
-
-# Downloads pre-built Packer boxes from detectionlab.network to save time during CI builds
-download_boxes() {
-  choose_md5_tool
-  if [ "$PROVIDER" == "virtualbox" ]; then
-    wget "https://www.detectionlab.network/windows_2016_virtualbox.box" -O "$DL_DIR"/Boxes/windows_2016_virtualbox.box
-    wget "https://www.detectionlab.network/windows_10_virtualbox.box" -O "$DL_DIR"/Boxes/windows_10_virtualbox.box
-  elif [ "$PROVIDER" == "vmware_desktop" ]; then
-    wget "https://www.detectionlab.network/windows_2016_vmware.box" -O "$DL_DIR"/Boxes/windows_2016_vmware.box
-    wget "https://www.detectionlab.network/windows_10_vmware.box" -O "$DL_DIR"/Boxes/windows_10_vmware.box
-  fi
-
-  # Ensure Windows 10 box exists
-  if [ ! -f "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box ]; then
-    (echo >&2 "Windows 10 box is missing from the Boxes directory. Qutting.")
-    exit 1
-  fi
-  # Ensure Windows 2016 box exists
-  if [ ! -f "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box ]; then
-    (echo >&2 "Windows 2016 box is missing from the Boxes directory. Qutting.")
-    exit 1
-  fi
-  # Verify hashes of VirtualBox boxes
-  if [ "$PACKER_PROVIDER" == "virtualbox" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "c03f10f21b8d79e6acca2b2965b23046" ]; then
-      (echo >&2 "Hash mismatch on windows_10_virtualbox.box")
-      (echo >&2 "The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.")
-    fi
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "231b54077d4396cad01e4cd60651b1e0" ]; then
-      (echo >&2 "Hash mismatch on windows_2016_virtualbox.box")
-      (echo >&2 "The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.")
-    fi
-    # Verify hashes of VMware boxes
-  elif [ "$PACKER_PROVIDER" == "vmware" ]; then
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_10_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "b334c3ba5be3b29840567ffe368db5fe" ]; then
-      (echo >&2 "Hash mismatch on windows_10_vmware.box")
-      (echo >&2 "The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.")
-      exit 1
-    fi
-    if [ "$("$MD5TOOL" "$DL_DIR"/Boxes/windows_2016_"$PACKER_PROVIDER".box | cut -d ' ' -f "$CUT_INDEX")" != "2bbaf5a1177e0499dc3aacdb0246eb38" ]; then
-      (echo >&2 "Hash mismatch on windows_2016_vmware.box")
-      (echo >&2 "The boxes may have been updated since you last ran the build script. Try updating the git repository to retrieve the latest hashes.")
-      exit 1
-    fi
-  fi
-}
-
 build_vagrant_hosts() {
   LAB_HOSTS=("logger" "dc" "wef" "win10")
 
@@ -457,9 +407,6 @@ main() {
 
   parse_cli_arguments "$@"
   preflight_checks
-  if [[ "$DOWNLOAD_BOXES" -eq 1 ]] && [[ "$VAGRANT_ONLY" -eq 1 ]]; then
-    download_boxes
-  fi
 
   # Build Packer boxes if this isn't a Vagrant-only build
   if [ "$VAGRANT_ONLY" -eq 0 ]; then

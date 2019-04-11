@@ -64,7 +64,9 @@ Windows users will want to use the following script:
 1. Determine which Vagrant provider you want to use.
   * Note: Virtualbox is free, the [VMWare Desktop vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80.
 
-  **NOTE:** If you'd like to save time, you can skip the building of the Packer boxes and download the boxes directly from https://detectionlab.network and put them into the `Boxes` directory:
+  #### Warning: As of May 1, 2019 the boxes will only be available from [Vagrant Cloud](https://app.vagrantup.com/detectionlab/)
+
+  If you'd like to save time, you can skip the building of the Packer boxes and download the boxes directly from https://detectionlab.network and put them into the `Boxes` directory:
 
 Provider | Box  | URL | MD5 | Size
 ------------|-----|-----|----|----

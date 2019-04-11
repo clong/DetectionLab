@@ -19,11 +19,53 @@ install_python_apt_source() {
 
 apt_install_prerequisites() {
   # Install prerequisites and useful tools
-  apt-get update
-  apt-get install -y apt-fast
-  apt-fast install -y jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
+  echo "Running apt-get update..."
+  apt-get -qq update
+  apt-get -qq install -y apt-fast
+  echo "Running apt-fast install..."
+  apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
   # Install pip for Python 3.6
+  echo "Installing Pip3.6..."
   curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
+}
+
+test_prerequisites() {
+  for package in jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
+  do
+    echo "[TEST] Validating that $package is correctly installed..."
+    # Loop through each package using dpkg
+    if ! dpkg -S $package > /dev/null; then
+      # If which returns a non-zero return code, try to re-install the package
+      echo "[-] $package was not found. Attempting to reinstall."
+      apt-get -qq update && apt-get install -y $package
+      if ! which $package > /dev/null; then
+        # If the reinstall fails, give up
+        echo "[X] Unable to install $package even after a retry. Exiting."
+        exit 1
+      fi
+    else
+      echo "[+] $package was successfully installed!"
+    fi
+  done
+
+  # One-off support for packages which aren't installed via dpkg
+  for package in "pip3.6"
+  do
+    echo "[TEST] Validating that $package is correctly installed..."
+    # Loop through each package using which
+    if ! which $package > /dev/null; then
+      # If which returns a non-zero return code, try to re-install the package
+      echo "[-] $package was not found. Attempting to reinstall."
+      curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
+      if ! which $package > /dev/null; then
+        # If the reinstall fails, give up
+        echo "[X] Unable to install $package even after a retry. Exiting."
+        exit 1
+      fi
+    else
+      echo "[+] $package was successfully installed!"
+    fi
+  done
 }
 
 fix_eth1_static_ip() {
@@ -55,7 +97,7 @@ install_golang() {
   if ! which go > /dev/null; then
     echo "Installing Golang v.1.12..."
     cd /home/vagrant || exit
-    wget https://dl.google.com/go/go1.12.linux-amd64.tar.gz
+    wget --progress=bar:force https://dl.google.com/go/go1.12.linux-amd64.tar.gz
     tar -C /usr/local -xzf go1.12.linux-amd64.tar.gz
     mkdir /root/go
   else
@@ -124,6 +166,7 @@ install_fleet() {
   else
     echo "Installing Fleet..."
     echo -e "\n127.0.0.1       kolide" >> /etc/hosts
+    echo -e "\n127.0.0.1       logger" >> /etc/hosts
     git clone https://github.com/kolide/kolide-quickstart.git
     cd kolide-quickstart || echo "Something went wrong while trying to clone the kolide-quickstart repository"
     cp /vagrant/resources/fleet/server.* .
@@ -149,7 +192,7 @@ download_palantir_osquery_config() {
 }
 
 import_osquery_config_into_fleet() {
-  wget https://github.com/kolide/fleet/releases/download/2.0.1/fleet_2.0.1.zip
+  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.0.1/fleet_2.0.1.zip
   unzip fleet_2.0.1.zip -d fleet_2.0.1
   cp fleet_2.0.1/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
   fleetctl config set --address https://192.168.38.105:8412
@@ -192,8 +235,8 @@ install_caldera() {
     systemctl enable mongod.service
     cd /home/vagrant/caldera || exit
     mkdir -p dep/crater/crater
-    wget https://github.com/mitre/caldera-crater/releases/download/v0.1.0/CraterMainWin8up.exe -O /home/vagrant/caldera/dep/crater/crater/CraterMain.exe
-    cp /vagrant/resources/caldera/cert.pem /vagrant/resources/caldera/key.pem /vagrant/resources/caldera/settings.yml /home/vagrant/caldera/caldera/conf 
+    wget --progress=bar:force https://github.com/mitre/caldera-crater/releases/download/v0.1.0/CraterMainWin8up.exe -O /home/vagrant/caldera/dep/crater/crater/CraterMain.exe
+    cp /vagrant/resources/caldera/cert.pem /vagrant/resources/caldera/key.pem /vagrant/resources/caldera/settings.yml /home/vagrant/caldera/caldera/conf
     service caldera start
     systemctl enable caldera.service
   fi
@@ -283,17 +326,19 @@ install_suricata() {
   # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
 
   # Install yq to maniuplate the suricata.yaml inline
-  /usr/local/go/bin/go get -u  github.com/mikefarah/yq
+  /usr/local/go/bin/go get -u github.com/mikefarah/yq
+
   # Install suricata
   add-apt-repository -y ppa:oisf/suricata-stable
   apt-get -qq -y update && apt-get -qq -y install suricata crudini
+  test_suricata_prerequisites
   # Install suricata-update
   cd /home/vagrant || exit 1
   git clone https://github.com/OISF/suricata-update.git
   cd /home/vagrant/suricata-update || exit 1
   python setup.py install
   # Add DC_SERVERS variable to suricata.yaml in support et-open signatures
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
+  /root/go/bin/yq w -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
 
   # It may make sense to store the suricata.yaml file as a resource file if this begins to become too complex
   # Add more verbose alert logging
@@ -341,10 +386,47 @@ install_suricata() {
   fi
 }
 
+test_suricata_prerequisites() {
+  for package in suricata crudini
+  do
+    echo "[TEST] Validating that $package is correctly installed..."
+    # Loop through each package using dpkg
+    if ! dpkg -S $package > /dev/null; then
+      # If which returns a non-zero return code, try to re-install the package
+      echo "[-] $package was not found. Attempting to reinstall."
+      apt-get -qq update && apt-get install -y $package
+      if ! which $package > /dev/null; then
+        # If the reinstall fails, give up
+        echo "[X] Unable to install $package even after a retry. Exiting."
+        exit 1
+      fi
+    else
+      echo "[+] $package was successfully installed!"
+    fi
+  done
+
+  # One-off support for packages which aren't installed via dpkg
+  echo "[TEST] Validating that yq is correctly installed..."
+  # Check if the binary exists
+  if ! [ -f /root/go/bin/yq ]; then
+    # If it doesn't exist, try to re-install the package
+    echo "[-] yq was not found. Attempting to reinstall."
+    /usr/local/go/bin/go get -u github.com/mikefarah/yq
+    if ! [ -f /root/go/bin/yq ]; then
+      # If the reinstall fails, give up
+      echo "[X] Unable to install yq even after a retry. Exiting."
+      exit 1
+    fi
+  else
+    echo "[+] yq was successfully installed!"
+  fi
+}
+
 main() {
   install_mongo_db_apt_key
   install_python_apt_source
   apt_install_prerequisites
+  test_prerequisites
   fix_eth1_static_ip
   install_golang
   install_splunk
