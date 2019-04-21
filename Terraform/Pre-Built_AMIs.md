@@ -10,7 +10,6 @@ The supplied Terraform configuration can then be used to create EC2 instances an
 * AWS credentials for Terraform
 
 [![DetectionLab - Terraform](https://i.vimeocdn.com/video/777172792_640.webp)](https://vimeo.com/331695321)
-<iframe src="https://player.vimeo.com/video/331695321" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
 
 
 ## Step by step guide
