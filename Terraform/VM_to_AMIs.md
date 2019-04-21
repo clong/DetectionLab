@@ -1,4 +1,4 @@
-# Method 1 - Build Locally and Import to AWS
+# Method 2 - Build Locally and Import to AWS
 
 This method involves using Terraform to bring DetectionLab infrastructure online by first building it locally using Virtualbox/VMware and then [importing the resulting virtual machines](https://docs.aws.amazon.com/vm-import/latest/userguide/vmimport-image-import.html#import-vm-image) as AMIs on AWS.
 
