@@ -57,6 +57,11 @@ test_prerequisites() {
 }
 
 fix_eth1_static_ip() {
+  USING_KVM=$(sudo lsmod | grep kvm)
+  if [ ! -z "$USING_KVM" ]; then
+    echo "[*] Using KVM, no need to fix DHCP for eth1 iface"
+    return 0
+  fi
   # There's a fun issue where dhclient keeps messing with eth1 despite the fact
   # that eth1 has a static IP set. We workaround this by setting a static DHCP lease.
   echo -e 'interface "eth1" {
