@@ -15,7 +15,7 @@ The supplied Terraform configuration can then be used to create EC2 instances an
   * [Terraform](https://www.terraform.io/downloads.html)
   * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
   * [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-2. [Configure the AWS command line utility](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html) and set up a user for Terraform.
+2. [Configure the AWS command line utility](https://docs.aws.amazon.com/polly/latest/dg/setup-aws-cli.html) and set up a user for Terraform via `aws configure --profile terraform`.
 3. Create a private/public keypair to use to SSH into logger: `ssh-keygen -b 2048 -f ~/.ssh/id_logger`
 4. Copy the file at [/DetectionLab/Terraform/terraform.tfvars.example](./terraform.tfvars.example) to `/DetectionLab/Terraform/terraform.tfvars`
 5. In `terraform.tfvars`, provide overrides for the variables specified in [variables.tf](./variables.tf)
