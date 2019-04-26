@@ -35,7 +35,7 @@ IP_ADDRESS=$(curl -s -X GET --header 'Accept: application/json' --header 'X-Auth
 # Copy repo to Packet server
 # TODO: Tar up the repo and expand it remotely
 cd ~/repo
-rsync -Pav -e "ssh -i ~/.ssh/id_rsa" ~/repo/ root@"$IP_ADDRESS":/opt/DetectionLab
+rsync -Paq -e "ssh -i ~/.ssh/id_rsa" ~/repo/ root@"$IP_ADDRESS":/opt/DetectionLab
 
 ## Running install script on Packet server
 ssh -i ~/.ssh/id_rsa root@"$IP_ADDRESS" 'bash -s' -- < ci/build_machine_bootstrap.sh --vagrant-only
@@ -46,16 +46,16 @@ while [ "$MINUTES_PAST" -lt 180 ]; do
   STATUS=$(curl $IP_ADDRESS)
   if [ "$STATUS" == "building" ]; then
     echo "$STATUS"
-    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+    scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
     sleep 300
     ((MINUTES_PAST += 5))
   else
-    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+    scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
     break
   fi
   if [ "$MINUTES_PAST" -gt 180 ]; then
     echo "Serer timed out. Uptime: $MINUTES_PAST minutes."
-    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
+    scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
     curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
     exit 1
   fi
@@ -64,7 +64,7 @@ done
 ## Recording the build results
 echo $STATUS
 if [ "$STATUS" != "success" ]; then
-  scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
+  scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
   echo "Build failed. Cleaning up server with ID $DEVICE_ID"
   curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
   exit 1

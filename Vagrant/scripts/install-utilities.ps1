@@ -11,6 +11,7 @@ Write-Host "Installing utilities..."
 If ($(hostname) -eq "win10") {
   # Because the Windows10 start menu sucks
   choco install -y classic-shell -installArgs ADDLOCAL=ClassicStartMenu
+  reg import "c:\vagrant\resources\windows\classic_shell_win7.reg"
 }
 choco install -y NotepadPlusPlus
 choco install -y GoogleChrome
