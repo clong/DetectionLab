@@ -29,10 +29,6 @@ Vagrant.configure("2") do |config|
     cfg.vm.box = "detectionlab/win2016"
     cfg.vm.hostname = "dc"
     cfg.vm.boot_timeout = 600
-    # use the plaintext WinRM transport and force it to use basic authentication.
-    # NB this is needed because the default negotiate transport stops working
-    #    after the domain controller is installed.
-    #    see https://groups.google.com/forum/#!topic/vagrant-up/sZantuCM0q4
     cfg.winrm.transport = :plaintext
     cfg.vm.communicator = "winrm"
     cfg.winrm.basic_auth_only = true
@@ -58,13 +54,14 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/configure-wef-gpo.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/configure-powershelllogging.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/configure-AuditingPolicyGPOs.ps1", privileged: false
+    cfg.vm.provision "shell", path: "scripts/configure-rdp-user-gpo.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
     cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
       v.vmx["displayname"] = "dc.windomain.local"
-      v.memory = 2560
+      v.memory = 3072
       v.cpus = 2
       v.gui = true
       v.enable_vmrun_ip_lookup = false
@@ -74,7 +71,7 @@ Vagrant.configure("2") do |config|
       vb.gui = true
       vb.name = "dc.windomain.local"
       vb.default_nic_type = "82545EM"
-      vb.customize ["modifyvm", :id, "--memory", 2560]
+      vb.customize ["modifyvm", :id, "--memory", 3072]
       vb.customize ["modifyvm", :id, "--cpus", 2]
       vb.customize ["modifyvm", :id, "--vram", "32"]
       vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
@@ -145,12 +142,12 @@ Vagrant.configure("2") do |config|
     cfg.vm.network :private_network, ip: "192.168.38.104", gateway: "192.168.38.1", dns: "192.168.38.102"
 
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.104 -dns 192.168.38.102"
+    cfg.vm.provision "shell", path: "scripts/MakeWindows10GreatAgain.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_osquery.ps1", privileged: false
-    cfg.vm.provision "shell", path: "scripts/MakeWindows10GreatAgain.ps1", privileged: false
     cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: false

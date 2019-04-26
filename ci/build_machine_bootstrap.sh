@@ -37,8 +37,10 @@ fi
 echo "deb http://download.virtualbox.org/virtualbox/debian xenial contrib" >> /etc/apt/sources.list
 sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-apt-get update
-apt-get install -y linux-headers-"$(uname -r)" virtualbox-5.2 build-essential unzip git ufw apache2
+echo "Running apt-get update..."
+apt-get -qq update
+echo "Running apt-get install..."
+apt-get -qq install -y linux-headers-"$(uname -r)" virtualbox-5.2 build-essential unzip git ufw apache2
 
 echo "building" > /var/www/html/index.html
 
@@ -52,9 +54,15 @@ if [ "$PACKER_ONLY" -eq 0 ]; then
   # Install Vagrant
   mkdir /opt/vagrant
   cd /opt/vagrant || exit 1
-  wget https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
+  wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
   dpkg -i vagrant_2.2.4_x86_64.deb
   vagrant plugin install vagrant-reload
+
+  # Make sure the plugin installed correctly. Retry if not.
+  if [ "$(vagrant plugin list | grep -c vagrant-reload)" -ne "1" ]; then
+    echo "The first attempt to install the vagrant-reload plugin failed. Trying again."
+    vagrant plugin install vagrant-reload
+  fi
 
   # Make the Vagrant instances headless
   cd /opt/DetectionLab/Vagrant || exit 1
@@ -65,7 +73,7 @@ if [ "$VAGRANT_ONLY" -eq 0 ]; then
   # Install Packer
   mkdir /opt/packer
   cd /opt/packer || exit 1
-  wget https://releases.hashicorp.com/packer/1.3.2/packer_1.3.2_linux_amd64.zip
+  wget --progress=bar:force https://releases.hashicorp.com/packer/1.3.2/packer_1.3.2_linux_amd64.zip
   unzip packer_1.3.2_linux_amd64.zip
   cp packer /usr/local/bin/packer
 
