@@ -71,14 +71,6 @@ resource "aws_security_group" "logger" {
     cidr_blocks = "${var.ip_whitelist}"
   }
 
-  # Caldera access
-  ingress {
-    from_port   = 8888
-    to_port     = 8888
-    protocol    = "tcp"
-    cidr_blocks = "${var.ip_whitelist}"
-  }
-
   # Allow all traffic from the private subnet
   ingress {
     from_port   = 0
@@ -166,7 +158,6 @@ resource "aws_instance" "logger" {
       "sudo mkdir /home/vagrant/.ssh && sudo cp /home/ubuntu/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys && sudo chown -R vagrant:vagrant /home/vagrant/.ssh",
       "echo 'vagrant    ALL=(ALL:ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers",
       "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
-      "sudo sed -i \"s#sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list##g\" /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo sed -i 's/eth1/eth0/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo sed -i 's/ETH1/ETH0/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo sed -i 's#/usr/local/go/bin/go get -u#GOPATH=/root/go /usr/local/go/bin/go get -u#g' /opt/DetectionLab/Vagrant/bootstrap.sh",
@@ -174,8 +165,6 @@ resource "aws_instance" "logger" {
       "sudo chmod +x /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo apt-get update",
       "sudo /opt/DetectionLab/Vagrant/bootstrap.sh",
-      "sudo pip3.6 install --upgrade --force-reinstall pip==9.0.3 && sudo pip3.6 install -r /home/vagrant/caldera/caldera/requirements.txt && sudo pip3.6 install --upgrade pip",
-      "sudo service caldera stop && sudo service caldera start",
     ]
     connection {
       type = "ssh"

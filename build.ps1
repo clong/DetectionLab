@@ -338,10 +338,6 @@ function download {
 
 function post_build_checks {
 
-  Write-Host '[post_build_checks] Running Caldera Check.'
-  $CALDERA_CHECK = download -URL 'https://192.168.38.105:8888' -PatternToMatch '<title>CALDERA</title>'
-  Write-Host "[post_build_checks] Cladera Result: $CALDERA_CHECK"
-
   Write-Host '[post_build_checks] Running Splunk Check.'
   $SPLUNK_CHECK = download -URL 'https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
   Write-Host "[post_build_checks] Splunk Result: $SPLUNK_CHECK"
@@ -354,9 +350,6 @@ function post_build_checks {
   $ATA_CHECK = download -URL 'https://192.168.38.103' -SuccessOn401
   Write-Host "[post_build_checks] ATA Result: $ATA_CHECK"
 
-  if ($CALDERA_CHECK -eq $false) {
-    Write-Warning 'Caldera failed post-build tests and may not be functioning correctly.'
-  }
   if ($SPLUNK_CHECK -eq $false) {
     Write-Warning 'Splunk failed post-build tests and may not be functioning correctly.'
   }

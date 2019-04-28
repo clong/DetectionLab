@@ -5,26 +5,17 @@ echo "apt-fast apt-fast/maxdownloads string 10" | debconf-set-selections;
 echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections;
 sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
 
-install_python_apt_source() {
-  # Install apt source for Python3.6
-  add-apt-repository -y ppa:jonathonf/python-3.6
-  add-apt-repository -y ppa:apt-fast/stable
-}
-
 apt_install_prerequisites() {
   # Install prerequisites and useful tools
   echo "Running apt-get update..."
   apt-get -qq update
   apt-get -qq install -y apt-fast
   echo "Running apt-fast install..."
-  apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip python3.6 python3.6-dev
-  # Install pip for Python 3.6
-  echo "Installing Pip3.6..."
-  curl -s https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
+  apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip
 }
 
 test_prerequisites() {
-  for package in jq whois build-essential git docker docker-compose unzip python3.6 python3.6-dev
+  for package in jq whois build-essential git docker docker-compose unzip 
   do
     echo "[TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
@@ -219,33 +210,6 @@ import_osquery_config_into_fleet() {
   /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
 }
 
-install_caldera() {
-  if [ -f "/lib/systemd/system/caldera.service" ]; then
-    echo "Caldera is already installed... Skipping"
-  else
-    # Install Mitre's Caldera
-    echo "Installing Caldera..."
-    cd /home/vagrant || exit
-    git clone https://github.com/mitre/caldera.git
-    cd /home/vagrant/caldera/plugins || exit
-    git clone https://github.com/mitre/adversary.git adversary
-    git clone https://github.com/mitre/chain.git chain
-    git clone https://github.com/mitre/gui.git gui
-    git clone https://github.com/mitre/sandcat.git sandcat
-    git clone https://github.com/mitre/stockpile.git stockpile
-    cd /home/vagrant/caldera || exit
-    pip3.6 install -r requirements.txt
-    # Make Caldera accessible on all ports
-    sed -i 's/127.0.0.1/0.0.0.0/g' conf/local.yml
-    # Create Systemd service for Caldera
-    cp /vagrant/resources/caldera/caldera.service /lib/systemd/system/caldera.service
-    cd /home/vagrant/caldera || exit
-    cp /vagrant/resources/caldera/cert.pem /vagrant/resources/caldera/key.pem /home/vagrant/caldera/conf
-    service caldera start
-    systemctl enable caldera.service
-  fi
-}
-
 install_bro() {
   # Environment variables
   NODECFG=/opt/bro/etc/node.cfg
@@ -436,7 +400,6 @@ main() {
   install_fleet
   download_palantir_osquery_config
   import_osquery_config_into_fleet
-  install_caldera
   install_suricata
   install_bro
 }
