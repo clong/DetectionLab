@@ -79,14 +79,15 @@ install_splunk() {
     echo "Splunk is already installed"
   else
     echo "Installing Splunk..."
-    # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
-    dig @8.8.8.8 splunk.com
+    # Get download.splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
+    dig @8.8.8.8 download.splunk.com > /dev/null
+    dig @8.8.8.8 splunk.com > /dev/null
     mkdir splunk
 
     # Try to resolve the latest version of Splunk by parsing the HTML on the downloads page
+    echo "Attempting to autoresolve the latest version of Splunk..."
     LATEST_SPLUNK=$(curl https://www.splunk.com/en_us/download/splunk-enterprise.html | grep -i deb | grep -Eo "data-link=\"................................................................................................................................" | cut -d '"' -f 2)
     # Sanity check what was returned from the auto-parse attempt
-    echo "Attempting to autoresolve the latest version of Splunk..."
     if [[ "$(echo $LATEST_SPLUNK | grep -c "^https:")" -eq 1 ]] && [[ "$(echo $LATEST_SPLUNK | grep -c "\.deb$")" -eq 1 ]]; then
       echo "The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
       echo "Attempting to download..."
