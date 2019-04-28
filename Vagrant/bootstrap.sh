@@ -6,6 +6,8 @@ echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections;
 sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
 
 apt_install_prerequisites() {
+  # Add repository for apt-fast
+  add-apt-repository -y ppa:apt-fast/stable
   # Install prerequisites and useful tools
   echo "Running apt-get update..."
   apt-get -qq update
