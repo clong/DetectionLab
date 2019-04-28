@@ -5,32 +5,19 @@ echo "apt-fast apt-fast/maxdownloads string 10" | debconf-set-selections;
 echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections;
 sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
 
-install_mongo_db_apt_key() {
-  # Install key and apt source for MongoDB
-  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
-  echo "deb http://repo.mongodb.org/apt/ubuntu $(lsb_release -sc)/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
-}
-
-install_python_apt_source() {
-  # Install apt source for Python3.6
-  add-apt-repository -y ppa:jonathonf/python-3.6
-  add-apt-repository -y ppa:apt-fast/stable
-}
-
 apt_install_prerequisites() {
+  # Add repository for apt-fast
+  add-apt-repository -y ppa:apt-fast/stable
   # Install prerequisites and useful tools
   echo "Running apt-get update..."
   apt-get -qq update
   apt-get -qq install -y apt-fast
   echo "Running apt-fast install..."
-  apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
-  # Install pip for Python 3.6
-  echo "Installing Pip3.6..."
-  curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
+  apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip
 }
 
 test_prerequisites() {
-  for package in jq whois build-essential git docker docker-compose unzip mongodb-org python3.6 python3.6-dev
+  for package in jq whois build-essential git docker docker-compose unzip
   do
     echo "[TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
@@ -38,25 +25,6 @@ test_prerequisites() {
       # If which returns a non-zero return code, try to re-install the package
       echo "[-] $package was not found. Attempting to reinstall."
       apt-get -qq update && apt-get install -y $package
-      if ! which $package > /dev/null; then
-        # If the reinstall fails, give up
-        echo "[X] Unable to install $package even after a retry. Exiting."
-        exit 1
-      fi
-    else
-      echo "[+] $package was successfully installed!"
-    fi
-  done
-
-  # One-off support for packages which aren't installed via dpkg
-  for package in "pip3.6"
-  do
-    echo "[TEST] Validating that $package is correctly installed..."
-    # Loop through each package using which
-    if ! which $package > /dev/null; then
-      # If which returns a non-zero return code, try to re-install the package
-      echo "[-] $package was not found. Attempting to reinstall."
-      curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
       if ! which $package > /dev/null; then
         # If the reinstall fails, give up
         echo "[X] Unable to install $package even after a retry. Exiting."
@@ -113,9 +81,22 @@ install_splunk() {
     echo "Installing Splunk..."
     # Get Splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
     dig @8.8.8.8 splunk.com
-    # Download Splunk
-    wget --progress=bar:force -O splunk-7.2.5.1-962d9a8e1586-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.5.1&product=splunk&filename=splunk-7.2.5.1-962d9a8e1586-linux-2.6-amd64.deb&wget=true'
-    dpkg -i splunk-7.2.5.1-962d9a8e1586-linux-2.6-amd64.deb
+    mkdir splunk
+
+    # Try to resolve the latest version of Splunk by parsing the HTML on the downloads page
+    LATEST_SPLUNK=$(curl https://www.splunk.com/en_us/download/splunk-enterprise.html | grep -i deb | grep -Eo "data-link=\"................................................................................................................................" | cut -d '"' -f 2)
+    # Sanity check what was returned from the auto-parse attempt
+    echo "Attempting to autoresolve the latest version of Splunk..."
+    if [[ "$(echo $LATEST_SPLUNK | grep -c "^https:")" -eq 1 ]] && [[ "$(echo $LATEST_SPLUNK | grep -c "\.deb$")" -eq 1 ]]; then
+      echo "The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
+      echo "Attempting to download..."
+      wget --progress=bar:force -P splunk/ "$LATEST_SPLUNK"
+    else
+      echo "Unable to auto-resolve the latest Splunk version. Falling back to hardcoded URL..."
+      # Download Hardcoded Splunk
+      wget --progress=bar:force -O splunk/splunk-7.2.6-c0bf0f679ce9-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.6&product=splunk&filename=splunk-7.2.6-c0bf0f679ce9-linux-2.6-amd64.deb&wget=true'
+    fi
+    dpkg -i splunk/*.deb
     /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
     /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
@@ -192,12 +173,12 @@ download_palantir_osquery_config() {
 }
 
 import_osquery_config_into_fleet() {
-  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.0.1/fleet_2.0.1.zip
-  unzip fleet_2.0.1.zip -d fleet_2.0.1
-  cp fleet_2.0.1/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
+  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.1.1/fleet_2.1.1.zip
+  unzip fleet_2.1.1.zip -d fleet_2.1.1
+  cp fleet_2.1.1/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
   fleetctl config set --address https://192.168.38.105:8412
   fleetctl config set --tls-skip-verify true
-  fleetctl setup --email admin@detectionlab.network --password 'admin123#' --org-name DetectionLab
+  fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
   fleetctl login --email admin@detectionlab.network --password 'admin123#'
 
   # Use fleetctl to import YAML files
@@ -210,36 +191,6 @@ import_osquery_config_into_fleet() {
   # Add Splunk monitors for Fleet
   /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
   /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
-}
-
-install_caldera() {
-  if [ -f "/lib/systemd/system/caldera.service" ]; then
-    echo "Caldera is already installed... Skipping"
-  else
-    # Install Mitre's Caldera
-    echo "Installing Caldera..."
-    cd /home/vagrant || exit
-    git clone https://github.com/mitre/caldera.git
-    cd /home/vagrant/caldera/caldera || exit
-    pip3.6 install -r requirements.txt
-
-    # Add a Systemd service for MongoDB
-    # https://www.howtoforge.com/tutorial/install-mongodb-on-ubuntu-16.04/
-    cp /vagrant/resources/caldera/mongod.service /lib/systemd/system/mongod.service
-    # Create Systemd service for Caldera
-    cp /vagrant/resources/caldera/caldera.service /lib/systemd/system/caldera.service
-    # Enable replication
-    echo 'replication:
-    replSetName: caldera' >> /etc/mongod.conf
-    service mongod start
-    systemctl enable mongod.service
-    cd /home/vagrant/caldera || exit
-    mkdir -p dep/crater/crater
-    wget --progress=bar:force https://github.com/mitre/caldera-crater/releases/download/v0.1.0/CraterMainWin8up.exe -O /home/vagrant/caldera/dep/crater/crater/CraterMain.exe
-    cp /vagrant/resources/caldera/cert.pem /vagrant/resources/caldera/key.pem /vagrant/resources/caldera/settings.yml /home/vagrant/caldera/caldera/conf
-    service caldera start
-    systemctl enable caldera.service
-  fi
 }
 
 install_bro() {
@@ -423,8 +374,6 @@ test_suricata_prerequisites() {
 }
 
 main() {
-  install_mongo_db_apt_key
-  install_python_apt_source
   apt_install_prerequisites
   test_prerequisites
   fix_eth1_static_ip
@@ -433,7 +382,6 @@ main() {
   install_fleet
   download_palantir_osquery_config
   import_osquery_config_into_fleet
-  install_caldera
   install_suricata
   install_bro
 }

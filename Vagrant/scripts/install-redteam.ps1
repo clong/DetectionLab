@@ -2,19 +2,7 @@
 
 Write-Host "Installing Red Team Tooling..."
 
-
-# Disable Windows Defender realtime scanning before downloading Mimikatz and drop the firewall
-If ($env:computername -eq "win10") {
-  If (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender")
-  {
-    Remove-Item "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Recurse -Force
-  }
-  gpupdate /force | Out-String
-  Write-Host "Disabling Windows Defender Realtime Monitoring..."
-  Set-MpPreference -ExclusionPath C:\commander.exe, C:\Tools
-  set-MpPreference -DisableRealtimeMonitoring $true
-  Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
-}
+# Windows Defender should be disabled already by O&O ShutUp10
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
 Write-Host "Determining latest release of Mimikatz..."

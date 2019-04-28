@@ -9,7 +9,7 @@ fi
 
 ## Provision two Type1 baremetal Packet.net servers
 echo "Provisioning packerwindows2016 on Packet.net"
-SERVER1_ID=$(curl -X POST -s --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "sjc1", "plan": "baremetal_1", "hostname": "packerwindows2016", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys":["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."id" | tr -d '"')
+SERVER1_ID=$(curl -s -X POST -s --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "sjc1", "plan": "baremetal_1", "hostname": "packerwindows2016", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys":["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."id" | tr -d '"')
 if [ "$(echo -n $SERVER1_ID | wc -c)" -ne 36 ]; then
   echo "Server may have failed provisionining. Device ID is set to: $SERVER1_ID"
   exit 1
@@ -19,7 +19,7 @@ echo "packerwindows2016 successfully provisioned with ID: $SERVER1_ID"
 sleep 5 # Wait a bit before issuing another provision command
 
 echo "Provisioning packerwindows10 on Packet.net"
-SERVER2_ID=$(curl -X POST -s --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "sjc1", "plan": "baremetal_1", "hostname": "packerwindows10", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys":["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."id" | tr -d '"')
+SERVER2_ID=$(curl -s -X POST -s --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "sjc1", "plan": "baremetal_1", "hostname": "packerwindows10", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys":["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."id" | tr -d '"')
 if [ "$(echo -n $SERVER2_ID | wc -c)" -ne 36 ]; then
   echo "Server may have failed provisionining. Device ID is set to: $SERVER2_ID"
   exit 1
@@ -32,8 +32,8 @@ echo "Sleeping 5 more minutes (CircleCI Keepalive)"
 sleep 300
 
 ## Recording the IP address of the newly provisioned Packet servers
-SERVER1_IP_ADDRESS=$(curl -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" "https://api.packet.net/devices/$SERVER1_ID/ips" | jq ."ip_addresses[0].address" | tr -d '"')
-SERVER2_IP_ADDRESS=$(curl -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" "https://api.packet.net/devices/$SERVER2_ID/ips" | jq ."ip_addresses[0].address" | tr -d '"')
+SERVER1_IP_ADDRESS=$(curl -s -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" "https://api.packet.net/devices/$SERVER1_ID/ips" | jq ."ip_addresses[0].address" | tr -d '"')
+SERVER2_IP_ADDRESS=$(curl -s -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" "https://api.packet.net/devices/$SERVER2_ID/ips" | jq ."ip_addresses[0].address" | tr -d '"')
 
 # Copy repo to Packet servers
 # TODO: Tar up the repo and expand it remotely
@@ -54,8 +54,8 @@ while [ "$MINUTES_PAST" -lt 150 ]; do
   SERVER2_STATUS=$(curl $SERVER2_IP_ADDRESS)
   if [[ "$SERVER1_STATUS" == "building" ]] || [[ "$SERVER2_STATUS" == "building" ]]; then
     echo "$SERVER1_STATUS" :: "$SERVER2_STATUS"
-    scp -i ~/.ssh/id_rsa root@"$SERVER1_IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/server1_packer.log
-    scp -i ~/.ssh/id_rsa root@"$SERVER2_IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/server2_packer.log
+    scp -q -i ~/.ssh/id_rsa root@"$SERVER1_IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/server1_packer.log
+    scp -q -i ~/.ssh/id_rsa root@"$SERVER2_IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/server2_packer.log
     sleep 300
     ((MINUTES_PAST += 5))
   fi
@@ -64,8 +64,8 @@ while [ "$MINUTES_PAST" -lt 150 ]; do
   fi
   if [ "$MINUTES_PAST" -gt 150 ]; then
     echo "Serer timed out. Uptime: $MINUTES_PAST minutes."
-    curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER1_ID"
-    curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER2_ID"
+    curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER1_ID"
+    curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER2_ID"
     exit 1
   fi
 done
@@ -75,17 +75,17 @@ echo "Server1 Status: $SERVER1_STATUS"
 echo "Server2 Status: $SERVER2_STATUS"
 if [ "$SERVER1_STATUS" != "success" ]; then
   echo "Build failed. Cleaning up server with ID $SERVER1_ID"
-  scp -i ~/.ssh/id_rsa root@"$SERVER1_IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/server1_packer.log || echo "Serveer1 packer_build.log not available yet"
-  curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER1_ID"
+  scp -q -i ~/.ssh/id_rsa root@"$SERVER1_IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/server1_packer.log || echo "Serveer1 packer_build.log not available yet"
+  curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER1_ID"
   exit 1
 fi
 if [ "$SERVER2_STATUS" != "success" ]; then
   echo "Build failed. Cleaning up server with ID $SERVER2_ID"
-  scp -i ~/.ssh/id_rsa root@"$SERVER2_IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/server2_packer.log || echo "Server2 packer_build.log not available yet"
-  curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER2_ID"
+  scp -q -i ~/.ssh/id_rsa root@"$SERVER2_IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/server2_packer.log || echo "Server2 packer_build.log not available yet"
+  curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER2_ID"
   exit 1
 fi
 echo "Builds were successful. Cleaning up servers with IDs $SERVER1_ID and $SERVER2_ID"
-curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER1_ID"
-curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER2_ID"
+curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER1_ID"
+curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$SERVER2_ID"
 exit 0

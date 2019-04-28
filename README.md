@@ -28,7 +28,6 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * Powershell transcript logging is enabled. All logs are saved to `\\wef\pslogs`
 * osquery comes installed on each host and is pre-configured to connect to a [Fleet](https://kolide.co/fleet) server via TLS. Fleet is preconfigured with the configuration from [Palantir's osquery Configuration](https://github.com/palantir/osquery-configuration)
 * Sysmon is installed and configured using SwiftOnSecurity’s open-sourced configuration
-* Mitre's [Caldera](https://github.com/mitre/caldera) server is built on the logger host and the Caldera agent gets pre-installed on all Windows hosts
 * All autostart items are logged to Windows Event Logs via [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog)
 * SMBv1 Auditing is enabled
 
@@ -93,7 +92,7 @@ $ packer build --only=[vmware|virtualbox]-iso windows_2016.json
 4. cd into the Vagrant directory: `cd ../Vagrant`
 5. Install the Vagrant-Reload plugin: `vagrant plugin install vagrant-reload`
 
-6. Ensure you are in the Vagrant folrder and run `vagrant up`. This command will do the following:
+6. Ensure you are in the Vagrant folder and run `vagrant up`. This command will do the following:
   * Provision the logger host. This host will run the [Fleet](https://kolide.co/fleet) osquery manager and a fully featured pre-configured Splunk instance.
   * Provision the DC host and configure it as a Domain Controller
   * Provision the WEF host and configure it as a Windows Event Collector in the Servers OU
@@ -101,7 +100,6 @@ $ packer build --only=[vmware|virtualbox]-iso windows_2016.json
 
 7. Navigate to https://192.168.38.105:8000 in a browser to access the Splunk instance on logger. Default credentials are admin:changeme (you will have the option to change them on the next screen)
 8. Navigate to https://192.168.38.105:8412 in a browser to access the Fleet server on logger. Default credentials are admin:admin123#. Query packs are pre-configured with queries from [palantir/osquery-configuration](https://github.com/palantir/osquery-configuration).
-9. Navigate to https://192.168.38.105:8888 in a browser to access the Caldera server on logger. Default credentials are admin:caldera.
 
 ## Basic Vagrant Usage
 Vagrant commands must be run from the "Vagrant" folder.
@@ -122,9 +120,8 @@ Vagrant commands must be run from the "Vagrant" folder.
 ## Lab Information
 * Domain Name: windomain.local
 * Admininstrator login: vagrant:vagrant
-* Fleet login: https://192.168.38.105:8412 - admin@detectionlab.network:admin123#
+* Fleet login: https://192.168.38.105:8412 - admin:admin123#
 * Splunk login: https://192.168.38.105:8000 - admin:changeme
-* Caldera login: https://192.168.38.105:8888 - admin:caldera
 * MS ATA login: https://192.168.38.103 - wef\vagrant:vagrant
 
 ## Lab Hosts
@@ -155,7 +152,6 @@ Vagrant commands must be run from the "Vagrant" folder.
 * Logger - Ubuntu 16.04
   * Splunk Enterprise
   * Fleet osquery Manager
-  * Mitre's Caldera Server
   * Bro
   * Suricata
 
@@ -174,7 +170,6 @@ suricata | Suricata IDS logs
   * Sysmon
   * osquery
   * AutorunsToWinEventLog
-  * Caldera Agent
   * Process Monitor
   * Process Explorer
   * PsExec
@@ -184,6 +179,7 @@ suricata | Suricata IDS logs
   * WinRar
   * Mimikatz
   * Wireshark
+  * Powersploit
 
 ## Applied GPOs
 * [Custom Event Channel Permissions](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Custom%20Event%20Channel%20Permissions.htm)
@@ -255,7 +251,6 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)
 * [Fleet](https://kolide.co/fleet)
-* [Caldera](https://github.com/mitre/caldera)
 * [Windows Event Forwarding for Network Defense](https://medium.com/@palantir/windows-event-forwarding-for-network-defense-cb208d5ff86f)
 * [palantir/windows-event-forwarding](http://github.com/palantir/windows-event-forwarding)
 * [osquery Across the Enterprise](https://medium.com/@palantir/osquery-across-the-enterprise-3c3c9d13ec55)
