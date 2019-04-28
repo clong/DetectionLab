@@ -163,7 +163,7 @@ resource "aws_instance" "logger" {
       "sudo sed -i 's#/usr/local/go/bin/go get -u#GOPATH=/root/go /usr/local/go/bin/go get -u#g' /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo chmod +x /opt/DetectionLab/Vagrant/bootstrap.sh",
-      "sudo apt-get update",
+      "sudo apt-get -qq update",
       "sudo /opt/DetectionLab/Vagrant/bootstrap.sh",
     ]
     connection {
