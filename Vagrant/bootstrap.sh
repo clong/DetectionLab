@@ -15,7 +15,7 @@ apt_install_prerequisites() {
 }
 
 test_prerequisites() {
-  for package in jq whois build-essential git docker docker-compose unzip 
+  for package in jq whois build-essential git docker docker-compose unzip
   do
     echo "[TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
@@ -23,25 +23,6 @@ test_prerequisites() {
       # If which returns a non-zero return code, try to re-install the package
       echo "[-] $package was not found. Attempting to reinstall."
       apt-get -qq update && apt-get install -y $package
-      if ! which $package > /dev/null; then
-        # If the reinstall fails, give up
-        echo "[X] Unable to install $package even after a retry. Exiting."
-        exit 1
-      fi
-    else
-      echo "[+] $package was successfully installed!"
-    fi
-  done
-
-  # One-off support for packages which aren't installed via dpkg
-  for package in "pip3.6"
-  do
-    echo "[TEST] Validating that $package is correctly installed..."
-    # Loop through each package using which
-    if ! which $package > /dev/null; then
-      # If which returns a non-zero return code, try to re-install the package
-      echo "[-] $package was not found. Attempting to reinstall."
-      curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
       if ! which $package > /dev/null; then
         # If the reinstall fails, give up
         echo "[X] Unable to install $package even after a retry. Exiting."
@@ -391,7 +372,6 @@ test_suricata_prerequisites() {
 }
 
 main() {
-  install_python_apt_source
   apt_install_prerequisites
   test_prerequisites
   fix_eth1_static_ip
