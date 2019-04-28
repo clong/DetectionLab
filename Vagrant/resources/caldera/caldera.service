@@ -1,11 +1,11 @@
 [Unit]
-Description=My Script Service
+Description=Caldera
 After=multi-user.target
 
 [Service]
 Type=idle
-WorkingDirectory=/home/vagrant/caldera/caldera
-ExecStart=/usr/bin/python3.6 caldera.py
+WorkingDirectory=/home/vagrant/caldera
+ExecStart=/usr/bin/python3.6 server.py -E local
 
 [Install]
 WantedBy=multi-user.target

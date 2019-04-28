@@ -56,7 +56,7 @@ while [ "$MINUTES_PAST" -lt 180 ]; do
   if [ "$MINUTES_PAST" -gt 180 ]; then
     echo "Serer timed out. Uptime: $MINUTES_PAST minutes."
     scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
-    curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+    curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
     exit 1
   fi
 done
@@ -66,9 +66,9 @@ echo $STATUS
 if [ "$STATUS" != "success" ]; then
   scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
   echo "Build failed. Cleaning up server with ID $DEVICE_ID"
-  curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+  curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
   exit 1
 fi
 echo "Build was successful. Cleaning up server with ID $DEVICE_ID"
-curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
 exit 0

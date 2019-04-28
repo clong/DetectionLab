@@ -43,8 +43,8 @@ while [ "$MINUTES_PAST" -lt 400 ]; do
   STATUS=$(curl $IP_ADDRESS)
   if [ "$STATUS" == "building" ]; then
     echo "$STATUS"
-    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/|| echo "Vagrant log not yet present"
-    scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/packer_build.log || echo "Packer log not yet present"
+    scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/|| echo "Vagrant log not yet present"
+    scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/packer_build.log || echo "Packer log not yet present"
     sleep 300
     ((MINUTES_PAST += 5))
   else
@@ -53,9 +53,9 @@ while [ "$MINUTES_PAST" -lt 400 ]; do
 done
 if [ "$MINUTES_PAST" -gt 400 ]; then
   echo "Serer timed out. Uptime: $MINUTES_PAST minutes."
-  scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
-  scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/packer_build.log || echo "Packer log not yet present"
-  curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+  scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+  scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/packer_build.log || echo "Packer log not yet present"
+  curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
   exit 1
 fi
 
@@ -63,11 +63,11 @@ fi
 echo $STATUS
 if [ "$STATUS" != "success" ]; then
   echo "Build failed. Cleaning up server with ID $DEVICE_ID"
-  scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
-  scp -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/packer_build.log || echo "Packer log not yet present"
-  curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+  scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+  scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Packer/packer_build.log /tmp/artifacts/packer_build.log || echo "Packer log not yet present"
+  curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
   exit 1
 fi
 echo "Build was successful. Cleaning up server with ID $DEVICE_ID"
-curl -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
 exit 0

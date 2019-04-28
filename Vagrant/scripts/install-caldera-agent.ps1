@@ -1,4 +1,6 @@
 # Purpose: Installs the Caldera agent on the host
+Write-Host "Installing the Caldera agent..."
+$url="https://192.168.38.105:8888/file/render"; $ps_table = $PSVersionTable.PSVersion;If([double]$ps_table.Major -ge 6){iex (irm -Method Post -Uri $url -Headers @{"file"="54ndc47.ps1"} -SkipCertificateCheck);}else{[System.Net.ServicePointManager]::ServerCertificateValidationCallback={$True};$web=New-Object System.Net.WebClient;$web.Headers.Add("file","54ndc47.ps1");$resp=$web.UploadString("$url",'');iex($resp);}
 
 If (-not (Test-Path 'C:\Program Files\cagent\cagent.exe')) {
   # Add /etc/hosts entry

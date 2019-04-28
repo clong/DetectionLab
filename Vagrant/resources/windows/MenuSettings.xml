@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<Settings component="StartMenu" version="4.3.1">
+	<MenuStyle value="Win7"/>
+	<SkipMetro value="1"/>
+</Settings>
