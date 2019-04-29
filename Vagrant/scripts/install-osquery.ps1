@@ -4,7 +4,7 @@
 
 Write-Host "Installing osquery"
 $packsDir = "c:\programdata\osquery\packs"
-choco install -y osquery | Out-String  # Apparently Out-String makes the process wait
+choco install -y --limit-output --no-progress osquery | Out-String  # Apparently Out-String makes the process wait
 $service = Get-WmiObject -Class Win32_Service -Filter "Name='osqueryd'"
 If (-not ($service)) {
   Write-Host "Setting osquery to run as a service"
