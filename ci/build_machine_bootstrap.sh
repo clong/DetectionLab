@@ -29,7 +29,7 @@ fi
 echo "Args: $ARGS"
 
 # Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
-echo "[$(date +%H:%M:%S)]: net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
+echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf
 
 if [[ "$VAGRANT_ONLY" -eq 1 ]] && [[ "$PACKER_ONLY" -eq 1 ]]; then
@@ -56,7 +56,7 @@ ufw --force enable
 
 if [ "$PACKER_ONLY" -eq 0 ]; then
   # Install Vagrant
-  echo "[$(date +%H:%M:%S)]: Installing vagrant..."
+  echo "[$(date +%H:%M:%S)]: Installing Vagrant..."
   mkdir /opt/vagrant
   cd /opt/vagrant || exit 1
   wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
