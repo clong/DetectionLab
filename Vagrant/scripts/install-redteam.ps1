@@ -35,4 +35,17 @@ if (-not (Test-Path $powersploitRepoPath)) {
   Write-Host "PowerSploit was already installed. Moving On."
 }
 
+# Download and unzip a copy of Atomic Red Team
+Write-Host "Downloading Atomic Red Team..."
+# GitHub requires TLS 1.2 as of 2/27
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$atomicRedTeamDownloadUrl = "https://github.com/redcanaryco/atomic-red-team/archive/master.zip"
+$atomicRedTeamRepoPath = "C:\Users\vagrant\AppData\Local\Temp\atomic_red_team.zip"
+if (-not (Test-Path $atomicRedTeamRepoPath)) {
+  Invoke-WebRequest -Uri "$atomicRedTeamDownloadUrl" -OutFile "$atomicRedTeamRepoPath"
+  Expand-Archive -path "$atomicRedTeamRepoPath" -destinationpath 'c:\Tools\Atomic Red Team' -Force
+} else {
+  Write-Host "Atomic Red Team was already installed. Moving On."
+}
+
 Write-Host "Red Team tooling installation complete!"

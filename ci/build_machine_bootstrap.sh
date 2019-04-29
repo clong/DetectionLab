@@ -28,8 +28,12 @@ fi
 
 echo "Args: $ARGS"
 
+# Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
+echo "[$(date +%H:%M:%S)]: net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
+
 if [[ "$VAGRANT_ONLY" -eq 1 ]] && [[ "$PACKER_ONLY" -eq 1 ]]; then
-  echo "Somehow this build is configured as both packer-only and vagrant-only. This means something has gone horribly wrong."
+  echo "[$(date +%H:%M:%S)]: Somehow this build is configured as both packer-only and vagrant-only. This means something has gone horribly wrong."
   exit 1
 fi
 
@@ -37,9 +41,9 @@ fi
 echo "deb http://download.virtualbox.org/virtualbox/debian xenial contrib" >> /etc/apt/sources.list
 sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-echo "Running apt-get update..."
+echo "[$(date +%H:%M:%S)]: Running apt-get update..."
 apt-get -qq update
-echo "Running apt-get install..."
+echo "[$(date +%H:%M:%S)]: Running apt-get install..."
 apt-get -qq install -y linux-headers-"$(uname -r)" virtualbox-5.2 build-essential unzip git ufw apache2
 
 echo "building" > /var/www/html/index.html
@@ -52,15 +56,17 @@ ufw --force enable
 
 if [ "$PACKER_ONLY" -eq 0 ]; then
   # Install Vagrant
+  echo "[$(date +%H:%M:%S)]: Installing vagrant..."
   mkdir /opt/vagrant
   cd /opt/vagrant || exit 1
   wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
   dpkg -i vagrant_2.2.4_x86_64.deb
+  echo "[$(date +%H:%M:%S)]: Installing vagrant-reload plugin..."
   vagrant plugin install vagrant-reload
 
   # Make sure the plugin installed correctly. Retry if not.
   if [ "$(vagrant plugin list | grep -c vagrant-reload)" -ne "1" ]; then
-    echo "The first attempt to install the vagrant-reload plugin failed. Trying again."
+    echo "[$(date +%H:%M:%S)]: The first attempt to install the vagrant-reload plugin failed. Trying again."
     vagrant plugin install vagrant-reload
   fi
 
@@ -70,6 +76,7 @@ if [ "$PACKER_ONLY" -eq 0 ]; then
 fi
 
 if [ "$VAGRANT_ONLY" -eq 0 ]; then
+  echo "[$(date +%H:%M:%S)]: Installing Packer..."
   # Install Packer
   mkdir /opt/packer
   cd /opt/packer || exit 1

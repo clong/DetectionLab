@@ -11,7 +11,7 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
 
   Write-Host 'Hostname is still the original one, skip provisioning for reboot'
 
-  Write-Host 'Install bginfo'
+  Write-Host 'Installing bginfo...'
   . c:\vagrant\scripts\install-bginfo.ps1
 
   Write-Host -fore red 'Hint: vagrant reload' $box '--provision'
@@ -23,6 +23,11 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
     Write-Host 'Install bginfo'
     . c:\vagrant\scripts\install-bginfo.ps1
+    # Set background to be "fitted" instead of "tiled"
+    Set-ItemProperty 'HKCU:\Control Panel\Desktop' -Name TileWallpaper -Value '0'
+    Set-ItemProperty 'HKCU:\Control Panel\Desktop' -Name WallpaperStyle -Value '6'
+    # Set Task Manager prefs
+    reg import "c:\vagrant\resources\windows\TaskManager.reg" 2>&1 | out-null
   }
 
   if ($env:COMPUTERNAME -imatch 'dc') {
@@ -41,8 +46,5 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
     . c:\vagrant\scripts\install-bginfo.ps1
   }
 
-  Write-Host 'Provisioning after joining domain'
-
-  # $script = "c:\vagrant\scripts\provision-" + $box + ".ps1"
-  # . $script
+  Write-Host 'Provisioning after joining domain...'
 }

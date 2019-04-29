@@ -129,10 +129,13 @@ install_splunk() {
     sed -i.bak 's/max_memtable_bytes = 10000000/max_memtable_bytes = 30000000/g' /opt/splunk/etc/system/local/limits.conf
 
     # Skip Splunk Tour and Change Password Dialog
+    echo "Disabling the Splunk tour prompt..."
     touch /opt/splunk/etc/.ui_login
+    mkdir /opt/splunk/etc/users/admin/search/local
+    echo -e "[search-tour]\nviewed = 1" > /opt/splunk/etc/users/admin/search/local/ui-tour.conf
+    
     # Enable SSL Login for Splunk
-    echo '[settings]
-    enableSplunkWebSSL = true' > /opt/splunk/etc/system/local/web.conf
+    echo -e "[settings]\nenableSplunkWebSSL = true" > /opt/splunk/etc/system/local/web.conf
     # Reboot Splunk to make changes take effect
     /opt/splunk/bin/splunk restart
     /opt/splunk/bin/splunk enable boot-start
