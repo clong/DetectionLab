@@ -3,6 +3,8 @@ DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to 
 
 CircleCI: [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.svg?style=svg)](https://circleci.com/gh/clong/DetectionLab/tree/master)
 
+[![Twitter](https://img.shields.io/twitter/follow/DetectionLab.svg?style=social)](https://twitter.com/DetectionLab)
+
 #### Donate to the project:
 
 All of the infrastructure, building, and testing of DetectionLab is currently funded by myself in my spare time. If you find this project useful, feel free to buy me a coffee using one of the buttons below!
@@ -39,10 +41,6 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * Vagrant 2.2.2 or newer
 * Virtualbox or VMWare Fusion/Workstation
 
-
-**Known Bad Versions:**
-* Packer 1.1.2 will fail to build VMWare-ISOs correctly due to [this issue](https://github.com/hashicorp/packer/issues/5622).
-
 ---
 
 ## Quickstart
@@ -50,31 +48,28 @@ DetectionLab now contains build scripts for \*NIX, MacOS, and Windows users!
 
 There is a single build script that supports 3 different options:
 - `./build.sh <virtualbox|vmware_desktop>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
-- `./build.sh <virtualbox|vmware_desktop> --vagrant-only` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
+- `./build.sh <virtualbox|vmware_desktop> --vagrant-only` - Downloads pre-built Packer boxes from Vagrant Cloud and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
 - `./build.sh <virtualbox|vmware_desktop> --packer-only` - This option only builds the Packer boxes and will not use Vagrant to start up the lab.
 
 Windows users will want to use the following script:
 - `./build.ps1 -ProviderName <virtualbox|vmware_desktop>` - Builds the entire lab from scratch. Takes 3-5 hours depending on hardware resources and bandwidth
-- `./build.ps1 -ProviderName <virtualbox|vmware_desktop> -VagrantOnly` - Downloads pre-built Packer boxes from https://detectionlab.network and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
+- `./build.ps1 -ProviderName <virtualbox|vmware_desktop> -VagrantOnly` - Downloads pre-built Packer boxes from Vagrant Cloud and builds the lab from those boxes. This option is recommended if you have more bandwidth than time or are having trouble building boxes.
 
 ---
 
 ## Building DetectionLab from Scratch
-1. Determine which Vagrant provider you want to use.
-  * Note: Virtualbox is free, the [VMWare Desktop vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80.
+1. Determine which Vagrant provider you want to use. Current supported providers are:
 
-  #### Warning: As of May 1, 2019 the boxes will only be available from [Vagrant Cloud](https://app.vagrantup.com/detectionlab/)
+  - Virtualbox
+  - VMware Workstation & Fusion
+    - Note: Virtualbox is free, the [VMWare Desktop Vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80 and is required to use Vagrant with VMware.
 
-  If you'd like to save time, you can skip the building of the Packer boxes and download the boxes directly from https://detectionlab.network and put them into the `Boxes` directory:
+There are currently three ways to build the lab:
+* **Recommended**: Use the boxes hosted on [Vagrant Cloud](https://app.vagrantup.com/detectionlab). This method should take **~2 hours** total to download the boxes and provision the lab.
+* Build the boxes yourself using Packer. This method will take ~4 hours to build the boxes and another ~90-120 minutes to provision them for a total of **5-6 hours**.
+* [Provision the lab in AWS using Terraform](Terraform/README.md). The lab can be brought online in under **30 minutes**.
 
-Provider | Box  | URL | MD5 | Size
-------------|-----|-----|----|----
-Virtualbox |Windows 2016 | https://www.detectionlab.network/windows_2016_virtualbox.box | 231b54077d4396cad01e4cd60651b1e0 | 7.9GB
-Virtualbox | Windows 10 | https://www.detectionlab.network/windows_10_virtualbox.box | c03f10f21b8d79e6acca2b2965b23046 | 6.4GB
-VMware | Windows 2016 | https://www.detectionlab.network/windows_2016_vmware.box | 2bbaf5a1177e0499dc3aacdb0246eb38 | 8.2GB
-VMware | Windows 10 | https://www.detectionlab.network/windows_10_vmware.box | b334c3ba5be3b29840567ffe368db5fe | 5.9GB
-
-If you choose to download the boxes, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
+If you choose to use the boxes hosted on Vagrant Cloud, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
 
 
 2. `cd` to the Packer directory and build the Windows 10 and Windows Server 2016 boxes using the commands below. Each build will take about 1 hour. As far as I know, you can only build one box at a time.
@@ -89,17 +84,28 @@ $ packer build --only=[vmware|virtualbox]-iso windows_2016.json
 
     `mv *.box ../Boxes`
 
-4. cd into the Vagrant directory: `cd ../Vagrant`
+4. `cd` into the Vagrant directory: `cd ../Vagrant` and edit the `Vagrantfile`. Change the lines `cfg.vm.box = "detectionlab/win2016"` and `cfg.vm.box = "detectionlab/win10` to `cfg.cm.box = "../Boxes/windows_2016_<provider>.box"` and "`cfg.cm.box = "../Boxes/windows_10_<provider>.box"` respectively.
+
 5. Install the Vagrant-Reload plugin: `vagrant plugin install vagrant-reload`
 
-6. Ensure you are in the Vagrant folder and run `vagrant up`. This command will do the following:
+6. **VMware Only:**  
+  * [Buy a license](https://www.vagrantup.com/vmware/index.html#buy-now) for the VMware plugin
+  * Install it with `vagrant plugin install vagrant-vmware-desktop`.
+  * License it with `vagrant plugin license vagrant-vmware-desktop <path_to_.lic>`.
+  * Download and install the VMware Vagrant utility: https://www.vagrantup.com/vmware/downloads.html
+
+7. Ensure you are in the base DetectionLab folder and run `./build.sh` (Mac & Linux) or `./build.ps1` (Windows). This script will do the following:
   * Provision the logger host. This host will run the [Fleet](https://kolide.co/fleet) osquery manager and a fully featured pre-configured Splunk instance.
   * Provision the DC host and configure it as a Domain Controller
   * Provision the WEF host and configure it as a Windows Event Collector in the Servers OU
   * Provision the Win10 host and configure it as a computer in the Workstations OU
 
-7. Navigate to https://192.168.38.105:8000 in a browser to access the Splunk instance on logger. Default credentials are admin:changeme (you will have the option to change them on the next screen)
-8. Navigate to https://192.168.38.105:8412 in a browser to access the Fleet server on logger. Default credentials are admin:admin123#. Query packs are pre-configured with queries from [palantir/osquery-configuration](https://github.com/palantir/osquery-configuration).
+8. Build logs will be present in the `Vagrant` folder as `vagrant_up_<host>.log`. If filing an issue, please paste the contents of that log into a Gist to help with debugging efforts.
+
+9. Navigate to https://192.168.38.105:8000 in a browser to access the Splunk instance on logger. Default credentials are admin:changeme (you will have the option to change them on the next screen)
+10. Navigate to https://192.168.38.105:8412 in a browser to access the Fleet server on logger. Default credentials are admin:admin123#. Query packs are pre-configured with queries from [palantir/osquery-configuration](https://github.com/palantir/osquery-configuration).
+
+---
 
 ## Basic Vagrant Usage
 Vagrant commands must be run from the "Vagrant" folder.
@@ -165,6 +171,7 @@ sysmon | Logs from the Sysmon service
 wineventlog | Windows Event Logs
 bro | Bro network traffic logs
 suricata | Suricata IDS logs
+threathunting | Used for the ThreatHunting app
 
 ## Installed Tools on Windows
   * Sysmon
@@ -180,6 +187,7 @@ suricata | Suricata IDS logs
   * Mimikatz
   * Wireshark
   * Powersploit
+  * Atomic Red Team
 
 ## Applied GPOs
 * [Custom Event Channel Permissions](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Custom%20Event%20Channel%20Permissions.htm)
@@ -191,11 +199,9 @@ suricata | Suricata IDS logs
 * [Windows Event Forwarding Server](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Windows%20Event%20Forwarding%20Server.htm)
 * [Workstations Enhanced Auditing Policy](https://rawgit.com/clong/DetectionLab/master/Vagrant/resources/GPO/reports/Workstations%20Enhanced%20Auditing%20Policy.htm)
 
-## Known Issues and Workarounds
-
-Vagrant has been particularly flaky with VMWare and I encountered many issues while testing. However, most of the issues are easily resolved.
-
 ---
+
+## Known Issues and Workarounds
 
 **Issue:** Vagrant reports: `Message: HTTPClient::KeepAliveDisconnected:` while provisioning.                     
 **Workaround:** Run `$ vagrant reload <hostname> --provision`
@@ -265,3 +271,4 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [SwiftOnSecurity - Sysmon Config](https://github.com/SwiftOnSecurity/sysmon-config)
 * [ThreatHunting](https://github.com/olafhartong/ThreatHunting)
 * [sysmon-modular](https://github.com/olafhartong/sysmon-modular)
+* [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team)
