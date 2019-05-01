@@ -32,7 +32,7 @@ The CircleCI worker will evaluate which files have been modified and set environ
 ### vagrant_changes.sh
 1. Spins up a single Packet server
 2. Bootstraps the Packet server by calling `ci/build_machine_bootstrap.sh` with the `--vagrant-only` argument
-3. Downloads the pre-build Windows10 and Windows2016 boxes from https://detectionlab.network directly to the Boxes directory
+3. Downloads the pre-build Windows10 and Windows2016 boxes from Vagrant Cloud
 4. Brings each Vagrant host online one-by-one
 5. CircleCI records the build results from the Packet server
 
