@@ -1,14 +1,14 @@
 # Purpose: Joins a Windows host to the windomain.local domain which was created with "create-domain.ps1".
 # Source: https://github.com/StefanScherer/adfs2
 
-Write-Host 'Join the domain'
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Joining the domain..."
 
-Write-Host "First, set DNS to DC to join the domain"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) First, set DNS to DC to join the domain..."
 $newDNSServers = "192.168.38.102"
 $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match "192.168.38."}
 $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}
 
-Write-Host "Now join the domain"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Now join the domain..."
 $hostname = $(hostname)
 $user = "windomain.local\vagrant"
 $pass = ConvertTo-SecureString "vagrant" -AsPlainText -Force

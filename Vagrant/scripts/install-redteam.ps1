@@ -1,11 +1,11 @@
 # Purpose: Installs Mimikatz and Powersploit into c:\Tools\Mimikatz. Used to install redteam related tooling.
 
-Write-Host "Installing Red Team Tooling..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Red Team Tooling..."
 
 # Windows Defender should be disabled already by O&O ShutUp10
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
-Write-Host "Determining latest release of Mimikatz..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Mimikatz..."
 # GitHub requires TLS 1.2 as of 2/27
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $tag = (Invoke-WebRequest "https://api.github.com/repos/gentilkiwi/mimikatz/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
@@ -22,7 +22,7 @@ else
 }
 
 # Download and unzip a copy of PowerSploit
-Write-Host "Downloading Powersploit..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Powersploit..."
 # GitHub requires TLS 1.2 as of 2/27
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $powersploitDownloadUrl = "https://github.com/PowerShellMafia/PowerSploit/archive/dev.zip"
@@ -36,7 +36,7 @@ if (-not (Test-Path $powersploitRepoPath)) {
 }
 
 # Download and unzip a copy of Atomic Red Team
-Write-Host "Downloading Atomic Red Team..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Atomic Red Team..."
 # GitHub requires TLS 1.2 as of 2/27
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $atomicRedTeamDownloadUrl = "https://github.com/redcanaryco/atomic-red-team/archive/master.zip"
@@ -48,4 +48,4 @@ if (-not (Test-Path $atomicRedTeamRepoPath)) {
   Write-Host "Atomic Red Team was already installed. Moving On."
 }
 
-Write-Host "Red Team tooling installation complete!"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Red Team tooling installation complete!"

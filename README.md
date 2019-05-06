@@ -1,3 +1,4 @@
+![DetectionLab](./img/DetectionLab.png)
 # Detection Lab
 DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to ensure that builds are passing.
 

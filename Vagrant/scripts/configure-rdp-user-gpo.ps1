@@ -1,5 +1,5 @@
 # Purpose: Install the GPO that allows windomain\vagrant to RDP
-Write-Host "Importing the GPO to allow windomain/vagrant to RDP..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Importing the GPO to allow windomain/vagrant to RDP..."
 Import-GPO -BackupGpoName 'Allow Domain Users RDP' -Path "c:\vagrant\resources\GPO\rdp_users" -TargetName 'Allow Domain Users RDP' -CreateIfNeeded
 
 $OU = "ou=Workstations,dc=windomain,dc=local"

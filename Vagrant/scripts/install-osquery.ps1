@@ -2,7 +2,7 @@
 # Note: by default, osquery will be configured to connect to the Fleet server on the "logger" host via TLS.
 # If you would like to have osquery run without TLS & Fleet, uncomment line 15 and comment lines 21-30.
 
-Write-Host "Installing osquery"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing osquery..."
 $packsDir = "c:\programdata\osquery\packs"
 choco install -y --limit-output --no-progress osquery | Out-String  # Apparently Out-String makes the process wait
 $service = Get-WmiObject -Class Win32_Service -Filter "Name='osqueryd'"

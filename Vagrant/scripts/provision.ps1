@@ -4,21 +4,21 @@
 $box = Get-ItemProperty -Path HKLM:SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName -Name "ComputerName"
 $box = $box.ComputerName.ToString().ToLower()
 
-Write-Host "Setting timezone to UTC"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting timezone to UTC..."
 c:\windows\system32\tzutil.exe /s "UTC"
 
 if ($env:COMPUTERNAME -imatch 'vagrant') {
 
-  Write-Host 'Hostname is still the original one, skip provisioning for reboot'
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Hostname is still the original one, skip provisioning for reboot..."
 
-  Write-Host 'Installing bginfo...'
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing bginfo..."
   . c:\vagrant\scripts\install-bginfo.ps1
 
   Write-Host -fore red 'Hint: vagrant reload' $box '--provision'
 
 } elseif ((gwmi win32_computersystem).partofdomain -eq $false) {
 
-  Write-Host -fore red "Current domain is set to 'workgroup'. Time to join the domain!"
+  Write-Host -fore red "$('[{0:HH:mm}]' -f (Get-Date)) Current domain is set to 'workgroup'. Time to join the domain!"
 
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
     Write-Host 'Install bginfo'
@@ -39,12 +39,12 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
 
 } else {
 
-  Write-Host -fore green "I am domain joined!"
+  Write-Host -fore green "$('[{0:HH:mm}]' -f (Get-Date)) I am domain joined!"
 
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
     Write-Host 'Install bginfo'
     . c:\vagrant\scripts\install-bginfo.ps1
   }
 
-  Write-Host 'Provisioning after joining domain...'
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Provisioning after joining domain..."
 }

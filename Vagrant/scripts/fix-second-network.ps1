@@ -5,6 +5,7 @@ if (! (Test-Path 'C:\Program Files\VMware\VMware Tools')) {
   Write-Host "Nothing to do for other providers than VMware."
   exit 0
 }
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date))"
 Write-Host "Setting IP address and DNS information for the Ethernet1 interface"
 Write-Host "If this step times out, it's because vagrant is connecting to the VM on the wrong interface"
 Write-Host "See https://github.com/clong/DetectionLab/issues/114 for more information"

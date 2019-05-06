@@ -1,6 +1,6 @@
 # Purpose: Sets up the Server and Workstations OUs
 
-Write-Host "Checking AD services status..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Checking AD services status..."
 $svcs = "adws","dns","kdc","netlogon"
 Get-Service -name $svcs -ComputerName localhost | Select Machinename,Name,Status
 
@@ -11,8 +11,8 @@ Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.102    d
 ping /n 1 dc.windomain.local
 ping /n 1 windomain.local
 
-Write-Host "Creating Server and Workstation OUs..."
-Write-Host "Creating Servers OU..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server and Workstation OUs..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Servers OU..."
 
 if (!([ADSI]::Exists("LDAP://OU=Servers,DC=windomain,DC=local")))
 {
@@ -23,7 +23,7 @@ else
     Write-Host "Servers OU already exists. Moving On."
 }
 
-Write-Host "Creating Workstations OU"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Workstations OU"
 if (!([ADSI]::Exists("LDAP://OU=Workstations,DC=windomain,DC=local")))
 {
   New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
