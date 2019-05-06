@@ -8,11 +8,11 @@ $domain= "windomain.local"
 
 if ((gwmi win32_computersystem).partofdomain -eq $false) {
 
-  Write-Host 'Installing RSAT tools'
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing RSAT tools"
   Import-Module ServerManager
   Add-WindowsFeature RSAT-AD-PowerShell,RSAT-AD-AdminCenter
 
-  Write-Host 'Creating domain controller'
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating domain controller..."
   # Disable password complexity policy
   secedit /export /cfg C:\secpol.cfg
   (gc C:\secpol.cfg).replace("PasswordComplexity = 1", "PasswordComplexity = 0") | Out-File C:\secpol.cfg
@@ -48,13 +48,13 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
   $newDNSServers = "127.0.0.1", "8.8.8.8", "4.4.4.4"
   $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -And ($_.IPAddress).StartsWith($subnet) }
   if ($adapters) {
-    Write-Host Setting DNS
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting DNS"
     $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}
   }
-  Write-Host "Setting timezone to UTC"
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting timezone to UTC"
   c:\windows\system32\tzutil.exe /s "UTC"
-  
-  Write-Host "Excluding NAT interface from DNS"
+
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Excluding NAT interface from DNS"
   $nics=Get-WmiObject "Win32_NetworkAdapterConfiguration where IPEnabled='TRUE'" |? { $_.IPAddress[0] -ilike "172.25.*" }
   $dnslistenip=$nics.IPAddress
   $dnslistenip
@@ -74,11 +74,11 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
  foreach($RR in $RRs)
  {
   if ( (Select-Object  -InputObject $RR HostName,RecordType -ExpandProperty RecordData).IPv4Address -ilike "10.*")
-  { 
+  {
    Remove-DnsServerResourceRecord -ZoneName $domain -RRType A -Name "@" -RecordData $RR.RecordData.IPv4Address -Confirm
   }
 
  }
   Restart-Service DNS
-  
+
 }

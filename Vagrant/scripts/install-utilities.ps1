@@ -7,7 +7,7 @@ If (-not (Test-Path "C:\ProgramData\chocolatey")) {
   Write-Host "Chocolatey is already installed."
 }
 
-Write-Host "Installing utilities..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing utilities..."
 If ($(hostname) -eq "win10") {
   # Because the Windows10 start menu sucks
   choco install -y --limit-output --no-progress classic-shell -installArgs ADDLOCAL=ClassicStartMenu

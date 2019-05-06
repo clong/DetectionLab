@@ -1,6 +1,6 @@
 # Purpose: Downloads and unzips a copy of the Palantir WEF Github Repo. This includes WEF subscriptions and custom WEF channels.
 
-Write-Host "Downloading and unzipping the Palantir Windows Event Forwarding Repo from Github..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading and unzipping the Palantir Windows Event Forwarding Repo from Github..."
 
 $wefRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\wef-Master.zip'
 
@@ -15,4 +15,4 @@ else
 {
     Write-Host "$wefRepoPath already exists. Moving On."
 }
-Write-Host "Palantir WEF download complete!"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Palantir WEF download complete!"

@@ -1,5 +1,6 @@
 # Installs BGInfo on the host for easy identification
 # Source: https://github.com/StefanScherer/adfs2
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing BGInfo..."
 if (!(Test-Path 'c:\Program Files\sysinternals')) {
   New-Item -Path 'c:\Program Files\sysinternals' -type directory -Force -ErrorAction SilentlyContinue
 }

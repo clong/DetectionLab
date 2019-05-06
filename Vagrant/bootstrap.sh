@@ -9,17 +9,17 @@ apt_install_prerequisites() {
   # Add repository for apt-fast
   add-apt-repository -y ppa:apt-fast/stable
   # Install prerequisites and useful tools
-  echo "Running apt-get update..."
+  echo "[$(date +%H:%M:%S)]: Running apt-get update..."
   apt-get -qq update
   apt-get -qq install -y apt-fast
-  echo "Running apt-fast install..."
+  echo "[$(date +%H:%M:%S)]: Running apt-fast install..."
   apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip
 }
 
 test_prerequisites() {
   for package in jq whois build-essential git docker docker-compose unzip
   do
-    echo "[TEST] Validating that $package is correctly installed..."
+    echo "[$(date +%H:%M:%S)]: [TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
     if ! dpkg -S $package > /dev/null; then
       # If which returns a non-zero return code, try to re-install the package
@@ -53,9 +53,9 @@ fix_eth1_static_ip() {
     ifup eth1
     ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
     if [ "$ETH1_IP" == "192.168.38.105" ]; then
-      echo "The static IP has been fixed and set to 192.168.38.105"
+      echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.38.105"
     else
-      echo "Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
+      echo "[$(date +%H:%M:%S)]: Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
       exit 1
     fi
   fi
@@ -63,37 +63,37 @@ fix_eth1_static_ip() {
 
 install_golang() {
   if ! which go > /dev/null; then
-    echo "Installing Golang v.1.12..."
+    echo "[$(date +%H:%M:%S)]: Installing Golang v.1.12..."
     cd /home/vagrant || exit
     wget --progress=bar:force https://dl.google.com/go/go1.12.linux-amd64.tar.gz
     tar -C /usr/local -xzf go1.12.linux-amd64.tar.gz
     mkdir /root/go
   else
-    echo "Golang seems to be installed already. Skipping."
+    echo "[$(date +%H:%M:%S)]: Golang seems to be installed already. Skipping."
   fi
 }
 
 install_splunk() {
   # Check if Splunk is already installed
   if [ -f "/opt/splunk/bin/splunk" ]; then
-    echo "Splunk is already installed"
+    echo "[$(date +%H:%M:%S)]: Splunk is already installed"
   else
-    echo "Installing Splunk..."
+    echo "[$(date +%H:%M:%S)]: Installing Splunk..."
     # Get download.splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
     dig @8.8.8.8 download.splunk.com > /dev/null
     dig @8.8.8.8 splunk.com > /dev/null
     mkdir splunk
 
     # Try to resolve the latest version of Splunk by parsing the HTML on the downloads page
-    echo "Attempting to autoresolve the latest version of Splunk..."
+    echo "[$(date +%H:%M:%S)]: Attempting to autoresolve the latest version of Splunk..."
     LATEST_SPLUNK=$(curl https://www.splunk.com/en_us/download/splunk-enterprise.html | grep -i deb | grep -Eo "data-link=\"................................................................................................................................" | cut -d '"' -f 2)
     # Sanity check what was returned from the auto-parse attempt
     if [[ "$(echo $LATEST_SPLUNK | grep -c "^https:")" -eq 1 ]] && [[ "$(echo $LATEST_SPLUNK | grep -c "\.deb$")" -eq 1 ]]; then
-      echo "The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
-      echo "Attempting to download..."
+      echo "[$(date +%H:%M:%S)]: The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
+      echo "[$(date +%H:%M:%S)]: Attempting to download..."
       wget --progress=bar:force -P splunk/ "$LATEST_SPLUNK"
     else
-      echo "Unable to auto-resolve the latest Splunk version. Falling back to hardcoded URL..."
+      echo "[$(date +%H:%M:%S)]: Unable to auto-resolve the latest Splunk version. Falling back to hardcoded URL..."
       # Download Hardcoded Splunk
       wget --progress=bar:force -O splunk/splunk-7.2.6-c0bf0f679ce9-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.6&product=splunk&filename=splunk-7.2.6-c0bf0f679ce9-linux-2.6-amd64.deb&wget=true'
     fi
@@ -129,11 +129,11 @@ install_splunk() {
     sed -i.bak 's/max_memtable_bytes = 10000000/max_memtable_bytes = 30000000/g' /opt/splunk/etc/system/local/limits.conf
 
     # Skip Splunk Tour and Change Password Dialog
-    echo "Disabling the Splunk tour prompt..."
+    echo "[$(date +%H:%M:%S)]: Disabling the Splunk tour prompt..."
     touch /opt/splunk/etc/.ui_login
     mkdir /opt/splunk/etc/users/admin/search/local
     echo -e "[search-tour]\nviewed = 1" > /opt/splunk/etc/users/admin/search/local/ui-tour.conf
-    
+
     # Enable SSL Login for Splunk
     echo -e "[settings]\nenableSplunkWebSSL = true" > /opt/splunk/etc/system/local/web.conf
     # Reboot Splunk to make changes take effect
@@ -147,9 +147,9 @@ install_splunk() {
 install_fleet() {
   # Install Fleet
   if [ -f "/home/vagrant/kolide-quickstart" ]; then
-    echo "Fleet is already installed"
+    echo "[$(date +%H:%M:%S)]: Fleet is already installed"
   else
-    echo "Installing Fleet..."
+    echo "[$(date +%H:%M:%S)]: Installing Fleet..."
     echo -e "\n127.0.0.1       kolide" >> /etc/hosts
     echo -e "\n127.0.0.1       logger" >> /etc/hosts
     git clone https://github.com/kolide/kolide-quickstart.git
@@ -168,10 +168,10 @@ install_fleet() {
 
 download_palantir_osquery_config() {
   if [ -f /home/vagrant/osquery-configuration ]; then
-    echo "osquery configs have already been downloaded"
+    echo "[$(date +%H:%M:%S)]: osquery configs have already been downloaded"
   else
     # Import Palantir osquery configs into Fleet
-    echo "Downloading Palantir configs..."
+    echo "[$(date +%H:%M:%S)]: Downloading Palantir osquery configs..."
     git clone https://github.com/palantir/osquery-configuration.git
   fi
 }
@@ -198,6 +198,7 @@ import_osquery_config_into_fleet() {
 }
 
 install_bro() {
+  echo "[$(date +%H:%M:%S)]: Installing Bro..."
   # Environment variables
   NODECFG=/opt/bro/etc/node.cfg
   SPLUNK_BRO_JSON=/opt/splunk/etc/apps/TA-bro_json
@@ -279,7 +280,7 @@ install_bro() {
 
 install_suricata() {
   # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
-
+  echo "[$(date +%H:%M:%S)]: Installing Suricata..."
   # Install yq to maniuplate the suricata.yaml inline
   /usr/local/go/bin/go get -u github.com/mikefarah/yq
 
@@ -344,7 +345,7 @@ install_suricata() {
 test_suricata_prerequisites() {
   for package in suricata crudini
   do
-    echo "[TEST] Validating that $package is correctly installed..."
+    echo "[$(date +%H:%M:%S)]: [TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
     if ! dpkg -S $package > /dev/null; then
       # If which returns a non-zero return code, try to re-install the package
@@ -361,7 +362,7 @@ test_suricata_prerequisites() {
   done
 
   # One-off support for packages which aren't installed via dpkg
-  echo "[TEST] Validating that yq is correctly installed..."
+  echo "[$(date +%H:%M:%S)]: [TEST] Validating that yq is correctly installed..."
   # Check if the binary exists
   if ! [ -f /root/go/bin/yq ]; then
     # If it doesn't exist, try to re-install the package
