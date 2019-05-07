@@ -85,7 +85,7 @@ $ packer build --only=[vmware|virtualbox]-iso windows_2016.json
 
     `mv *.box ../Boxes`
 
-4. `cd` into the Vagrant directory: `cd ../Vagrant` and edit the `Vagrantfile`. Change the lines `cfg.vm.box = "detectionlab/win2016"` and `cfg.vm.box = "detectionlab/win10` to `cfg.cm.box = "../Boxes/windows_2016_<provider>.box"` and "`cfg.cm.box = "../Boxes/windows_10_<provider>.box"` respectively.
+4. `cd` into the Vagrant directory: `cd ../Vagrant` and edit the `Vagrantfile`. Change the lines `cfg.vm.box = "detectionlab/win2016"` and `cfg.vm.box = "detectionlab/win10` to `cfg.vm.box = "../Boxes/windows_2016_<provider>.box"` and "`cfg.vm.box = "../Boxes/windows_10_<provider>.box"` respectively.
 
 5. Install the Vagrant-Reload plugin: `vagrant plugin install vagrant-reload`
 
