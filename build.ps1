@@ -246,7 +246,7 @@ function packer_build_box {
   Set-Location "$DL_DIR\Packer"
   Write-Output "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware."
   $env:PACKER_LOG=1
-  $env:PACKER_LOG_PATH="$DL_DIR\Packer"
+  $env:PACKER_LOG_PATH="$DL_DIR\Packer\packer.log"
   &$PackerPath @('build', "--only=$PackerProvider-iso", "$box.json")
   Write-Host "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE"
 
