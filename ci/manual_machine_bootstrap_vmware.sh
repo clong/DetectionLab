@@ -1,9 +1,9 @@
 #! /bin/bash
 
 # This script is used to manually prepare an Ubuntu 16.04 server for DetectionLab building
-
-SERIALNUMBER="TODO"
-LICENSEFILE="TODO"
+export DEBIAN_FRONTEND=noninteractive
+export SERIALNUMBER="SECRET"
+export LICENSEFILE="SECRET"
 
 sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
 
@@ -14,7 +14,7 @@ fi
 
 # Install VMWare Workstation 15
 apt-get update
-apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apache2 python-pip
+apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apache2 python-pip ubuntu-desktop
 pip install awscli --upgrade --user
 export PATH=$PATH:/root/.local/bin
 
@@ -22,11 +22,8 @@ wget -O VMware-Workstation-Full-15.0.4-12990004.x86_64.bundle "https://download3
 chmod +x VMware-Workstation-Full-15.0.4-12990004.x86_64.bundle
 sudo sh VMware-Workstation-Full-15.0.4-12990004.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
 
-echo "building" > /var/www/html/index.html
-
 # Set up firewall
 ufw allow ssh
-ufw allow http
 ufw default allow outgoing
 ufw --force enable
 
@@ -39,7 +36,8 @@ wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2
 dpkg -i vagrant_2.2.4_x86_64.deb
 vagrant plugin install vagrant-reload
 vagrant plugin install vagrant-vmware-desktop
-vagrant plugin license vagrant-vmware-desktop $LICENSEFILE
+echo $LICENSEFILE | base64 -d > /tmp/license.lic
+vagrant plugin license vagrant-vmware-desktop /tmp/license.lic
 wget --progress=bar:force "https://releases.hashicorp.com/vagrant-vmware-utility/1.0.7/vagrant-vmware-utility_1.0.7_x86_64.deb"
 dpkg -i vagrant-vmware-utility_1.0.7_x86_64.deb
 

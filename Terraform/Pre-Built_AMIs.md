@@ -19,7 +19,7 @@ The supplied Terraform configuration can then be used to create EC2 instances an
 3. Create a private/public keypair to use to SSH into logger: `ssh-keygen -b 2048 -f ~/.ssh/id_logger`
 4. Copy the file at [/DetectionLab/Terraform/terraform.tfvars.example](./terraform.tfvars.example) to `/DetectionLab/Terraform/terraform.tfvars`
 5. In `terraform.tfvars`, provide overrides for the variables specified in [variables.tf](./variables.tf)
-6. From the `/DetectionLab/Terraform/` directory, run `terraform init` to setup the initial Terraform configuration
+6. From the `/DetectionLab/Terraform` directory, run `terraform init` to setup the initial Terraform configuration
 7. Run `terraform apply` to begin the provisioning process
 
 [![DetectionLab - Terraform](https://i.vimeocdn.com/video/777172792_640.webp)](https://vimeo.com/331695321)
