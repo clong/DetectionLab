@@ -30,7 +30,7 @@ echo "Args: $ARGS"
 
 # Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
 echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
-sysctl -p /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf > /dev/null
 
 if [[ "$VAGRANT_ONLY" -eq 1 ]] && [[ "$PACKER_ONLY" -eq 1 ]]; then
   echo "[$(date +%H:%M:%S)]: Somehow this build is configured as both packer-only and vagrant-only. This means something has gone horribly wrong."
@@ -70,6 +70,10 @@ if [ "$PACKER_ONLY" -eq 0 ]; then
     vagrant plugin install vagrant-reload
   fi
 
+  # Re-enable IPv6 - may help with the Vagrant Cloud slowness
+  echo "net.ipv6.conf.all.disable_ipv6=0" >> /etc/sysctl.conf
+  sysctl -p /etc/sysctl.conf > /dev/null
+
   # Make the Vagrant instances headless
   cd /opt/DetectionLab/Vagrant || exit 1
   sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
@@ -80,8 +84,8 @@ if [ "$VAGRANT_ONLY" -eq 0 ]; then
   # Install Packer
   mkdir /opt/packer
   cd /opt/packer || exit 1
-  wget --progress=bar:force https://releases.hashicorp.com/packer/1.3.2/packer_1.3.2_linux_amd64.zip
-  unzip packer_1.3.2_linux_amd64.zip
+  wget --progress=bar:force https://releases.hashicorp.com/packer/1.4.0/packer_1.4.0_linux_amd64.zip
+  unzip packer_1.4.0_linux_amd64.zip
   cp packer /usr/local/bin/packer
 
   # Make the Packer images headless

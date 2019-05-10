@@ -152,7 +152,7 @@ resource "aws_instance" "logger" {
   # Provision the AWS Ubuntu 16.04 AMI from scratch.
   provisioner "remote-exec" {
     inline = [
-      "sudo add-apt-repository universe && sudo apt-get update && sudo apt-get install -y git",
+      "sudo add-apt-repository universe && sudo apt-get -qq update && sudo apt-get -qq install -y git",
       "echo 'logger' | sudo tee /etc/hostname && sudo hostnamectl set-hostname logger",
       "sudo adduser --disabled-password --gecos \"\" vagrant && echo 'vagrant:vagrant' | sudo chpasswd",
       "sudo mkdir /home/vagrant/.ssh && sudo cp /home/ubuntu/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys && sudo chown -R vagrant:vagrant /home/vagrant/.ssh",
@@ -180,7 +180,8 @@ resource "aws_instance" "logger" {
 
 resource "aws_instance" "dc" {
   instance_type = "t2.medium"
-  ami = "${var.dc_ami}"
+  # Change the below variable to "${var.dc_ami}" if using hardcoded AMIs
+  ami = "${data.aws_ami.dc_ami.image_id}"
   tags {
     Name = "dc.windomain.local"
   }
@@ -194,7 +195,8 @@ resource "aws_instance" "dc" {
 
 resource "aws_instance" "wef" {
   instance_type = "t2.medium"
-  ami = "${var.wef_ami}"
+  # Change the below variable to "${var.wef_ami}" if using hardcoded AMIs
+  ami = "${data.aws_ami.wef_ami.image_id}"
   tags {
     Name = "wef.windomain.local"
   }
@@ -208,7 +210,8 @@ resource "aws_instance" "wef" {
 
 resource "aws_instance" "win10" {
   instance_type = "t2.medium"
-  ami = "${var.win10_ami}"
+  # Change the below variable to "${var.win10_ami}" if using hardcoded AMIs
+  ami = "${data.aws_ami.win10_ami.image_id}"
   tags {
     Name = "win10.windomain.local"
   }
