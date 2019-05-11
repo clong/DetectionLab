@@ -131,8 +131,16 @@ install_splunk() {
     # Skip Splunk Tour and Change Password Dialog
     echo "[$(date +%H:%M:%S)]: Disabling the Splunk tour prompt..."
     touch /opt/splunk/etc/.ui_login
-    mkdir /opt/splunk/etc/users/admin/search/local
-    echo -e "[search-tour]\nviewed = 1" > /opt/splunk/etc/users/admin/search/local/ui-tour.conf
+    mkdir -p /opt/splunk/etc/users/admin/search/local
+    echo -e "[search-tour]\nviewed = 1" > /opt/splunk/etc/system/local/ui-tour.conf
+    mkdir /opt/splunk/etc/apps/user-prefs/local
+    echo '[general]
+ render_version_messages = 0
+ hideInstrumentationOptInModal = 1
+ dismissedInstrumentationOptInVersion = 2
+ [general_default]
+ hideInstrumentationOptInModal = 1
+ showWhatsNew = 0' > /opt/splunk/etc/apps/user-prefs/local/user-prefs.conf
 
     # Enable SSL Login for Splunk
     echo -e "[settings]\nenableSplunkWebSSL = true" > /opt/splunk/etc/system/local/web.conf
@@ -204,13 +212,19 @@ install_bro() {
   SPLUNK_BRO_JSON=/opt/splunk/etc/apps/TA-bro_json
   SPLUNK_BRO_MONITOR='monitor:///opt/bro/spool/manager'
   SPLUNK_SURICATA_MONITOR='monitor:///var/log/suricata'
+  SPLUNK_SURICATA_SOURCETYPE='json_suricata'
   echo "deb http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/ /" > /etc/apt/sources.list.d/bro.list
   curl -s http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/Release.key |apt-key add -
 
   # Update APT repositories
   apt-get -qq -ym update
   # Install tools to build and configure bro
-  apt-get -qq -ym install bro crudini
+  apt-get -qq -ym install bro crudini python-pip
+  export PATH=$PATH:/opt/bro/bin
+  pip install bro-pkg
+  bro-pkg refresh
+  bro-pkg autoconfig
+  bro-pkg install --force salesforce/ja3
   # Load bro scripts
   echo '
   @load protocols/ftp/software
@@ -226,6 +240,7 @@ install_bro() {
   @load policy/protocols/smb
   @load policy/protocols/conn/vlan-logging
   @load policy/protocols/conn/mac-logging
+  @load ja3
 
   redef Intel::read_files += {
     "/opt/bro/etc/intel.dat"
@@ -266,6 +281,7 @@ install_bro() {
   crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR sourcetype   json_suricata
   crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR whitelist   'eve.json'
   crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR disabled   0
+  crudini --set  $SPLUNK_BRO_JSON/local/props.conf  $SPLUNK_SURICATA_SOURCETYPE TRUNCATE    0
 
   # Ensure permissions are correct and restart splunk
   chown -R splunk $SPLUNK_BRO_JSON
@@ -314,8 +330,11 @@ install_suricata() {
   /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SSH
   /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Stats
   /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Flow
+  # Enable JA3 fingerprinting
+  /root/go/bin/yq w -i /etc/suricata/suricata.yaml app-layer.protocols.tls.ja3-fingerprints true
   # AF packet monitoring should be set to eth1
   /root/go/bin/yq w -i /etc/suricata/suricata.yaml af-packet.0.interface eth1
+
 
   crudini --set --format=sh /etc/default/suricata '' iface eth1
   # update suricata signature sources
@@ -378,6 +397,11 @@ test_suricata_prerequisites() {
   fi
 }
 
+postinstall_tasks() {
+  # Include Splunk and Bro in the PATH
+  echo export PATH="$PATH:/opt/splunk/bin:/opt/bro/bin" >> ~/.bashrc
+}
+
 main() {
   apt_install_prerequisites
   test_prerequisites
@@ -389,6 +413,7 @@ main() {
   import_osquery_config_into_fleet
   install_suricata
   install_bro
+  postinstall_tasks
 }
 
 main
