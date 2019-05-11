@@ -211,6 +211,16 @@ install_bro() {
   apt-get -qq -ym update
   # Install tools to build and configure bro
   apt-get -qq -ym install bro crudini
+  # install bro-pkg and bro ja3 pkg
+  export PATH=$PATH:/opt/bro/bin
+  pip install bro-pkg
+  bro-pkg refresh
+  bro-pkg autoconfig
+  for i in salesforce/ja3
+  do
+      bro-pkg install --force $i
+  done
+
   # Load bro scripts
   echo '
   @load protocols/ftp/software
