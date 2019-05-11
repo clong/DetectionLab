@@ -35,22 +35,47 @@ variable "external_dns_servers" {
   default = ["8.8.8.8"]
 }
 
+# Use Data Sources to resolve the AMI-ID for the pre-built DC host
+data "aws_ami" "dc_ami" {
+  owners = ["505638924199"]
+  filter {
+    name = "name"
+    values = ["detectionlab-dc"]
+  }
+}
+
+ # Use Data Sources to resolve the AMI-ID for the pre-built WEF host
+data "aws_ami" "wef_ami" {
+  owners = ["505638924199"]
+  most_recent = true
+  filter {
+    name = "name"
+    values = ["detectionlab-wef"]
+  }
+}
+
+ # Use Data Sources to resolve the AMI-ID for the pre-built Win10 host
+data "aws_ami" "win10_ami" {
+  owners = ["505638924199"]
+  most_recent = true
+  filter {
+    name = "name"
+    values = ["detectionlab-win10"]
+  }
+}
+
 # The logger host uses the Amazon Ubuntu 16.04 image
 # If you are building your own AMIs, replace the default values below with
 # the AMI IDs
-variable "logger_ami" {
-  type = "string"
-  default = "ami-0693b32d066fade8a"
-}
 variable "dc_ami" {
   type = "string"
-  default = "ami-0f0f0aaba01986b10"
+  default = "ami-03e2df055c632a0dd"
 }
 variable "wef_ami" {
   type = "string"
-  default = "ami-02566cd6ca3b7c6ae"
+  default = "ami-03c82482c03a740c5"
 }
 variable "win10_ami" {
   type = "string"
-  default = "ami-06a8a101dac68a81a"
+  default = "ami-0a4644e74768900f7"
 }
