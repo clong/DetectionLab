@@ -1,6 +1,9 @@
 variable "region" {
   default = "us-west-1"
 }
+variable "profile" {
+  default = "terraform"
+}
 variable "availability_zone" {
   description = "https://www.terraform.io/docs/providers/aws/d/availability_zone.html"
   default = ""
