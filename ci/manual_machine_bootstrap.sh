@@ -4,18 +4,13 @@
 
 sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
 
-if [[ "$VAGRANT_ONLY" -eq 1 ]] && [[ "$PACKER_ONLY" -eq 1 ]]; then
-  echo "Somehow this build is configured as both packer-only and vagrant-only. This means something has gone horribly wrong."
-  exit 1
-fi
-
 # Install Virtualbox 5.2
 echo "deb http://download.virtualbox.org/virtualbox/debian xenial contrib" >> /etc/apt/sources.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
 apt-get update
 apt-get install -y linux-headers-"$(uname -r)" virtualbox-5.2 build-essential unzip git ufw apache2 python-pip
 pip install awscli --upgrade --user
-export PATH=$PATH:/root/.local/bin
+cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
 
 # Set up firewall
 ufw allow ssh

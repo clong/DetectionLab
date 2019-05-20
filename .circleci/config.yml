@@ -10,67 +10,127 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Choose which test suite to run based on which files were modified
+          name: Create directory for artifacts
           command: |
-            ## As far as I'm aware, there are three possibile cases to check for here. The CIRCLE_COMPARE_URL environment variable will either contain:
-            ## - A SHA1 hash for the commit (If there is only a single commit on the branch)
-            ## - Two SHA1 hashes in a "xxxxxxxx..yyyyyyyy" (comparing the two most recent commits
-            ## - Nothing
-            ## There is certainly a better way to accomplish all of this, but my limited knowledge of git has lead me to write this awful spaghetti code :-/
-            ## We'll handle all 3 of these cases below:
-            ## Checking commits for changes to Packer files
-            COMMIT_SHA1=""
-            PACKER_MODIFIED=0
-            VAGRANT_MODIFIED=0
-            ## Check for empty CIRCLE_COMPARE_URL. If it is, set the SHA1 hash to the CIRCLE_SHA1 environment variable
-            if [ "$(echo -n $CIRCLE_COMPARE_URL | wc -c)" -eq 0 ]; then
-              export COMMIT_SHA1=$CIRCLE_SHA1
-            ## Check for two short-hashes in the CIRCLE_COMPARE_URL by searching for '..'. If it exists, use the second short-hash
-            elif echo "$CIRCLE_COMPARE_URL" | grep '\.\.'; then
-              export COMMIT_SHA1="$(echo $CIRCLE_COMPARE_URL | cut -d '.' -f 5)"
-            ## Check for a single short hash in the CIRCLE_COMPARE_URL and use it if it exists
-            ## TODO: This check may not be needed.
+            # Create artifacts directory
+            if [ ! -d "/tmp/artifacts" ]; then
+              mkdir /tmp/artifacts
+            fi
+
+      - run:
+          name: Creating a Packet Server
+          command: |
+            ## Provision a Type1 baremetal Packet.net server
+            echo "[$(date +%H:%M:%S)]: Provisioning a server on Packet.net"
+            DEVICE_ID=$(curl -s -X POST --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "sjc1", "plan": "baremetal_1", "hostname": "detectionlab", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys": ["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."id" | tr -d '"')
+            echo $DEVICE_ID > /tmp/device_id
+            # Make sure the device ID is sane.
+            # TODO: maybe make this a regex
+            if [ "$(echo -n $DEVICE_ID | wc -c)" -ne 36 ]; then
+              echo "[$(date +%H:%M:%S)]: Server may have failed provisionining. Device ID is set to: $DEVICE_ID"
+              echo "[$(date +%H:%M:%S)]: This usually happens if there are no servers available in the selected datacenter."
+              echo "[$(date +%H:%M:%S)]: Attempting to retry in another datacenter..."
+              export DEVICE_ID=$(curl -s -X POST --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{ "facility": "ewr1", "plan": "baremetal_1", "hostname": "detectionlab", "description": "testing", "billing_cycle": "hourly", "operating_system": "ubuntu_16_04", "userdata": "", "locked": "false", "project_ssh_keys": ["315a9565-d5b1-41b6-913d-fcf022bb89a6", "755b134a-f63c-4fc5-9103-c1b63e65fdfc"] }' 'https://api.packet.net/projects/0b3f4f2e-ff05-41a8-899d-7923f620ca85/devices' | jq ."id" | tr -d '"')
+              if [ "$(echo -n $DEVICE_ID | wc -c)" -ne 36 ]; then
+                echo "[$(date +%H:%M:%S)]: This script was still unable to successfully provision a server. Exiting."
+                exit 1
+              fi
+            fi
+            echo "[$(date +%H:%M:%S)]: Server successfully created with ID: $DEVICE_ID"
+
+      - run:
+          name: Waiting for Packet server provisioning to complete
+          command: |
+            DEVICE_ID=$(cat /tmp/device_id)
+            echo "[$(date +%H:%M:%S)]: Waiting for server to finish provisioning..."
+            # Continue to poll the API until the state of the host is "active"
+            export STATE="provisioning"
+            while [ "$STATE" != "active" ]; do
+              sleep 10
+              echo "[$(date +%H:%M:%S)]: Sleeping for 10 seconds. Server is still $STATE."
+              export STATE="$(curl -s --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" "https://api.packet.net/devices/$DEVICE_ID" | jq .state | tr -d '"')"
+            done
+            echo "[$(date +%H:%M:%S)]: Device with ID $DEVICE_ID has finished provisioning! Onto the build process..."
+
+      - run:
+          name: Mount external storage
+          command: |
+            DEVICE_ID=$(cat /tmp/device_id)
+            ## Mount external storage containing Vagrant boxes
+            echo "[$(date +%H:%M:%S)]: Attempting to mount external storage to this server..."
+            MOUNT_STATUS=$(curl -s -X POST --header 'Accept: application/json' --header 'Content-Type: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" -d '{"device_id": "'"$DEVICE_ID"'"}' 'https://api.packet.net/storage/fed37d73-6719-451a-9160-df8b0addc915/attachments' | jq .id | wc -c)
+            # Stupid check to make sure MOUNT_STATUS contains a UUID
+            if [ "$MOUNT_STATUS" != "39" ]; then
+              echo "[$(date +%H:%M:%S)]: Mounting may have failed. ID is $MOUNT_STATUS"
             else
-              export COMMIT_SHA1="$(echo $CIRCLE_COMPARE_URL | cut -d '/' -f 7)"
+              echo "[$(date +%H:%M:%S)]: External storage successfully mounted!"
             fi
-            ## Display the files that were modified in this branch
-            echo "Files modified since origin/Master:"
-            git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) "$COMMIT_SHA1"
-            ## Check to see if Packer files were modified
-            if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) "$COMMIT_SHA1" | grep -c ^Packer/)" -gt 0 ]; then
-              export PACKER_MODIFIED=1
+
+      - run:
+          name: Record the IP address of the Packet server
+          command: |
+            ## Recording the IP address of the newly provisioned Packet server
+            DEVICE_ID=$(cat /tmp/device_id)
+            IP_ADDRESS=$(curl -s -X GET --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" "https://api.packet.net/devices/$DEVICE_ID/ips" | jq ."ip_addresses[0].address" | tr -d '"')
+            echo $IP_ADDRESS > /tmp/ip_address
+
+      - run:
+          name: SCP Repo to Packet Server
+          command: |
+            # Copy repo to Packet server
+            # TODO: Tar up the repo and expand it remotely
+            IP_ADDRESS=$(cat /tmp/ip_address)
+            cd ~/repo && rsync -Paq -e "ssh -i ~/.ssh/id_rsa" ~/repo/ root@"$IP_ADDRESS":/opt/DetectionLab
+
+      - run:
+          name: Run the build machine bootstrap script
+          command: |
+            IP_ADDRESS=$(cat /tmp/ip_address)
+            ssh -i ~/.ssh/id_rsa root@"$IP_ADDRESS" 'bash -s' -- < ci/build_machine_bootstrap.sh
+
+      - run:
+          name: Wait for build results
+          command: |
+            export MINUTES_PAST=0
+            IP_ADDRESS=$(cat /tmp/ip_address)
+            DEVICE_ID=$(cat /tmp/device_id)
+            while [ "$MINUTES_PAST" -le 240 ]; do
+              export STATUS=$(curl -s $IP_ADDRESS)
+              if [ "$STATUS" == "building" ]; then
+                echo "[$(date +%H:%M:%S)]: $STATUS"
+                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+                sleep 300
+                ((MINUTES_PAST += 5))
+              else
+                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+                echo "$STATUS" > /tmp/status
+                break
+              fi
+              if [ "$MINUTES_PAST" -gt 240 ]; then
+                echo "[$(date +%H:%M:%S)]: Serer timed out. Uptime: $MINUTES_PAST minutes."
+                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
+                curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+                exit 1
+              fi
+            done
+
+      - run:
+          name: Wait for build results
+          command: |
+            ## Recording the build results
+            STATUS=$(cat /tmp/status)
+            IP_ADDRESS=$(cat /tmp/ip_address)
+            DEVICE_ID=$(cat /tmp/device_id)
+            echo "[$(date +%H:%M:%S)]: $STATUS"
+            if [ "$STATUS" != "success" ]; then
+              scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
+              echo "Build failed. Cleaning up server with ID $DEVICE_ID"
+              curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"'?force_delete=true'
+              exit 1
             fi
-            if [ "$(git diff-tree --no-commit-id --name-only -r $(git rev-parse origin/HEAD) "$COMMIT_SHA1" | grep -c ^Vagrant/)" -gt 0 ]; then
-              export VAGRANT_MODIFIED=1
-            fi
-            echo "Displaying the values of the modifier environment variables:"
-            echo "VAGRANT_MODIFIED=$VAGRANT_MODIFIED"
-            echo "PACKER_MODIFIED=$PACKER_MODIFIED"
-            ## Choosing which test suite to run based on the files that were changed
-            if [[ "$PACKER_MODIFIED" -eq 1 ]] && [[ "$VAGRANT_MODIFIED" -eq 1 ]]; then
-              echo "Running the test suite for Packer and Vagrant changes"
-              chmod +x ci/circle_workflows/packer_and_vagrant_changes.sh
-              ci/circle_workflows/packer_and_vagrant_changes.sh
-              exit 0
-            fi
-            if [[ "$PACKER_MODIFIED" -eq 0 ]] && [[ "$VAGRANT_MODIFIED" -eq 0 ]]; then
-              echo "Running the default test suite (Vagrant-only)"
-              chmod +x ci/circle_workflows/vagrant_changes.sh
-              ci/circle_workflows/vagrant_changes.sh
-              exit 0
-            fi
-            if [ "$PACKER_MODIFIED" -eq 1 ]; then
-              echo "Running the test suite for Packer-only changes"
-              chmod +x ci/circle_workflows/packer_changes.sh
-              ci/circle_workflows/packer_changes.sh
-              exit 0
-            fi
-            if [ "$VAGRANT_MODIFIED" -eq 1 ]; then
-              echo "Running the test suite for Vagrant-only changes"
-              chmod +x ci/circle_workflows/vagrant_changes.sh
-              ci/circle_workflows/vagrant_changes.sh
-              exit 0
-            fi
+            echo "[$(date +%H:%M:%S)]: Build was successful. Cleaning up server with ID $DEVICE_ID"
+            curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"'?force_delete=true'
+            exit 0
 
       - store_artifacts:
           path: /tmp/artifacts
