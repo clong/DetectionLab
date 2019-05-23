@@ -6,7 +6,7 @@
 
 As of March 2019, I am now sharing pre-built AMIs on the Amazon Marketplace. The code inside of main.tf uses Terraform data sources to determine the correct AMI ID and will use the pre-built AMIs by default.
 
-Using this method, it should be possible to bring DetectionLab online in under 15 minutes.
+Using this method, it should be possible to bring DetectionLab online in under 30 minutes.
 
 The instructions for deploying DetectionLab in AWS using the pre-built AMIs are available here: [Pre-Built AMIs README](./Pre-Built_AMIs.md)
 
