@@ -29,3 +29,11 @@ output "latest_wef_ami_id" {
 output "latest_win10_ami_id" {
   value = "${data.aws_ami.wef_ami.image_id}"
 }
+
+output "fleet_url" {
+  value = "${local.fleet_url}"
+}
+
+output "splunk_url" {
+  value = "${local.splunk_url}"
+}
