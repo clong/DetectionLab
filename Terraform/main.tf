@@ -1,8 +1,8 @@
 # Specify the provider and access details
 provider "aws" {
   shared_credentials_file = "${var.shared_credentials_file}"
-  region = "${var.region}"
-  profile = "${var.profile}"
+  region                  = "${var.region}"
+  profile                 = "${var.profile}"
 }
 
 # Create a VPC to launch our instances into
@@ -36,6 +36,7 @@ resource "aws_vpc_dhcp_options" "default" {
   domain_name_servers  = ["${aws_instance.dc.private_ip}", "${var.external_dns_servers}"]
   netbios_name_servers = ["${aws_instance.dc.private_ip}"]
 }
+
 resource "aws_vpc_dhcp_options_association" "default" {
   vpc_id          = "${aws_vpc.default.id}"
   dhcp_options_id = "${aws_vpc_dhcp_options.default.id}"
@@ -141,14 +142,17 @@ resource "aws_key_pair" "auth" {
 
 resource "aws_instance" "logger" {
   instance_type = "t2.medium"
-  ami = "ami-0ad16744583f21877"
+  ami           = "ami-0ad16744583f21877"
+
   tags {
     Name = "logger"
   }
-  subnet_id = "${aws_subnet.default.id}"
+
+  subnet_id              = "${aws_subnet.default.id}"
   vpc_security_group_ids = ["${aws_security_group.logger.id}"]
-  key_name = "${aws_key_pair.auth.key_name}"
-  private_ip = "192.168.38.105"
+  key_name               = "${aws_key_pair.auth.key_name}"
+  private_ip             = "192.168.38.105"
+
   # Provision the AWS Ubuntu 16.04 AMI from scratch.
   provisioner "remote-exec" {
     inline = [
@@ -166,28 +170,34 @@ resource "aws_instance" "logger" {
       "sudo apt-get -qq update",
       "sudo /opt/DetectionLab/Vagrant/bootstrap.sh",
     ]
+
     connection {
-      type = "ssh"
-      user = "ubuntu"
+      type        = "ssh"
+      user        = "ubuntu"
       private_key = "${file("${var.private_key_path}")}"
     }
   }
+
   root_block_device {
     delete_on_termination = true
-    volume_size = 64
+    volume_size           = 64
   }
 }
 
 resource "aws_instance" "dc" {
   instance_type = "t2.medium"
+
   # Change the below variable to "${var.dc_ami}" if using hardcoded AMIs
   ami = "${data.aws_ami.dc_ami.image_id}"
+
   tags {
     Name = "dc.windomain.local"
   }
-  subnet_id = "${aws_subnet.default.id}"
+
+  subnet_id              = "${aws_subnet.default.id}"
   vpc_security_group_ids = ["${aws_security_group.windows.id}"]
-  private_ip = "192.168.38.102"
+  private_ip             = "192.168.38.102"
+
   root_block_device {
     delete_on_termination = true
   }
@@ -195,14 +205,18 @@ resource "aws_instance" "dc" {
 
 resource "aws_instance" "wef" {
   instance_type = "t2.medium"
+
   # Change the below variable to "${var.wef_ami}" if using hardcoded AMIs
   ami = "${data.aws_ami.wef_ami.image_id}"
+
   tags {
     Name = "wef.windomain.local"
   }
-  subnet_id = "${aws_subnet.default.id}"
+
+  subnet_id              = "${aws_subnet.default.id}"
   vpc_security_group_ids = ["${aws_security_group.windows.id}"]
-  private_ip = "192.168.38.103"
+  private_ip             = "192.168.38.103"
+
   root_block_device {
     delete_on_termination = true
   }
@@ -210,14 +224,18 @@ resource "aws_instance" "wef" {
 
 resource "aws_instance" "win10" {
   instance_type = "t2.medium"
+
   # Change the below variable to "${var.win10_ami}" if using hardcoded AMIs
   ami = "${data.aws_ami.win10_ami.image_id}"
+
   tags {
     Name = "win10.windomain.local"
   }
-  subnet_id = "${aws_subnet.default.id}"
+
+  subnet_id              = "${aws_subnet.default.id}"
   vpc_security_group_ids = ["${aws_security_group.windows.id}"]
-  private_ip = "192.168.38.104"
+  private_ip             = "192.168.38.104"
+
   root_block_device {
     delete_on_termination = true
   }
