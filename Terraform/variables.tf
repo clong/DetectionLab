@@ -46,6 +46,16 @@ variable "external_dns_servers" {
   default     = ["8.8.8.8"]
 }
 
+# Use Data Sources to resolve the AMI-ID for the Ubuntu 16.04 AMI
+data "aws_ami" "logger_ami" {
+  owners = ["099720109477"]
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20180912"]
+  }
+}
+
 # Use Data Sources to resolve the AMI-ID for the pre-built DC host
 data "aws_ami" "dc_ami" {
   owners = ["505638924199"]
@@ -78,9 +88,15 @@ data "aws_ami" "win10_ami" {
   }
 }
 
-# The logger host uses the Amazon Ubuntu 16.04 image
 # If you are building your own AMIs, replace the default values below with
 # the AMI IDs
+# The default values for us-west-1 have been provied for you
+# You will have to change the default values if you use a different region
+variable "logger_ami" {
+  type    = "string"
+  default = "ami-0ad16744583f21877"
+}
+
 variable "dc_ami" {
   type    = "string"
   default = "ami-03e2df055c632a0dd"

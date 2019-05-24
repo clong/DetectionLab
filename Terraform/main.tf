@@ -142,7 +142,7 @@ resource "aws_key_pair" "auth" {
 
 resource "aws_instance" "logger" {
   instance_type = "t2.medium"
-  ami           = "ami-0ad16744583f21877"
+  ami           = "${coalesce(data.aws_ami.logger_ami.image_id, var.logger_ami)}"
 
   tags {
     Name = "logger"
@@ -187,8 +187,8 @@ resource "aws_instance" "logger" {
 resource "aws_instance" "dc" {
   instance_type = "t2.medium"
 
-  # Change the below variable to "${var.dc_ami}" if using hardcoded AMIs
-  ami = "${data.aws_ami.dc_ami.image_id}"
+  # Uses the local variable if external data source resolution fails
+  ami = "${coalesce(data.aws_ami.dc_ami.image_id, var.dc_ami)}"
 
   tags {
     Name = "dc.windomain.local"
@@ -206,8 +206,8 @@ resource "aws_instance" "dc" {
 resource "aws_instance" "wef" {
   instance_type = "t2.medium"
 
-  # Change the below variable to "${var.wef_ami}" if using hardcoded AMIs
-  ami = "${data.aws_ami.wef_ami.image_id}"
+  # Uses the local variable if external data source resolution fails
+  ami = "${coalesce(data.aws_ami.wef_ami.image_id, var.wef_ami)}"
 
   tags {
     Name = "wef.windomain.local"
@@ -225,8 +225,8 @@ resource "aws_instance" "wef" {
 resource "aws_instance" "win10" {
   instance_type = "t2.medium"
 
-  # Change the below variable to "${var.win10_ami}" if using hardcoded AMIs
-  ami = "${data.aws_ami.win10_ami.image_id}"
+  # Uses the local variable if external data source resolution fails
+  ami = "${coalesce(data.aws_ami.win10_ami.image_id, var.win10_ami)}"
 
   tags {
     Name = "win10.windomain.local"
