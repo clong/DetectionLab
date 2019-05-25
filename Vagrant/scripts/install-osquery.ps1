@@ -38,7 +38,7 @@ If (-not ($service)) {
 else {
   Write-Host "osquery is already installed. Moving On."
 }
-If ((Get-Service -name osqueryd).Status -ne "Running")	
+If ((Get-Service -name osqueryd).Status -ne "Running")
 {
   throw "osqueryd service was not running"
 }
