@@ -130,7 +130,7 @@ jobs:
             done
 
       - run:
-          name: Wait for build results
+          name: Post the build results
           command: |
             ## Recording the build results
             STATUS=$(cat /tmp/status)

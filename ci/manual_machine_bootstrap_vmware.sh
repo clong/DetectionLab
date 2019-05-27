@@ -6,7 +6,7 @@ export DEBIAN_FRONTEND=noninteractive
 export SERIALNUMBER="SECRET"
 export LICENSEFILE="SECRET"
 
-sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
+sed -i 's#http://archive.ubuntu.com#http://us.archive.ubuntu.com#g' /etc/apt/sources.list
 
 # Install VMWare Workstation 15
 apt-get update
