@@ -13,7 +13,7 @@ variable "availability_zone" {
 
 variable "shared_credentials_file" {
   description = "Path to your AWS credentials file"
-  type        = "string"
+  type        = string
   default     = "/home/username/.aws/credentials"
 }
 
@@ -24,25 +24,25 @@ variable "public_key_name" {
 
 variable "public_key_path" {
   description = "Path to the public key to be loaded into the logger authorized_keys file"
-  type        = "string"
+  type        = string
   default     = "/home/username/.ssh/id_logger.pub"
 }
 
 variable "private_key_path" {
   description = "Path to the private key to use to authenticate to logger."
-  type        = "string"
+  type        = string
   default     = "/home/username/.ssh/id_logger"
 }
 
 variable "ip_whitelist" {
   description = "A list of CIDRs that will be allowed to access the EC2 instances"
-  type        = "list"
+  type        = list(string)
   default     = [""]
 }
 
 variable "external_dns_servers" {
   description = "Configure lab to allow external DNS resolution"
-  type        = "list"
+  type        = list(string)
   default     = ["8.8.8.8"]
 }
 
@@ -93,21 +93,22 @@ data "aws_ami" "win10_ami" {
 # The default values for us-west-1 have been provied for you
 # You will have to change the default values if you use a different region
 variable "logger_ami" {
-  type    = "string"
+  type    = string
   default = "ami-0ad16744583f21877"
 }
 
 variable "dc_ami" {
-  type    = "string"
+  type    = string
   default = "ami-03e2df055c632a0dd"
 }
 
 variable "wef_ami" {
-  type    = "string"
+  type    = string
   default = "ami-03c82482c03a740c5"
 }
 
 variable "win10_ami" {
-  type    = "string"
+  type    = string
   default = "ami-0a4644e74768900f7"
 }
+
