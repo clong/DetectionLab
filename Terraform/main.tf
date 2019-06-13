@@ -33,7 +33,7 @@ resource "aws_subnet" "default" {
 # Adjust VPC DNS settings to not conflict with lab
 resource "aws_vpc_dhcp_options" "default" {
   domain_name          = "windomain.local"
-  domain_name_servers  = concat(aws_instance.dc.private_ip, var.external_dns_servers)
+  domain_name_servers  = concat([aws_instance.dc.private_ip], var.external_dns_servers)
   netbios_name_servers = [aws_instance.dc.private_ip]
 }
 
