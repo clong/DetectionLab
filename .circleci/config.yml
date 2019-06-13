@@ -8,11 +8,11 @@ jobs:
       - run:
           name: Download and Install Terraform
           command: |
-            wget -O terraform.zip https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip
+            wget -O terraform.zip https://releases.hashicorp.com/terraform/0.12.2/terraform_0.12.2_linux_amd64.zip
             unzip terraform.zip
             sudo mv terraform /usr/local/bin/terraform
 
-      - run: for dir in $(find . -name \*.tf -exec dirname {} \; | sort | uniq); do echo ${dir} && terraform validate -check-variables=false ${dir}; done
+      - run: for dir in $(find . -name \*.tf -exec dirname {} \; | sort | uniq); do echo ${dir} && terraform init ${dir} && terraform validate ${dir}; done
       - run: terraform fmt -check
 
   hold:
