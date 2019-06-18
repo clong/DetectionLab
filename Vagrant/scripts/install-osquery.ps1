@@ -8,7 +8,8 @@ choco install -y --limit-output --no-progress osquery | Out-String  # Apparently
 $service = Get-WmiObject -Class Win32_Service -Filter "Name='osqueryd'"
 If (-not ($service)) {
   Write-Host "Setting osquery to run as a service"
-  Start-Process -FilePath "c:\Program Files\osquery\osqueryd\osqueryd.exe" -ArgumentList "--install" -Wait
+  New-Service -Name "osqueryd" -BinaryPathName "C:\Program Files\osquery\osqueryd\osqueryd.exe --flagfile=`"C:\Program Files\osquery\osquery.flags`""
+
   # Copy over the config and packs from the Palantir repo
   Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Classic\Endpoints\Windows\*" "c:\Program Files\osquery"
   Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Classic\Endpoints\packs" -Path "c:\Program Files\osquery"
@@ -27,12 +28,11 @@ If (-not ($service)) {
   (Get-Content "c:\Program Files\osquery\osquery.flags") -replace 'tls.endpoint.server.com', 'kolide:8412' | Set-Content "c:\Program Files\osquery\osquery.flags"
   ## Change path to secrets
   (Get-Content "c:\Program Files\osquery\osquery.flags") -replace 'path\\to\\file\\containing\\secret.txt', 'Program Files\osquery\kolide_secret.txt' | Set-Content "c:\Program Files\osquery\osquery.flags"
+  ## Change path to certfile
+  (Get-Content "c:\Program Files\osquery\osquery.flags") -replace 'c:\\ProgramData\\osquery\\certfile.crt', 'c:\Program Files\osquery\certfile.crt' | Set-Content "c:\Program Files\osquery\osquery.flags"
   ## Add certfile.crt
   Copy-Item "c:\vagrant\resources\fleet\server.crt" "c:\Program Files\osquery\certfile.crt"
   ### --- TLS CONFIG ENDS ---
-
-  Stop-service osqueryd
-  Start-Sleep -s 5
   Start-Service osqueryd
 }
 else {
