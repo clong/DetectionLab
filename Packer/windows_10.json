@@ -1,38 +1,6 @@
 {
   "builders": [
     {
-      "type": "hyperv-iso",
-      "vm_name":"windows_10",
-      "iso_url": "{{user `iso_url`}}",
-      "iso_checksum_type": "{{user `iso_checksum_type`}}",
-      "iso_checksum": "{{user `iso_checksum`}}",
-      "boot_wait": "6m",
-      "communicator":"winrm",
-      "winrm_username": "vagrant",
-      "winrm_password": "vagrant",
-      "winrm_timeout" : "4h",
-      "ram_size": "2048",
-      "cpu": "2",
-      "switch_name": "{{user `switch_name`}}",
-      "guest_additions_mode": "none",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
-      "disk_size": "{{user `disk_size`}}",
-      "floppy_files": [
-        "{{user `autounattend`}}",
-        "./floppy/WindowsPowershell.lnk",
-        "./floppy/PinTo10.exe",
-        "./scripts/fixnetwork.ps1",
-        "./scripts/MakeWindows10GreatAgain.ps1",
-        "./scripts/MakeWindows10GreatAgain.reg",
-        "./scripts/rearm-windows.ps1",
-        "./scripts/disable-screensaver.ps1",
-        "./scripts/disable-winrm.ps1",
-        "./scripts/enable-winrm.ps1",
-        "./scripts/microsoft-updates.bat",
-        "./scripts/win-updates.ps1"
-      ]
-    },
-    {
       "type": "vmware-iso",
       "vm_name":"windows_10",
       "communicator": "winrm",
@@ -45,7 +13,8 @@
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
       "winrm_timeout": "4h",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "shutdown_timeout": "2h",
+      "shutdown_command": "a:/sysprep.bat",
       "guest_os_type": "windows9-64",
       "disk_size": "{{user `disk_size`}}",
       "vnc_port_min": 5900,
@@ -56,14 +25,14 @@
         "./floppy/WindowsPowershell.lnk",
         "./floppy/PinTo10.exe",
         "./scripts/fixnetwork.ps1",
-        "./scripts/MakeWindows10GreatAgain.ps1",
-        "./scripts/MakeWindows10GreatAgain.reg",
         "./scripts/rearm-windows.ps1",
         "./scripts/disable-screensaver.ps1",
         "./scripts/disable-winrm.ps1",
         "./scripts/enable-winrm.ps1",
         "./scripts/microsoft-updates.bat",
-        "./scripts/win-updates.ps1"
+        "./scripts/win-updates.ps1",
+        "./scripts/unattend.xml",
+        "./scripts/sysprep.bat"
       ],
       "vmx_data": {
         "RemoteDisplay.vnc.enabled": "false",
@@ -86,7 +55,8 @@
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
       "winrm_timeout": "4h",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "shutdown_timeout": "2h",
+      "shutdown_command": "a:/sysprep.bat",
       "guest_os_type": "Windows81_64",
       "guest_additions_mode": "disable",
       "disk_size": "{{user `disk_size`}}",
@@ -95,15 +65,14 @@
         "./floppy/WindowsPowershell.lnk",
         "./floppy/PinTo10.exe",
         "./scripts/fixnetwork.ps1",
-        "./scripts/MakeWindows10GreatAgain.ps1",
-        "./scripts/MakeWindows10GreatAgain.reg",
         "./scripts/rearm-windows.ps1",
         "./scripts/disable-screensaver.ps1",
         "./scripts/disable-winrm.ps1",
         "./scripts/enable-winrm.ps1",
         "./scripts/microsoft-updates.bat",
         "./scripts/win-updates.ps1",
-        "./scripts/oracle-cert.cer"
+        "./scripts/unattend.xml",
+        "./scripts/sysprep.bat"
       ],
       "vboxmanage": [
         [
@@ -134,9 +103,7 @@
     {
       "type": "powershell",
       "scripts": [
-        "./scripts/debloat-windows.ps1",
-        "./scripts/rearm-windows.ps1",
-        "./scripts/MakeWindows10GreatAgain.ps1"
+        "./scripts/debloat-windows.ps1"
       ]
     },
     {
@@ -157,7 +124,7 @@
         "./scripts/pin-powershell.bat",
         "./scripts/compile-dotnet-assemblies.bat",
         "./scripts/set-winrm-automatic.bat",
-        "./scripts/compact.bat"
+        "./scripts/dis-updates.bat"
       ]
     }
   ],
@@ -170,9 +137,9 @@
     }
   ],
   "variables": {
-    "iso_checksum": "27e4feb9102f7f2b21ebdb364587902a70842fb550204019d1a14b120918e455",
+    "iso_checksum": "ab4862ba7d1644c27f27516d24cb21e6b39234eb3301e5f1fb365a78b22f79b3",
     "iso_checksum_type": "sha256",
-    "iso_url": "https://software-download.microsoft.com/download/pr/17134.1.180410-1804.rs4_release_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+    "iso_url": "https://software-download.microsoft.com/download/pr/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
     "autounattend": "./answer_files/10/Autounattend.xml",
     "disk_size": "61440"
   }

@@ -28,8 +28,8 @@ git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab
 # Install Vagrant
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
-dpkg -i vagrant_2.2.4_x86_64.deb
+wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
+dpkg -i vagrant_2.2.5_x86_64.deb
 vagrant plugin install vagrant-reload
 vagrant plugin install vagrant-vmware-desktop
 echo $LICENSEFILE | base64 -d > /tmp/license.lic
@@ -44,8 +44,8 @@ sed -i 's/v.gui = true/v.gui = false/g' Vagrantfile
 # Install Packer
 mkdir /opt/packer
 cd /opt/packer || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/packer/1.4.0/packer_1.4.0_linux_amd64.zip
-unzip packer_1.4.0_linux_amd64.zip
+wget --progress=bar:force https://releases.hashicorp.com/packer/1.4.1/packer_1.4.1_linux_amd64.zip
+unzip packer_1.4.1_linux_amd64.zip
 cp packer /usr/local/bin/packer
 
 # Make the Packer images headless
