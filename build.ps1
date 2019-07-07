@@ -74,7 +74,12 @@ function install_checker {
 }
 
 function check_packer {
-  #Check for packer at $PackerPath
+  # Check for packer using Get-Command
+  if ((Get-Command packer).Path) {
+    $PackerPath = (Get-Command packer).Path
+    Write-Output "Packer found at $PackerPath"
+  }
+  # Check for packer at $PackerPath
   if (!(Test-Path $PackerPath)) {
     Write-Error "Packer not found at $PackerPath"
     Write-Output 'Re-run the script setting the PackerPath parameter to the location of packer'
