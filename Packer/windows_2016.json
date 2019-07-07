@@ -2,37 +2,6 @@
   "builders": [
     {
       "vm_name":"WindowsServer2016",
-      "type": "hyperv-iso",
-      "disk_size": 41440,
-      "boot_wait": "0s",
-      "guest_additions_mode":"disable",
-      "iso_url": "{{user `iso_url`}}",
-      "iso_checksum_type": "{{user `iso_checksum_type`}}",
-      "iso_checksum": "{{user `iso_checksum`}}",
-      "floppy_files": [
-        "{{user `autounattend`}}",
-        "./floppy/WindowsPowershell.lnk",
-        "./floppy/PinTo10.exe",
-        "./scripts/unattend.xml",
-        "./scripts/sysprep.bat",
-        "./scripts/disable-screensaver.ps1",
-        "./scripts/disable-winrm.ps1",
-        "./scripts/enable-winrm.ps1",
-        "./scripts/microsoft-updates.bat",
-        "./scripts/win-updates.ps1"
-      ],
-      "communicator":"winrm",
-      "winrm_username": "vagrant",
-      "winrm_password": "vagrant",
-      "winrm_timeout" : "2h",
-      "shutdown_command": "a:/sysprep.bat",
-      "ram_size": 2048,
-      "cpu": 2,
-      "switch_name":"{{user `hyperv_switchname`}}",
-      "enable_secure_boot":true
-    },
-    {
-      "vm_name":"WindowsServer2016",
       "type": "vmware-iso",
       "communicator": "winrm",
       "iso_url": "{{user `iso_url`}}",
@@ -143,11 +112,6 @@
         "./scripts/uac-enable.bat",
         "./scripts/compact.bat"
       ]
-    },
-    {
-      "type": "file",
-      "source": "./answer_files/2016/Autounattend_sysprep.xml",
-      "destination": "c:/Windows/Temp/Autounattend_sysprep.xml"
     }
   ],
   "post-processors": [
@@ -162,7 +126,6 @@
     "iso_url": "https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
     "iso_checksum_type": "md5",
     "iso_checksum": "70721288BBCDFE3239D8F8C0FAE55F1F",
-    "autounattend": "./answer_files/2016/Autounattend.xml",
-    "hyperv_switchname": "{{env `hyperv_switchname`}}"
+    "autounattend": "./answer_files/2016/Autounattend.xml"
   }
 }

@@ -50,7 +50,7 @@
                 <OSImage>
                     <InstallFrom>
                         <MetaData wcm:action="add">
-                            <Key>/IMAGE/NAME </Key>
+                            <Key>/IMAGE/NAME</Key>
                             <Value>Windows Server 2016 SERVERSTANDARD</Value>
                         </MetaData>
                     </InstallFrom>
@@ -181,15 +181,14 @@
                     <Description>Disable password expiration for vagrant user</Description>
                 </SynchronousCommand>
                 <!-- WITHOUT WINDOWS UPDATES -->
-                <!--
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File a:\enable-winrm.ps1</CommandLine>
                     <Description>Enable WinRM</Description>
                     <Order>99</Order>
                 </SynchronousCommand>
-                -->
                 <!-- END WITHOUT WINDOWS UPDATES -->
                 <!-- WITH WINDOWS UPDATES -->
+                <!--
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c a:\microsoft-updates.bat</CommandLine>
                     <Order>98</Order>
@@ -207,6 +206,7 @@
                     <Order>100</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
+                -->
                 <!-- END WITH WINDOWS UPDATES -->
             </FirstLogonCommands>
             <OOBE>
