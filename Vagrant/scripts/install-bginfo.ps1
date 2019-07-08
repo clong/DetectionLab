@@ -9,6 +9,9 @@ if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   (New-Object Net.WebClient).DownloadFile('http://live.sysinternals.com/bginfo.exe', 'c:\Program Files\sysinternals\bginfo.exe')
 }
+
+Copy-Item "c:\vagrant\resources\windows\background.bmp" 'c:\Program Files\sysinternals\background.bmp'
+
 $vbsScript = @'
 WScript.Sleep 15000
 Dim objShell
