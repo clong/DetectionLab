@@ -142,7 +142,7 @@ resource "aws_key_pair" "auth" {
 
 resource "aws_instance" "logger" {
   instance_type = "t2.medium"
-  ami           = coalesce(data.aws_ami.logger_ami.image_id, var.logger_ami)
+  ami           = coalesce(var.logger_ami, data.aws_ami.logger_ami.image_id)
 
   tags = {
     Name = "logger"
@@ -190,7 +190,7 @@ resource "aws_instance" "dc" {
   instance_type = "t2.medium"
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(data.aws_ami.dc_ami.image_id, var.dc_ami)
+  ami = coalesce(var.dc_ami, data.aws_ami.dc_ami.image_id)
 
   tags = {
     Name = "dc.windomain.local"
@@ -209,7 +209,7 @@ resource "aws_instance" "wef" {
   instance_type = "t2.medium"
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(data.aws_ami.wef_ami.image_id, var.wef_ami)
+  ami = coalesce(var.wef_ami, data.aws_ami.wef_ami.image_id)
 
   tags = {
     Name = "wef.windomain.local"
@@ -228,7 +228,7 @@ resource "aws_instance" "win10" {
   instance_type = "t2.medium"
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(data.aws_ami.win10_ami.image_id, var.win10_ami)
+  ami = coalesce(var.win10_ami, data.aws_ami.win10_ami.image_id)
 
   tags = {
     Name = "win10.windomain.local"
