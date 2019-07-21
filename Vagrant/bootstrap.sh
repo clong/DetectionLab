@@ -226,7 +226,7 @@ install_bro() {
   # Install tools to build and configure bro
   apt-get -qq -ym install bro crudini python-pip
   export PATH=$PATH:/opt/bro/bin
-  pip install bro-pkg
+  pip install bro-pkg future
   bro-pkg refresh
   bro-pkg autoconfig
   bro-pkg install --force salesforce/ja3
