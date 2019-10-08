@@ -266,7 +266,7 @@ post_build_checks() {
   ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.38.103 -m 2)
   [[ $ATA_CHECK == 401 ]] && ATA_CHECK=1
 
-  BASH_MAJOR_VERSION=$(/bin/bash --version | grep 'GNU bash' | grep -o version\.\.. | cut -d ' ' -f 2 | cut -d '.' -f 1)
+  BASH_MAJOR_VERSION=$(/bin/bash --version | grep 'GNU bash' | grep -oi version\.\.. | cut -d ' ' -f 2 | cut -d '.' -f 1)
   # Associative arrays are only supported in bash 4 and up
   if [ "$BASH_MAJOR_VERSION" -ge 4 ]; then
     declare -A SERVICES
