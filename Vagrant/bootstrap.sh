@@ -349,8 +349,7 @@ install_suricata() {
   # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
   echo "[$(date +%H:%M:%S)]: Installing Suricata..."
   # Install yq to maniuplate the suricata.yaml inline
-  /usr/local/go/bin/go get gopkg.in/mikefarah/yq.v2
-  cp /root/go/bin/yq.v2 /root/go/bin/yq && chmod +x /root/go/bin/yq
+  GOPATH=/root/go/ GO111MODULE=on /usr/local/go/bin/go get github.com/mikefarah/yq@d05391e
 
   # Install suricata
   add-apt-repository -y ppa:oisf/suricata-stable
@@ -438,8 +437,7 @@ test_suricata_prerequisites() {
   if ! [ -f /root/go/bin/yq ]; then
     # If it doesn't exist, try to re-install the package
     echo "[-] yq was not found. Attempting to reinstall."
-      /usr/local/go/bin/go get gopkg.in/mikefarah/yq.v2
-      cp /root/go/bin/yq.v2 /root/go/bin/yq && chmod +x /root/go/bin/yq
+      GOPATH=/root/go/ GO111MODULE=on /usr/local/go/bin/go get github.com/mikefarah/yq@d05391e
     if ! [ -f /root/go/bin/yq ]; then
       # If the reinstall fails, give up
       echo "[X] Unable to install yq even after a retry. Exiting."
