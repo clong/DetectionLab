@@ -349,7 +349,8 @@ install_suricata() {
   # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
   echo "[$(date +%H:%M:%S)]: Installing Suricata..."
   # Install yq to maniuplate the suricata.yaml inline
-  /usr/local/go/bin/go get -u github.com/mikefarah/yq
+  /usr/local/go/bin/go get gopkg.in/mikefarah/yq.v2
+  cp /root/go/bin/yq.v2 /root/go/bin/yq && chmod +x /root/go/bin/yq
 
   # Install suricata
   add-apt-repository -y ppa:oisf/suricata-stable
