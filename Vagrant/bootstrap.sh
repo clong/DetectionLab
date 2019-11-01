@@ -438,7 +438,8 @@ test_suricata_prerequisites() {
   if ! [ -f /root/go/bin/yq ]; then
     # If it doesn't exist, try to re-install the package
     echo "[-] yq was not found. Attempting to reinstall."
-    /usr/local/go/bin/go get -u github.com/mikefarah/yq
+      /usr/local/go/bin/go get gopkg.in/mikefarah/yq.v2
+      cp /root/go/bin/yq.v2 /root/go/bin/yq && chmod +x /root/go/bin/yq
     if ! [ -f /root/go/bin/yq ]; then
       # If the reinstall fails, give up
       echo "[X] Unable to install yq even after a retry. Exiting."
