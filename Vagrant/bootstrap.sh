@@ -8,16 +8,18 @@ sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted uni
 apt_install_prerequisites() {
   # Add repository for apt-fast
   add-apt-repository -y ppa:apt-fast/stable
+  # Add repository for yq
+  add-apt-repository -y ppa:rmescandon/yq
   # Install prerequisites and useful tools
   echo "[$(date +%H:%M:%S)]: Running apt-get update..."
   apt-get -qq update
   apt-get -qq install -y apt-fast
   echo "[$(date +%H:%M:%S)]: Running apt-fast install..."
-  apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip htop
+  apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip htop yq
 }
 
 test_prerequisites() {
-  for package in jq whois build-essential git docker docker-compose unzip
+  for package in jq whois build-essential git docker docker-compose unzip yq
   do
     echo "[$(date +%H:%M:%S)]: [TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
@@ -348,9 +350,6 @@ install_bro() {
 install_suricata() {
   # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
   echo "[$(date +%H:%M:%S)]: Installing Suricata..."
-  # Install yq to maniuplate the suricata.yaml inline
-  /usr/local/go/bin/go get gopkg.in/mikefarah/yq.v2
-  cp /root/go/bin/yq.v2 /root/go/bin/yq && chmod +x /root/go/bin/yq
 
   # Install suricata
   add-apt-repository -y ppa:oisf/suricata-stable
@@ -362,31 +361,30 @@ install_suricata() {
   cd /home/vagrant/suricata-update || exit 1
   python setup.py install
   # Add DC_SERVERS variable to suricata.yaml in support et-open signatures
-  /root/go/bin/yq w -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
+  yq w -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
 
   # It may make sense to store the suricata.yaml file as a resource file if this begins to become too complex
   # Add more verbose alert logging
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload true
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-buffer-size 4kb
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-printable yes
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.packet yes
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.http yes
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.tls yes
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.ssh yes
-  /root/go/bin/yq w  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.smtp yes
+  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload true
+  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-buffer-size 4kb
+  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-printable yes
+  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.packet yes
+  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.http yes
+  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.tls yes
+  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.ssh yes
+  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.smtp yes
   # Turn off traffic flow logging (duplicative of Bro and wrecks Splunk trial license)
-  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove HTTP
-  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove DNS
-  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove TLS
-  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SMTP
-  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SSH
-  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Stats
-  /root/go/bin/yq d  -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Flow
+  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove HTTP
+  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove DNS
+  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove TLS
+  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SMTP
+  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SSH
+  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Stats
+  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Flow
   # Enable JA3 fingerprinting
-  /root/go/bin/yq w -i /etc/suricata/suricata.yaml app-layer.protocols.tls.ja3-fingerprints true
+  yq w -i /etc/suricata/suricata.yaml app-layer.protocols.tls.ja3-fingerprints true
   # AF packet monitoring should be set to eth1
-  /root/go/bin/yq w -i /etc/suricata/suricata.yaml af-packet.0.interface eth1
-
+  yq w -i /etc/suricata/suricata.yaml af-packet.0.interface eth1
 
   crudini --set --format=sh /etc/default/suricata '' iface eth1
   # update suricata signature sources
@@ -431,23 +429,6 @@ test_suricata_prerequisites() {
       echo "[+] $package was successfully installed!"
     fi
   done
-
-  # One-off support for packages which aren't installed via dpkg
-  echo "[$(date +%H:%M:%S)]: [TEST] Validating that yq is correctly installed..."
-  # Check if the binary exists
-  if ! [ -f /root/go/bin/yq ]; then
-    # If it doesn't exist, try to re-install the package
-    echo "[-] yq was not found. Attempting to reinstall."
-      /usr/local/go/bin/go get gopkg.in/mikefarah/yq.v2
-      cp /root/go/bin/yq.v2 /root/go/bin/yq && chmod +x /root/go/bin/yq
-    if ! [ -f /root/go/bin/yq ]; then
-      # If the reinstall fails, give up
-      echo "[X] Unable to install yq even after a retry. Exiting."
-      exit 1
-    fi
-  else
-    echo "[+] yq was successfully installed!"
-  fi
 }
 
 postinstall_tasks() {
