@@ -10,7 +10,11 @@ apt_install_prerequisites() {
   add-apt-repository -y ppa:apt-fast/stable
   # Add repository for yq
   add-apt-repository -y ppa:rmescandon/yq
+　# Add repository for suricata
+  add-apt-repository -y ppa:oisf/suricata-stable
   # Install prerequisites and useful tools
+  echo "[$(date +%H:%M:%S)]: Running apt-get clean..."
+  apt-get clean
   echo "[$(date +%H:%M:%S)]: Running apt-get update..."
   apt-get -qq update
   apt-get -qq install -y apt-fast
@@ -60,18 +64,6 @@ fix_eth1_static_ip() {
       echo "[$(date +%H:%M:%S)]: Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
       exit 1
     fi
-  fi
-}
-
-install_golang() {
-  if ! which go > /dev/null; then
-    echo "[$(date +%H:%M:%S)]: Installing Golang v.1.12..."
-    cd /home/vagrant || exit
-    wget --progress=bar:force https://dl.google.com/go/go1.12.linux-amd64.tar.gz
-    tar -C /usr/local -xzf go1.12.linux-amd64.tar.gz
-    mkdir /root/go
-  else
-    echo "[$(date +%H:%M:%S)]: Golang seems to be installed already. Skipping."
   fi
 }
 
@@ -352,8 +344,7 @@ install_suricata() {
   echo "[$(date +%H:%M:%S)]: Installing Suricata..."
 
   # Install suricata
-  add-apt-repository -y ppa:oisf/suricata-stable
-  apt-get -qq -y update && apt-get -qq -y install suricata crudini
+  apt-get -qq -y install suricata crudini
   test_suricata_prerequisites
   # Install suricata-update
   cd /home/vagrant || exit 1
@@ -419,7 +410,7 @@ test_suricata_prerequisites() {
     if ! dpkg -S $package > /dev/null; then
       # If which returns a non-zero return code, try to re-install the package
       echo "[-] $package was not found. Attempting to reinstall."
-      apt-get -qq update && apt-get install -y $package
+      apt-get clean && apt-get -qq update && apt-get install -y $package
       if ! which $package > /dev/null; then
         # If the reinstall fails, give up
         echo "[X] Unable to install $package even after a retry. Exiting."
@@ -440,7 +431,6 @@ main() {
   apt_install_prerequisites
   test_prerequisites
   fix_eth1_static_ip
-  install_golang
   install_splunk
   install_fleet
   download_palantir_osquery_config
