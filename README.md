@@ -12,11 +12,9 @@ DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to 
 
 All of the infrastructure, building, and testing of DetectionLab is currently funded by myself in my spare time. If you find this project useful, feel free to buy me a coffee using one of the buttons below!
 
+[![GitHub Sponsor](https://img.shields.io/badge/GitHub-Sponsor-red.svg)](https://github.com/sponsors/clong)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](paypal.me/clong0)
 [![Donate](https://img.shields.io/badge/Donate-Crypto-blue.svg)](https://commerce.coinbase.com/checkout/838ac7a2-7b9d-4d40-b475-fd1015fdaacd)
-[![Donate](https://img.shields.io/badge/Donate-GoFundMe-red.svg)](https://www.gofundme.com/detectionlab-platform-support)
-
-Additionally, A [GoFundMe](https://www.gofundme.com/detectionlab-platform-support) has been generously started by [@BlueTeamHB](https://twitter.com/BlueTeamHB) to support development of DetectionLab. Thank you so much to everyone who has made a donation!
 
 ## Purpose
 This lab has been designed with defenders in mind. Its primary purpose is to allow the user to quickly build a Windows domain that comes pre-loaded with security tooling and some best practices when it comes to system logging configurations. It can easily be modified to fit most needs or expanded to include additional hosts.
