@@ -124,7 +124,7 @@ jobs:
               if [ "$MINUTES_PAST" -gt 240 ]; then
                 echo "[$(date +%H:%M:%S)]: Serer timed out. Uptime: $MINUTES_PAST minutes."
                 scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
-                curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"
+                curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"'?force_delete=true'
                 exit 1
               fi
             done
