@@ -14,4 +14,3 @@ Terraform/*.terraform
 Terraform/*.tfvars
 Terraform/*.lock.info
 Terraform/*.backup
-Vagrant/resources/GPO/*/manifest.xml
