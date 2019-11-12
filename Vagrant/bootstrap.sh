@@ -108,7 +108,8 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/force-directed-app-for-splunk_200.tgz  -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz  -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz  -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_134.tgz  -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_141.tgz  -auth 'admin:changeme'
 
     # Uncomment the following block to install BOTSv2 
     # Thanks to @MHaggis for this addition!
