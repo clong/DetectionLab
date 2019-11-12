@@ -32,7 +32,7 @@ Machine Name,Policy Target,Subcategory,Subcategory GUID,Inclusion Setting,Exclus
 ,System,Audit Audit Policy Change,{0cce922f-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit Authentication Policy Change,{0cce9230-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit MPSSVC Rule-Level Policy Change,{0cce9232-69ae-11d9-bed3-505054503030},Success,,1
-,System,Audit IPsec Driver,{0cce9213-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit IPsec Driver,{0cce9213-69ae-11d9-bed3-505054503030},Success,,1
 ,System,Audit Security State Change,{0cce9210-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit Security System Extension,{0cce9211-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit System Integrity,{0cce9212-69ae-11d9-bed3-505054503030},Success and Failure,,3

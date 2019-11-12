@@ -189,6 +189,17 @@ resource "aws_instance" "logger" {
 resource "aws_instance" "dc" {
   instance_type = "t2.medium"
 
+  provisioner "remote-exec" {
+    inline = ["choco install -force -y winpcap"]
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
+
   # Uses the local variable if external data source resolution fails
   ami = coalesce(var.dc_ami, data.aws_ami.dc_ami.image_id)
 
@@ -208,6 +219,17 @@ resource "aws_instance" "dc" {
 resource "aws_instance" "wef" {
   instance_type = "t2.medium"
 
+  provisioner "remote-exec" {
+    inline = ["choco install -force -y winpcap"]
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
+
   # Uses the local variable if external data source resolution fails
   ami = coalesce(var.wef_ami, data.aws_ami.wef_ami.image_id)
 
@@ -226,6 +248,17 @@ resource "aws_instance" "wef" {
 
 resource "aws_instance" "win10" {
   instance_type = "t2.medium"
+
+  provisioner "remote-exec" {
+    inline = ["choco install -force -y winpcap"]
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
 
   # Uses the local variable if external data source resolution fails
   ami = coalesce(var.win10_ami, data.aws_ami.win10_ami.image_id)
