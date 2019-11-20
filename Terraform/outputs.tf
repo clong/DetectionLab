@@ -30,3 +30,6 @@ output "splunk_url" {
   value = local.splunk_url
 }
 
+output "guacamole_url" {
+  value = local.guacamole_url
+}
