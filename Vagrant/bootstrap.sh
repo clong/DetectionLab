@@ -423,6 +423,29 @@ test_suricata_prerequisites() {
   done
 }
 
+install_guacamole() {
+  echo "[$(date +%H:%M:%S)]: Installing Guacamole..."
+  cd /home/vagrant
+  apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng12-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
+  wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz" -O guacamole-server-1.0.0.tar.gz
+  tar -xvf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0
+  ./configure &> /dev/null && make --quiet &> /dev/null && make --quiet install &> /dev/null || echo "[-] An error occurred while installing Guacamole."
+  ldconfig
+  cd /var/lib/tomcat8/webapps
+  wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/binary/guacamole-1.0.0.war" -O guacamole.war
+  mkdir /etc/guacamole
+  mkdir /usr/share/tomcat8/.guacamole
+  cp /vagrant/resources/guacamole/user-mapping.xml /etc/guacamole/
+  cp /vagrant/resources/guacamole/guacamole.properties /etc/guacamole/
+  cp /vagrant/resources/guacamole/guacd.service /lib/systemd/system
+  sudo ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat8/.guacamole/
+  sudo ln -s /etc/guacamole/user-mapping.xml /usr/share/tomcat8/.guacamole/
+  systemctl enable guacd
+  systemctl enable tomcat8
+  systemctl start guacd
+  systemctl start tomcat8
+}
+
 postinstall_tasks() {
   # Include Splunk and Bro in the PATH
   echo export PATH="$PATH:/opt/splunk/bin:/opt/bro/bin" >> ~/.bashrc
@@ -438,6 +461,7 @@ main() {
   import_osquery_config_into_fleet
   install_suricata
   install_bro
+  install_guacamole
   postinstall_tasks
 }
 
