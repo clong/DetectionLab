@@ -14,9 +14,9 @@ apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apa
 pip install awscli --upgrade --user
 cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
 
-wget -O VMware-Workstation-Full-15.0.4-12990004.x86_64.bundle "https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-15.0.4-12990004.x86_64.bundle?HashKey=6f83753e4d9e94da7f920c32b5808033&params=%7B%22custnumber%22%3A%22KipkcHRoJWVlZA%3D%3D%22%2C%22sourcefilesize%22%3A%22472.70+MB%22%2C%22dlgcode%22%3A%22WKST-1504-LX%22%2C%22languagecode%22%3A%22en%22%2C%22source%22%3A%22DOWNLOADS%22%2C%22downloadtype%22%3A%22manual%22%2C%22eula%22%3A%22Y%22%2C%22downloaduuid%22%3A%225caee685-d5ad-4f6b-94db-2ddc4f7f3a97%22%2C%22purchased%22%3A%22N%22%2C%22dlgtype%22%3A%22Product+Binaries%22%2C%22productversion%22%3A%2215.0.4%22%2C%22productfamily%22%3A%22VMware+Workstation+Pro%22%7D&AuthKey=1556427011_a994b5252f29429710c077c8dcab1c19"
-chmod +x VMware-Workstation-Full-15.0.4-12990004.x86_64.bundle
-sudo sh VMware-Workstation-Full-15.0.4-12990004.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
+wget -O VMware-Workstation-Full-15.5.1-15018445.x86_64.bundle "https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-15.5.1-15018445.x86_64.bundle"
+chmod +x VMware-Workstation-Full-15.5.1-15018445.x86_64.bundle
+sudo sh VMware-Workstation-Full-15.5.1-15018445.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
 
 # Set up firewall
 ufw allow ssh
@@ -28,8 +28,8 @@ git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab
 # Install Vagrant
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
-dpkg -i vagrant_2.2.5_x86_64.deb
+wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.deb
+dpkg -i vagrant_2.2.6_x86_64.deb
 # Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
 echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf > /dev/null

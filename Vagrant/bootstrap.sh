@@ -6,6 +6,7 @@ echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections;
 sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
 
 apt_install_prerequisites() {
+  echo "[$(date +%H:%M:%S)]: Adding apt repositories..."
   # Add repository for apt-fast
   add-apt-repository -y ppa:apt-fast/stable
   # Add repository for yq
@@ -20,6 +21,18 @@ apt_install_prerequisites() {
   apt-get -qq install -y apt-fast
   echo "[$(date +%H:%M:%S)]: Running apt-fast install..."
   apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip htop yq
+}
+
+modify_motd() {
+  echo "[$(date +%H:%M:%S)]: Updating the MOTD..."
+  # Force color terminal
+  sed -i 's/#force_color_prompt=yes/force_color_prompt=yes/g' /root/.bashrc
+  sed -i 's/#force_color_prompt=yes/force_color_prompt=yes/g' /home/vagrant/.bashrc
+  # Remove some stock Ubuntu MOTD content
+  chmod -x /etc/update-motd.d/10-help-text
+  # Copy the DetectionLab MOTD
+  cp /vagrant/resources/logger/20-detectionlab /etc/update-motd.d/
+  chmod +x /etc/update-motd.d/20-detectionlab
 }
 
 test_prerequisites() {
@@ -453,6 +466,7 @@ postinstall_tasks() {
 
 main() {
   apt_install_prerequisites
+  modify_motd
   test_prerequisites
   fix_eth1_static_ip
   install_splunk
