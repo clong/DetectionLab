@@ -240,7 +240,7 @@ resource "aws_instance" "wef" {
       "choco install -force -y winpcap",
       "cscript c:\\windows\\system32\\slmgr.vbs -rearm",
       "shutdown -r",
-      ]
+    ]
 
     connection {
       type     = "winrm"
