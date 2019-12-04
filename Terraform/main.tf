@@ -236,7 +236,11 @@ resource "aws_instance" "wef" {
   instance_type = "t2.medium"
 
   provisioner "remote-exec" {
-    inline = ["choco install -force -y winpcap"]
+    inline = [
+      "choco install -force -y winpcap",
+      "cscript c:\\windows\\system32\\slmgr.vbs -rearm",
+      "shutdown -r",
+    ]
 
     connection {
       type     = "winrm"
