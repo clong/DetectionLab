@@ -57,6 +57,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
     cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
+    cfg.vm.provision "shell", inline: "cscript c:\\windows\\system32\\slmgr.vbs -rearm", privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
       v.vmx["displayname"] = "dc.windomain.local"
@@ -108,6 +109,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-microsoft-ata.ps1", privileged: false
+    cfg.vm.provision "shell", inline: "cscript c:\\windows\\system32\\slmgr.vbs -rearm", privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
       v.vmx["displayname"] = "wef.windomain.local"
@@ -154,6 +156,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
+    cfg.vm.provision "shell", inline: "cscript c:\\windows\\system32\\slmgr.vbs -rearm", privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
       v.vmx["displayname"] = "win10.windomain.local"
