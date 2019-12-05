@@ -14,11 +14,7 @@ If (-not ($service)) {
   Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Classic\Endpoints\Windows\*" "c:\Program Files\osquery"
   Copy-Item "c:\Users\vagrant\AppData\Local\Temp\osquery-configuration-master\Classic\Endpoints\packs" -Path "c:\Program Files\osquery"
 
-  ## Use the TLS config by default. Un-comment the line below to use the local configuration and avoid connecting to Fleet.
-  # Copy-Item "c:\Program Files\osquery\osquery_no_tls.flags" -Path "c:\Program Files\osquery\osquery.flags" -Force
-
-  ###  --- TLS CONFIG BEGINS ---
-  ### COMMENT ALL LINES BELOW UNTIL "TLS CONFIG ENDS" if using local configuration
+  ## Use the TLS config
   ## Add entry to hosts file for Kolide for SSL validation
   Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.105    kolide"
   ## Add kolide secret and avoid BOM
@@ -32,7 +28,7 @@ If (-not ($service)) {
   (Get-Content "c:\Program Files\osquery\osquery.flags") -replace 'c:\\ProgramData\\osquery\\certfile.crt', 'c:\Program Files\osquery\certfile.crt' | Set-Content "c:\Program Files\osquery\osquery.flags"
   ## Add certfile.crt
   Copy-Item "c:\vagrant\resources\fleet\server.crt" "c:\Program Files\osquery\certfile.crt"
-  ### --- TLS CONFIG ENDS ---
+  ## Start the service
   Start-Service osqueryd
 }
 else {

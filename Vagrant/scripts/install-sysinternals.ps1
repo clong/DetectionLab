@@ -58,3 +58,6 @@ If ((Get-Service -name Sysmon64).Status -ne "Running")
 {
   throw "The Sysmon service did not start successfully"
 }
+
+# Make the event log channel readable. For some reason this doesn't work in the GPO and only works when run manually.
+wevtutil sl Microsoft-Windows-Sysmon/Operational "/ca:O:BAG:SYD:(A;;0x5;;;BA)(A;;0x1;;;S-1-5-20)(A;;0x1;;;S-1-5-32-573)"
