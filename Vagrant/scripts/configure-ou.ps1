@@ -12,25 +12,24 @@ ping /n 1 dc.windomain.local
 ping /n 1 windomain.local
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server and Workstation OUs..."
-Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Servers OU..."
-
-if (!([ADSI]::Exists("LDAP://OU=Servers,DC=windomain,DC=local")))
-{
+# Create the Servers OU if it doesn't exist
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server OU"
+try {
+  Get-ADOrganizationalUnit -Identity 'OU=Servers,DC=windomain,DC=local' | Out-Null
+  Write-Host "Servers OU already exists. Moving On."
+}
+catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
   New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
 }
-else
-{
-    Write-Host "Servers OU already exists. Moving On."
-}
 
+# Create the Workstations OU if it doesn't exist
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Workstations OU"
-if (!([ADSI]::Exists("LDAP://OU=Workstations,DC=windomain,DC=local")))
-{
-  New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
-}
-else
-{
+try {
+  Get-ADOrganizationalUnit -Identity 'OU=Workstations,DC=windomain,DC=local' | Out-Null
   Write-Host "Workstations OU already exists. Moving On."
+}
+catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+  New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
 }
 
 # Sysprep breaks auto-login. Let's restore it here:
