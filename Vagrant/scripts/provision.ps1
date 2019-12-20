@@ -7,6 +7,9 @@ $box = $box.ComputerName.ToString().ToLower()
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting timezone to UTC..."
 c:\windows\system32\tzutil.exe /s "UTC"
 
+# Ping DetectionLab server for usage statistics
+curl -userAgent "DetectionLab-$box" "https://detectionlab.network/$box" -UseBasicParsing | out-null
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disable IPv6 on all network adatpers..."
 Get-NetAdapterBinding -ComponentID ms_tcpip6 | ForEach-Object {Disable-NetAdapterBinding -Name $_.Name -ComponentID ms_tcpip6}
 Get-NetAdapterBinding -ComponentID ms_tcpip6 
