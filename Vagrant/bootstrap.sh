@@ -90,7 +90,6 @@ install_splunk() {
     # Get download.splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
     dig @8.8.8.8 download.splunk.com > /dev/null
     dig @8.8.8.8 splunk.com > /dev/null
-    mkdir splunk
 
     # Try to resolve the latest version of Splunk by parsing the HTML on the downloads page
     echo "[$(date +%H:%M:%S)]: Attempting to autoresolve the latest version of Splunk..."
@@ -99,13 +98,13 @@ install_splunk() {
     if [[ "$(echo $LATEST_SPLUNK | grep -c "^https:")" -eq 1 ]] && [[ "$(echo $LATEST_SPLUNK | grep -c "\.deb$")" -eq 1 ]]; then
       echo "[$(date +%H:%M:%S)]: The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
       echo "[$(date +%H:%M:%S)]: Attempting to download..."
-      wget --progress=bar:force -P splunk/ "$LATEST_SPLUNK"
+      wget --progress=bar:force -P /opt "$LATEST_SPLUNK"
     else
       echo "[$(date +%H:%M:%S)]: Unable to auto-resolve the latest Splunk version. Falling back to hardcoded URL..."
       # Download Hardcoded Splunk
       wget --progress=bar:force -O splunk/splunk-7.2.6-c0bf0f679ce9-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.6&product=splunk&filename=splunk-7.2.6-c0bf0f679ce9-linux-2.6-amd64.deb&wget=true'
     fi
-    dpkg -i splunk/*.deb
+    dpkg -i /opt/splunk*.deb
     /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
     /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
@@ -194,14 +193,23 @@ install_splunk() {
     touch /opt/splunk/etc/.ui_login
     mkdir -p /opt/splunk/etc/users/admin/search/local
     echo -e "[search-tour]\nviewed = 1" > /opt/splunk/etc/system/local/ui-tour.conf
-    mkdir /opt/splunk/etc/apps/user-prefs/local
+    # Source: https://answers.splunk.com/answers/660728/how-to-disable-the-modal-pop-up-help-us-to-improve.html
     echo '[general]
 render_version_messages = 0
 hideInstrumentationOptInModal = 1
-dismissedInstrumentationOptInVersion = 2
+dismissedInstrumentationOptInVersion = 1
 [general_default]
 hideInstrumentationOptInModal = 1
-showWhatsNew = 0' > /opt/splunk/etc/system/local/user-prefs.conf
+showWhatsNew = 0
+notification_python_3_impact = false' > /opt/splunk/etc/system/local/user-prefs.conf
+    echo '[general]
+render_version_messages = 0
+hideInstrumentationOptInModal = 1
+dismissedInstrumentationOptInVersion = 1
+[general_default]
+hideInstrumentationOptInModal = 1
+showWhatsNew = 0
+notification_python_3_impact = false' > /opt/splunk/etc/apps/user-prefs/local/user-prefs.conf
 
     # Enable SSL Login for Splunk
     echo -e "[settings]\nenableSplunkWebSSL = true" > /opt/splunk/etc/system/local/web.conf
@@ -215,14 +223,14 @@ showWhatsNew = 0' > /opt/splunk/etc/system/local/user-prefs.conf
 
 install_fleet() {
   # Install Fleet
-  if [ -f "/home/vagrant/kolide-quickstart" ]; then
+  if [ -f "/opt/kolide-quickstart" ]; then
     echo "[$(date +%H:%M:%S)]: Fleet is already installed"
   else
     echo "[$(date +%H:%M:%S)]: Installing Fleet..."
     echo -e "\n127.0.0.1       kolide" >> /etc/hosts
     echo -e "\n127.0.0.1       logger" >> /etc/hosts
-    git clone https://github.com/kolide/kolide-quickstart.git
-    cd kolide-quickstart || echo "Something went wrong while trying to clone the kolide-quickstart repository"
+    cd /opt && git clone https://github.com/kolide/kolide-quickstart.git
+    cd /opt/kolide-quickstart || echo "Something went wrong while trying to clone the kolide-quickstart repository"
     cp /vagrant/resources/fleet/server.* .
     sed -i 's/ -it//g' demo.sh
     ./demo.sh up simple
@@ -231,24 +239,24 @@ install_fleet() {
     # Set snapshot events to be split into multiple events
     docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u kolide --password=kolide -e 'insert into options (name, type, value) values ("logger_snapshot_event_type", 2, "true");' --batch kolide
     echo "Updated enrollment secret"
-    cd /home/vagrant || exit
   fi
 }
 
 download_palantir_osquery_config() {
-  if [ -f /home/vagrant/osquery-configuration ]; then
+  if [ -f /opt/osquery-configuration ]; then
     echo "[$(date +%H:%M:%S)]: osquery configs have already been downloaded"
   else
     # Import Palantir osquery configs into Fleet
     echo "[$(date +%H:%M:%S)]: Downloading Palantir osquery configs..."
-    git clone https://github.com/palantir/osquery-configuration.git
+    cd /opt && git clone https://github.com/palantir/osquery-configuration.git
   fi
 }
 
 import_osquery_config_into_fleet() {
-  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.4.0/fleet_2.4.0.zip
-  unzip fleet_2.4.0.zip -d fleet_2.4.0
-  cp fleet_2.4.0/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
+  cd /opt
+  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.4.0/fleet.zip
+  unzip fleet.zip -d fleet
+  cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
   fleetctl config set --address https://192.168.38.105:8412
   fleetctl config set --tls-skip-verify true
   fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
@@ -261,6 +269,13 @@ import_osquery_config_into_fleet() {
   sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
   sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
   sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
+  # These can be removed after this PR is merged: https://github.com/palantir/osquery-configuration/pull/14
+  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
+  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoint/packs/windows-application-security.yaml
+  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/packs/windows-compliance.yaml
+  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/packs/windows-registry-monitoring.yaml
+  sed -i "s/labels: null/labels:\n    - MS Windows\n    - macOS/g" osquery-configuration/Fleet/Endpoints/packs/performance-metrics.yaml
+  sed -i "s/labels: null/labels:\n    - MS Windows\n    - macOS/g" osquery-configuration/Fleet/Endpoints/packs/security-tooling-checks.yaml
 
   # Use fleetctl to import YAML files
   fleetctl apply -f osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
@@ -270,8 +285,8 @@ import_osquery_config_into_fleet() {
   done
 
   # Add Splunk monitors for Fleet
-  /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
-  /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
+  /opt/splunk/bin/splunk add monitor "/opt/kolide-quickstart/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
+  /opt/splunk/bin/splunk add monitor "/opt/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
 }
 
 install_zeek() {
@@ -368,9 +383,9 @@ install_suricata() {
   apt-get -qq -y install suricata crudini
   test_suricata_prerequisites
   # Install suricata-update
-  cd /home/vagrant || exit 1
+  cd /opt || exit 1
   git clone https://github.com/OISF/suricata-update.git
-  cd /home/vagrant/suricata-update || exit 1
+  cd /opt/suricata-update || exit 1
   python setup.py install
   # Add DC_SERVERS variable to suricata.yaml in support et-open signatures
   yq w -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
@@ -445,7 +460,7 @@ test_suricata_prerequisites() {
 
 install_guacamole() {
   echo "[$(date +%H:%M:%S)]: Installing Guacamole..."
-  cd /home/vagrant
+  cd /opt
   apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz" -O guacamole-server-1.0.0.tar.gz
   tar -xvf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0
