@@ -4,6 +4,8 @@ export DEBIAN_FRONTEND=noninteractive
 echo "apt-fast apt-fast/maxdownloads string 10" | debconf-set-selections;
 echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections;
 
+sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse" /etc/apt/sources.list
+
 apt_install_prerequisites() {
   echo "[$(date +%H:%M:%S)]: Adding apt repositories..."
   # Add repository for apt-fast
