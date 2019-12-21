@@ -246,9 +246,9 @@ download_palantir_osquery_config() {
 }
 
 import_osquery_config_into_fleet() {
-  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.4.0/fleet_2.4.0.zip
-  unzip fleet_2.4.0.zip -d fleet_2.4.0
-  cp fleet_2.4.0/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
+  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.4.0/fleet.zip
+  unzip fleet.zip -d fleet
+  cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
   fleetctl config set --address https://192.168.38.105:8412
   fleetctl config set --tls-skip-verify true
   fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
