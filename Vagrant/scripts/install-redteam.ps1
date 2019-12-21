@@ -48,4 +48,11 @@ if (-not (Test-Path $atomicRedTeamRepoPath)) {
   Write-Host "Atomic Red Team was already installed. Moving On."
 }
 
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Configuring Invoke-AtomicTest..."
+# Copy over a Powershell profile that includes the Atomic Red Team stuff
+Copy-Item "C:\vagrant\resources\windows\Microsoft.PowerShell_profile.ps1" "C:\Windows\System32\WindowsPowerShell\v1.0" -Force
+# Install prereqs
+Install-PackageProvider -Name NuGet -force
+Install-Module -Name powershell-yaml -Force
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Red Team tooling installation complete!"
