@@ -3,7 +3,8 @@
 export DEBIAN_FRONTEND=noninteractive
 echo "apt-fast apt-fast/maxdownloads string 10" | debconf-set-selections;
 echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections;
-sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
+
+sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse" /etc/apt/sources.list
 
 apt_install_prerequisites() {
   echo "[$(date +%H:%M:%S)]: Adding apt repositories..."
@@ -62,9 +63,9 @@ fix_eth1_static_ip() {
     send host-name = gethostname();
     send dhcp-requested-address 192.168.38.105;
   }' >> /etc/dhcp/dhclient.conf
-  service networking restart
+  netplan apply
   # Fix eth1 if the IP isn't set correctly
-  ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
+  ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
   if [ "$ETH1_IP" != "192.168.38.105" ]; then
     echo "Incorrect IP Address settings detected. Attempting to fix."
     ifdown eth1
@@ -111,13 +112,14 @@ install_splunk() {
     /opt/splunk/bin/splunk add index osquery-status -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index sysmon -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index powershell -auth 'admin:changeme'
-    /opt/splunk/bin/splunk add index bro -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add index zeek -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index threathunting -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_500.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_800.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_101.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/lookup-file-editor_331.tgz
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/lookup-file-editor_331.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-zeek-aka-bro_400.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/force-directed-app-for-splunk_200.tgz  -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz  -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz  -auth 'admin:changeme'
@@ -194,12 +196,12 @@ install_splunk() {
     echo -e "[search-tour]\nviewed = 1" > /opt/splunk/etc/system/local/ui-tour.conf
     mkdir /opt/splunk/etc/apps/user-prefs/local
     echo '[general]
- render_version_messages = 0
- hideInstrumentationOptInModal = 1
- dismissedInstrumentationOptInVersion = 2
- [general_default]
- hideInstrumentationOptInModal = 1
- showWhatsNew = 0' > /opt/splunk/etc/system/local/user-prefs.conf
+render_version_messages = 0
+hideInstrumentationOptInModal = 1
+dismissedInstrumentationOptInVersion = 2
+[general_default]
+hideInstrumentationOptInModal = 1
+showWhatsNew = 0' > /opt/splunk/etc/system/local/user-prefs.conf
 
     # Enable SSL Login for Splunk
     echo -e "[settings]\nenableSplunkWebSSL = true" > /opt/splunk/etc/system/local/web.conf
@@ -244,13 +246,21 @@ download_palantir_osquery_config() {
 }
 
 import_osquery_config_into_fleet() {
-  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.1.1/fleet_2.1.1.zip
-  unzip fleet_2.1.1.zip -d fleet_2.1.1
-  cp fleet_2.1.1/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
+  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.4.0/fleet_2.4.0.zip
+  unzip fleet_2.4.0.zip -d fleet_2.4.0
+  cp fleet_2.4.0/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
   fleetctl config set --address https://192.168.38.105:8412
   fleetctl config set --tls-skip-verify true
   fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
   fleetctl login --email admin@detectionlab.network --password 'admin123#'
+
+  # Change the query invervals to reflect a lab environment
+  # Every hour -> Every 3 minutes
+  # Every 24 hours -> Every 15 minutes
+  sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
+  sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
+  sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
+  sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
 
   # Use fleetctl to import YAML files
   fleetctl apply -f osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
@@ -264,27 +274,27 @@ import_osquery_config_into_fleet() {
   /opt/splunk/bin/splunk add monitor "/home/vagrant/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
 }
 
-install_bro() {
-  echo "[$(date +%H:%M:%S)]: Installing Bro..."
+install_zeek() {
+  echo "[$(date +%H:%M:%S)]: Installing Zeek..."
   # Environment variables
-  NODECFG=/opt/bro/etc/node.cfg
-  SPLUNK_BRO_JSON=/opt/splunk/etc/apps/TA-bro_json
-  SPLUNK_BRO_MONITOR='monitor:///opt/bro/spool/manager'
+  NODECFG=/opt/zeek/etc/node.cfg
+  SPLUNK_ZEEK_JSON=/opt/splunk/etc/apps/Splunk_TA_bro
+  SPLUNK_ZEEK_MONITOR='monitor:///opt/zeek/spool/manager'
   SPLUNK_SURICATA_MONITOR='monitor:///var/log/suricata'
   SPLUNK_SURICATA_SOURCETYPE='json_suricata'
-  echo "deb http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/ /" > /etc/apt/sources.list.d/bro.list
-  curl -s http://download.opensuse.org/repositories/network:/bro/xUbuntu_16.04/Release.key |apt-key add -
-
+  sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
+  wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_18.04/Release.key -O /tmp/Release.key
+  apt-key add - < /tmp/Release.key
   # Update APT repositories
   apt-get -qq -ym update
-  # Install tools to build and configure bro
-  apt-get -qq -ym install bro crudini python-pip
-  export PATH=$PATH:/opt/bro/bin
-  pip install bro-pkg future
-  bro-pkg refresh
-  bro-pkg autoconfig
-  bro-pkg install --force salesforce/ja3
-  # Load bro scripts
+  # Install tools to build and configure Zeek
+  apt-get -qq -ym install zeek crudini python-pip
+  export PATH=$PATH:/opt/zeek/bin
+  pip install zkg
+  zkg refresh
+  zkg autoconfig
+  zkg install --force salesforce/ja3
+  # Load Zeek scripts
   echo '
   @load protocols/ftp/software
   @load protocols/smtp/software
@@ -296,59 +306,56 @@ install_bro() {
   @load frameworks/intel/seen
   @load frameworks/intel/do_notice
   @load frameworks/files/hash-all-files
-  @load policy/protocols/smb
+  @load base/protocols/smb
   @load policy/protocols/conn/vlan-logging
   @load policy/protocols/conn/mac-logging
   @load ja3
 
   redef Intel::read_files += {
-    "/opt/bro/etc/intel.dat"
+    "/opt/zeek/etc/intel.dat"
   };
-  ' >> /opt/bro/share/bro/site/local.bro
+  ' >> /opt/zeek/share/zeek/site/local.zeek
 
-  # Configure Bro
-  crudini --del $NODECFG bro
+  # Configure Zeek
+  crudini --del $NODECFG zeek
   crudini --set $NODECFG manager type manager
   crudini --set $NODECFG manager host localhost
   crudini --set $NODECFG proxy type proxy
   crudini --set $NODECFG proxy host localhost
 
-  # Setup $CPUS numbers of bro workers
+  # Setup $CPUS numbers of Zeek workers
   crudini --set $NODECFG worker-eth1 type worker
   crudini --set $NODECFG worker-eth1 host localhost
   crudini --set $NODECFG worker-eth1 interface eth1
   crudini --set $NODECFG worker-eth1 lb_method pf_ring
   crudini --set $NODECFG worker-eth1 lb_procs "$(nproc)"
 
-  # Setup bro to run at boot
-  cp /vagrant/resources/bro/bro.service /lib/systemd/system/bro.service
-  systemctl enable bro
-  systemctl start bro
+  # Setup Zeek to run at boot
+  cp /vagrant/resources/zeek/zeek.service /lib/systemd/system/zeek.service
+  systemctl enable zeek
+  systemctl start zeek
 
-  # Setup splunk TA to ingest bro and suricata data
-  git clone https://github.com/jahshuah/splunk-ta-bro-json $SPLUNK_BRO_JSON
+  mkdir -p $SPLUNK_ZEEK_JSON/local
+  cp $SPLUNK_ZEEK_JSON/default/inputs.conf $SPLUNK_ZEEK_JSON/local/inputs.conf
 
-  mkdir -p $SPLUNK_BRO_JSON/local
-  cp $SPLUNK_BRO_JSON/default/inputs.conf $SPLUNK_BRO_JSON/local/inputs.conf
-
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR index   bro
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR sourcetype   json_bro
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR whitelist   '.*\.log$'
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR blacklist   '.*(communication|stderr)\.log$'
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_BRO_MONITOR disabled   0
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR index   suricata
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR sourcetype   json_suricata
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR whitelist   'eve.json'
-  crudini --set  $SPLUNK_BRO_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR disabled   0
-  crudini --set  $SPLUNK_BRO_JSON/local/props.conf  $SPLUNK_SURICATA_SOURCETYPE TRUNCATE    0
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR index   zeek
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR sourcetype   bro:json
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR whitelist   '.*\.log$'
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR blacklist   '.*(communication|stderr)\.log$'
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR disabled   0
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR index   suricata
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR sourcetype   suricata:json
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR whitelist   'eve.json'
+  crudini --set  $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR disabled   0
+  crudini --set  $SPLUNK_ZEEK_JSON/local/props.conf  $SPLUNK_SURICATA_SOURCETYPE TRUNCATE    0
 
   # Ensure permissions are correct and restart splunk
-  chown -R splunk $SPLUNK_BRO_JSON
+  chown -R splunk $SPLUNK_ZEEK_JSON
   /opt/splunk/bin/splunk restart
 
-  # Verify that Bro is running
-  if ! pgrep -f bro > /dev/null; then
-    echo "Bro attempted to start but is not running. Exiting"
+  # Verify that Zeek is running
+  if ! pgrep -f zeek > /dev/null; then
+    echo "Zeek attempted to start but is not running. Exiting"
     exit 1
   fi
 }
@@ -378,7 +385,7 @@ install_suricata() {
   yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.tls yes
   yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.ssh yes
   yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.smtp yes
-  # Turn off traffic flow logging (duplicative of Bro and wrecks Splunk trial license)
+  # Turn off traffic flow logging (duplicative of Zeek and wrecks Splunk trial license)
   yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove HTTP
   yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove DNS
   yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove TLS
@@ -394,7 +401,7 @@ install_suricata() {
   crudini --set --format=sh /etc/default/suricata '' iface eth1
   # update suricata signature sources
   suricata-update update-sources
-  # disable protocol decode as it is duplicative of bro
+  # disable protocol decode as it is duplicative of Zeek
   echo re:protocol-command-decode >> /etc/suricata/disable.conf
   # enable et-open and attackdetection sources
   suricata-update enable-source et/open
@@ -439,7 +446,7 @@ test_suricata_prerequisites() {
 install_guacamole() {
   echo "[$(date +%H:%M:%S)]: Installing Guacamole..."
   cd /home/vagrant
-  apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng12-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
+  apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz" -O guacamole-server-1.0.0.tar.gz
   tar -xvf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0
   ./configure &> /dev/null && make --quiet &> /dev/null && make --quiet install &> /dev/null || echo "[-] An error occurred while installing Guacamole."
@@ -460,8 +467,10 @@ install_guacamole() {
 }
 
 postinstall_tasks() {
-  # Include Splunk and Bro in the PATH
-  echo export PATH="$PATH:/opt/splunk/bin:/opt/bro/bin" >> ~/.bashrc
+  # Include Splunk and Zeek in the PATH
+  echo export PATH="$PATH:/opt/splunk/bin:/opt/zeek/bin" >> ~/.bashrc
+  # Ping DetectionLab server for usage statistics
+  curl -A "DetectionLab-logger" "https://detectionlab.network/logger"
 }
 
 main() {
@@ -474,7 +483,7 @@ main() {
   download_palantir_osquery_config
   import_osquery_config_into_fleet
   install_suricata
-  install_bro
+  install_zeek
   install_guacamole
   postinstall_tasks
 }

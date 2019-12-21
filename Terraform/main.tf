@@ -171,7 +171,7 @@ resource "aws_instance" "logger" {
   # Provision the AWS Ubuntu 16.04 AMI from scratch.
   provisioner "remote-exec" {
     inline = [
-      "sudo add-apt-repository universe && sudo apt-get -qq update && sudo apt-get -qq install -y git",
+      "sudo apt-get -qq update && sudo apt-get -qq install -y git",
       "echo 'logger' | sudo tee /etc/hostname && sudo hostnamectl set-hostname logger",
       "sudo adduser --disabled-password --gecos \"\" vagrant && echo 'vagrant:vagrant' | sudo chpasswd",
       "sudo mkdir /home/vagrant/.ssh && sudo cp /home/ubuntu/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys && sudo chown -R vagrant:vagrant /home/vagrant/.ssh",
@@ -179,7 +179,6 @@ resource "aws_instance" "logger" {
       "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
       "sudo sed -i 's/eth1/eth0/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo sed -i 's/ETH1/ETH0/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
-      "sudo sed -i 's#/usr/local/go/bin/go get -u#GOPATH=/root/go /usr/local/go/bin/go get -u#g' /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config",
       "sudo service ssh restart",

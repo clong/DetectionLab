@@ -52,7 +52,7 @@ data "aws_ami" "logger_ami" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20180912"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20191113"]
   }
 }
 
