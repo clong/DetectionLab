@@ -205,7 +205,11 @@ resource "aws_instance" "dc" {
   instance_type = "t2.medium"
 
   provisioner "remote-exec" {
-    inline = ["choco install -force -y winpcap"]
+    inline = [
+      "choco install -force -y winpcap",
+      "powershell -c \"$ifindex = get-netipinterface | where-object InterfaceAlias -eq 'Ethernet' | where-object AddressFamily -eq 2 | select-object -ExpandProperty ifIndex; set-dnsclientserveraddress -InterfaceIndex $ifindex\"",
+      "ipconfig /all"
+      ]
 
     connection {
       type     = "winrm"
