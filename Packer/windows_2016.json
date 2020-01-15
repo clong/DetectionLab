@@ -7,7 +7,7 @@
       "iso_url": "{{user `iso_url`}}",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
-      "headless": false,
+      "headless": true,
       "boot_wait": "6m",
       "boot_command": "",
       "winrm_username": "vagrant",
