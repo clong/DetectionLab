@@ -1,6 +1,7 @@
 # Purpose: Installs chocolatey package manager, then installs custom utilities from Choco.
 
 If (-not (Test-Path "C:\ProgramData\chocolatey")) {
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   Write-Host "Installing Chocolatey"
   iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
 } else {
