@@ -5,6 +5,10 @@
 # the text "building". Once the test is completed, the text will be replaced
 # with "success" or "failed".
 
+export DEBIAN_FRONTEND=noninteractive
+# Bypass prompt for libsslv1.1 https://unix.stackexchange.com/a/543706
+echo 'libssl1.1:amd64 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
+
 # Download Packet.net storage utilities
 echo "[$(date +%H:%M:%S)]: Downloading Packet external storage utilities..."
 wget -q -O /usr/local/bin/packet-block-storage-attach "https://raw.githubusercontent.com/packethost/packet-block-storage/master/packet-block-storage-attach"
@@ -54,14 +58,14 @@ fi
 echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf > /dev/null
 
-# Install Virtualbox 5.2
-echo "deb http://download.virtualbox.org/virtualbox/debian xenial contrib" >> /etc/apt/sources.list
-sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt xenial main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt xenial-security main restricted universe multiverse" /etc/apt/sources.list
+# Install Virtualbox 6.1
+echo "deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian $(lsb_release -sc) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 echo "[$(date +%H:%M:%S)]: Running apt-get update..."
 apt-get -qq update
 echo "[$(date +%H:%M:%S)]: Running apt-get install..."
-apt-get -qq install -y linux-headers-"$(uname -r)" virtualbox-5.2 build-essential unzip git ufw apache2
+apt-get -qq install -y linux-headers-"$(uname -r)" virtualbox-6.1 build-essential unzip git ufw apache2
 
 echo "building" > /var/www/html/index.html
 
@@ -75,8 +79,8 @@ ufw --force enable
 echo "[$(date +%H:%M:%S)]: Installing Vagrant..."
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.deb
-dpkg -i vagrant_2.2.6_x86_64.deb
+wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.7/vagrant_2.2.7_x86_64.deb
+dpkg -i vagrant_2.2.7_x86_64.deb
 echo "[$(date +%H:%M:%S)]: Installing vagrant-reload plugin..."
 vagrant plugin install vagrant-reload
 
@@ -93,6 +97,10 @@ sysctl -p /etc/sysctl.conf > /dev/null
 # Make the Vagrant instances headless
 cd /opt/DetectionLab/Vagrant || exit 1
 sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
+
+# Temporary workaround for VB 6.1 until this is fixed in Vagrant
+# https://github.com/clong/DetectionLab/issues/374
+sed -i 's/--clipboard/--clipboard-mode/g' /opt/DetectionLab/Vagrant/Vagrantfile
 
 # If the boxes are present on external storage, we can modify the Vagrantfile to
 # point to the boxes on disk so we don't have to download them
