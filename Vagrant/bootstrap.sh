@@ -95,6 +95,7 @@ install_splunk() {
     # Get download.splunk.com into the DNS cache. Sometimes resolution randomly fails during wget below
     dig @8.8.8.8 download.splunk.com > /dev/null
     dig @8.8.8.8 splunk.com > /dev/null
+    dig @8.8.8.8 www.splunk.com > /dev/null
 
     # Try to resolve the latest version of Splunk by parsing the HTML on the downloads page
     echo "[$(date +%H:%M:%S)]: Attempting to autoresolve the latest version of Splunk..."
@@ -107,7 +108,7 @@ install_splunk() {
     else
       echo "[$(date +%H:%M:%S)]: Unable to auto-resolve the latest Splunk version. Falling back to hardcoded URL..."
       # Download Hardcoded Splunk
-      wget --progress=bar:force -O splunk/splunk-7.2.6-c0bf0f679ce9-linux-2.6-amd64.deb 'https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.6&product=splunk&filename=splunk-7.2.6-c0bf0f679ce9-linux-2.6-amd64.deb&wget=true'
+      wget --progress=bar:force -O /opt/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb 'https://download.splunk.com/products/splunk/releases/8.0.2/linux/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb&wget=true'
     fi
     dpkg -i /opt/splunk*.deb
     /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
