@@ -384,7 +384,7 @@ install_zeek() {
 }
 
 install_suricata() {
-  # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts
+  # Run iwr -Uri testmyids.com -UserAgent "BlackSun" in Powershell to generate test alerts from Windows
   echo "[$(date +%H:%M:%S)]: Installing Suricata..."
 
   # Install suricata
@@ -395,32 +395,8 @@ install_suricata() {
   git clone https://github.com/OISF/suricata-update.git
   cd /opt/suricata-update || exit 1
   python setup.py install
-  # Add DC_SERVERS variable to suricata.yaml in support et-open signatures
-  yq w -i /etc/suricata/suricata.yaml vars.address-groups.DC_SERVERS '$HOME_NET'
 
-  # It may make sense to store the suricata.yaml file as a resource file if this begins to become too complex
-  # Add more verbose alert logging
-  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload true
-  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-buffer-size 4kb
-  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.payload-printable yes
-  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.packet yes
-  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.http yes
-  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.tls yes
-  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.ssh yes
-  yq w -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.0.alert.smtp yes
-  # Turn off traffic flow logging (duplicative of Zeek and wrecks Splunk trial license)
-  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove HTTP
-  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove DNS
-  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.1 # Remove TLS
-  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SMTP
-  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove SSH
-  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Stats
-  yq d -i /etc/suricata/suricata.yaml outputs.1.eve-log.types.2 # Remove Flow
-  # Enable JA3 fingerprinting
-  yq w -i /etc/suricata/suricata.yaml app-layer.protocols.tls.ja3-fingerprints true
-  # AF packet monitoring should be set to eth1
-  yq w -i /etc/suricata/suricata.yaml af-packet.0.interface eth1
-
+  cp /vagrant/resources/suricata/suricata.yaml /etc/suricata/suricata.yaml
   crudini --set --format=sh /etc/default/suricata '' iface eth1
   # update suricata signature sources
   suricata-update update-sources
@@ -429,9 +405,6 @@ install_suricata() {
   # enable et-open and attackdetection sources
   suricata-update enable-source et/open
   suricata-update enable-source ptresearch/attackdetection
-  # Add the YAML header to the top of the suricata config
-  echo "Adding the YAML header to /etc/suricata/suricata.yaml"
-  echo -e "%YAML 1.1\n---\n$(cat /etc/suricata/suricata.yaml)" > /etc/suricata/suricata.yaml
 
   # Update suricata and restart
   suricata-update
