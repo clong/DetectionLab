@@ -5,6 +5,12 @@ NOTE: This is a work in progress and provisioning is not yet functional. At this
 * Building Packer Windows images on ESXi
 * Bringing the Windows Images online using Terraform
 
+Here is what doesn't work yet:
+
+* Setting IP Addresses
+* Provisioning (Domain creation, software installation, etc)
+* Pretty much everything else
+
 ## Prereqs
 1. Install the [requirements from the ESXi Terraform Provider](https://github.com/josenk/terraform-provider-esxi#requirements)
 2. Build and install the [terraform-provider-esxi](https://github.com/josenk/terraform-provider-esxi#building-the-provider) provider
