@@ -47,8 +47,14 @@ resource "esxi_guest" "dc" {
   }
   network_interfaces {
     virtual_network = var.nat_network
+    mac_address     = "00:50:56:a1:b1:c3"
+    nic_type        = "e1000"
   }
-
+  network_interfaces {
+    virtual_network = var.hostonly_network
+    mac_address     = "00:50:56:a1:b1:c4"
+    nic_type        = "e1000"
+  }
   guest_startup_timeout  = 45
   guest_shutdown_timeout = 30
 }
@@ -73,14 +79,20 @@ resource "esxi_guest" "wef" {
   clone_from_vm = "WindowsServer2016"
 
   network_interfaces {
-    virtual_network = "var.vm_network"
-    mac_address     = "00:50:56:a1:b1:c3"
+    virtual_network = var.vm_network
+    mac_address     = "00:50:56:a1:b2:c2"
     nic_type        = "e1000"
   }
   network_interfaces {
-    virtual_network = "var.nat_network"
+    virtual_network = var.nat_network
+    mac_address     = "00:50:56:a1:b3:c3"
+    nic_type        = "e1000"
   }
-
+  network_interfaces {
+    virtual_network = var.hostonly_network
+    mac_address     = "00:50:56:a1:b4:c4"
+    nic_type        = "e1000"
+  }
   guest_startup_timeout  = 45
   guest_shutdown_timeout = 30
 }
@@ -106,14 +118,20 @@ resource "esxi_guest" "win10" {
   clone_from_vm = "Windows10"
 
   network_interfaces {
-    virtual_network = "var.vm_network"
-    mac_address     = "00:50:56:a1:b1:c4"
+    virtual_network = var.vm_network
+    mac_address     = "00:50:56:a2:b1:c2"
     nic_type        = "e1000"
   }
   network_interfaces {
-    virtual_network = "var.nat_network"
+    virtual_network = var.nat_network
+    mac_address     = "00:50:56:a2:b1:c3"
+    nic_type        = "e1000"
   }
-
+  network_interfaces {
+    virtual_network = var.hostonly_network
+    mac_address     = "00:50:56:a2:b1:c4"
+    nic_type        = "e1000"
+  }
   guest_startup_timeout  = 45
   guest_shutdown_timeout = 30
 }

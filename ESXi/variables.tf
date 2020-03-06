@@ -26,3 +26,7 @@ variable "vm_network" {
 variable "nat_network" {
   default = "NAT Network"
 }
+
+variable "hostonly_network" {
+  default = "HostOnly Network"
+}

@@ -1,0 +1,4 @@
+---
+- hosts: dc
+  roles:
+    - dc
