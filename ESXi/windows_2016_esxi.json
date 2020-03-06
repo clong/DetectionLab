@@ -1,0 +1,92 @@
+{
+  "builders": [
+    {
+      "vnc_disable_password": true,
+      "keep_registered": true,
+      "remote_datastore": "<fill_me_in>",
+      "remote_host": "<fill_me_in>",
+      "remote_username": "<fill_me_in>",
+      "remote_password": "<fill_me_in>",
+      "remote_type": "esx5",
+      "vm_name":"WindowsServer2016",
+      "type": "vmware-iso",
+      "communicator": "winrm",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "headless": false,
+      "boot_wait": "2m",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h",
+      "shutdown_timeout": "2h",
+      "shutdown_command": "a:/sysprep.bat",
+      "guest_os_type": "windows8srv-64",
+      "disk_size": 61440,
+      "version": 11,
+      "floppy_files": [
+        "{{user `autounattend`}}",
+        "../Packer/floppy/WindowsPowershell.lnk",
+        "../Packer/floppy/PinTo10.exe",
+        "../Packer/scripts/unattend.xml",
+        "../Packer/scripts/sysprep.bat",
+        "../Packer/scripts/disable-screensaver.ps1",
+        "../Packer/scripts/disable-winrm.ps1",
+        "../Packer/scripts/enable-winrm.ps1",
+        "../Packer/scripts/microsoft-updates.bat",
+        "../Packer/scripts/win-updates.ps1"
+      ],
+      "vmx_data": {
+        "ethernet0.networkName": "VM Network",
+        "memsize": "2048",
+        "numvcpus": "2",
+        "scsi0.virtualDev": "lsisas1068"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "windows-shell",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../Packer/scripts/vm-guest-tools.bat",
+        "../Packer/scripts/enable-rdp.bat"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "../Packer/scripts/debloat-windows.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "windows-shell",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../Packer/scripts/pin-powershell.bat",
+        "../Packer/scripts/set-winrm-automatic.bat",
+        "../Packer/scripts/compile-dotnet-assemblies.bat",
+        "../Packer/scripts/uac-enable.bat",
+        "../Packer/scripts/compact.bat"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": false,
+      "output": "windows_2016_{{.Provider}}.box",
+      "vagrantfile_template": "vagrantfile-windows_2016.template"
+    }
+  ],
+  "variables": {
+    "iso_url": "https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
+    "iso_checksum_type": "md5",
+    "iso_checksum": "70721288BBCDFE3239D8F8C0FAE55F1F",
+    "autounattend": "../Packer/answer_files/2016/Autounattend.xml"
+  }
+}
+

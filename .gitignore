@@ -14,3 +14,7 @@ Terraform/*.terraform
 Terraform/*.tfvars
 Terraform/*.lock.info
 Terraform/*.backup
+ESXi/.terraform/*
+ESXi/*.tfstate
+ESXi/*.backup
+ESXi/*.tfvars
