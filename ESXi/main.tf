@@ -74,7 +74,7 @@ resource "esxi_guest" "wef" {
 
   network_interfaces {
     virtual_network = "var.vm_network"
-    mac_address     = "00:50:56:a1:b1:c2"
+    mac_address     = "00:50:56:a1:b1:c3"
     nic_type        = "e1000"
   }
   network_interfaces {
@@ -107,7 +107,7 @@ resource "esxi_guest" "win10" {
 
   network_interfaces {
     virtual_network = "var.vm_network"
-    mac_address     = "00:50:56:a1:b1:c2"
+    mac_address     = "00:50:56:a1:b1:c4"
     nic_type        = "e1000"
   }
   network_interfaces {
