@@ -28,7 +28,7 @@ Here is what doesn't work yet:
 4. Edit the variables in `ESXi/variables.tf` to match your local ESXi configuration
 5. Run `terraform init && terraform apply`
 
-It takes quite some time for the linked clones to be created, but once they're finished, they should be accessible!
+It takes quite some time (30m on my host) for the linked clones to be created, but once they're finished, they should be accessible!
 
 ## Future work required
 * The logger host needs to be implemented. This should be fairly straightforward.
