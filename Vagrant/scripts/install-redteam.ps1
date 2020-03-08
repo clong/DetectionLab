@@ -3,6 +3,9 @@
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Red Team Tooling..."
 
 # Windows Defender should be disabled already by O&O ShutUp10
+# Adding Defender exclusions just in case
+Add-MpPreference -ExclusionPath “C:\Tools”
+Add-MpPreference -ExclusionPath “C:\Users\vagrant\AppData\Local\Temp”
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Mimikatz..."
