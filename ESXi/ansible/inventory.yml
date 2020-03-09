@@ -1,4 +1,23 @@
 ---
+
+logger:
+  hosts:
+    192.168.3.151:
+      ansible_user: vagrant
+      ansible_password: vagrant
+      ansible_port: 22
+      ansible_connection: ssh
+      ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
 dc:
   hosts:
     192.168.3.189:
+
+wef:
+  hosts:
+    192.168.3.194:
+
+win10:
+  hosts:
+    192.168.3.193:
+

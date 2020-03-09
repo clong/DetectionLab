@@ -3,10 +3,10 @@
     {
       "vnc_disable_password": true,
       "keep_registered": true,
-      "remote_datastore": "<fill_me_in>",
-      "remote_host": "<fill_me_in>",
-      "remote_username": "<fill_me_in>",
-      "remote_password": "<fill_me_in>",
+      "remote_datastore": "{{user `esxi_datastore`}}",
+      "remote_host": "{{user `esxi_host`}}",
+      "remote_username": "{{user `esxi_username`}}",
+      "remote_password": "{{user `esxi_password`}}",
       "remote_type": "esx5",
       "type": "vmware-iso",
       "vm_name":"Windows10",
@@ -29,20 +29,20 @@
       "version": 11,
       "floppy_files": [
         "{{user `autounattend`}}",
-        "../Packer/floppy/WindowsPowershell.lnk",
-        "../Packer/floppy/PinTo10.exe",
-        "../Packer/scripts/fixnetwork.ps1",
-        "../Packer/scripts/rearm-windows.ps1",
-        "../Packer/scripts/disable-screensaver.ps1",
-        "../Packer/scripts/disable-winrm.ps1",
-        "../Packer/scripts/enable-winrm.ps1",
-        "../Packer/scripts/microsoft-updates.bat",
-        "../Packer/scripts/win-updates.ps1",
-        "../Packer/scripts/unattend.xml",
-        "../Packer/scripts/sysprep.bat"
+        "../../Packer/floppy/WindowsPowershell.lnk",
+        "../../Packer/floppy/PinTo10.exe",
+        "../../Packer/scripts/fixnetwork.ps1",
+        "../../Packer/scripts/rearm-windows.ps1",
+        "../../Packer/scripts/disable-screensaver.ps1",
+        "../../Packer/scripts/disable-winrm.ps1",
+        "../../Packer/scripts/enable-winrm.ps1",
+        "../../Packer/scripts/microsoft-updates.bat",
+        "../../Packer/scripts/win-updates.ps1",
+        "../../Packer/scripts/unattend.xml",
+        "../../Packer/scripts/sysprep.bat"
       ],
       "vmx_data": {
-        "ethernet0.networkName": "VM Network",
+        "ethernet0.networkName": "{{ esxi_network_with_dhcp_and_internet }}",
         "memsize": "2048",
         "numvcpus": "2",
         "scsi0.virtualDev": "lsisas1068"
@@ -55,14 +55,14 @@
       "remote_path": "/tmp/script.bat",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "../Packer/scripts/vm-guest-tools.bat",
-        "../Packer/scripts/enable-rdp.bat"
+        "../../Packer/scripts/vm-guest-tools.bat",
+        "../../Packer/scripts/enable-rdp.bat"
       ]
     },
     {
       "type": "powershell",
       "scripts": [
-        "../Packer/scripts/debloat-windows.ps1"
+        "../../Packer/scripts/debloat-windows.ps1"
       ]
     },
     {
@@ -71,8 +71,8 @@
     {
       "type": "powershell",
       "scripts": [
-        "../Packer/scripts/set-powerplan.ps1",
-        "../Packer/scripts/docker/disable-windows-defender.ps1"
+        "../../Packer/scripts/set-powerplan.ps1",
+        "../../Packer/scripts/docker/disable-windows-defender.ps1"
       ]
     },
     {
@@ -80,26 +80,22 @@
       "remote_path": "/tmp/script.bat",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "../Packer/scripts/pin-powershell.bat",
-        "../Packer/scripts/compile-dotnet-assemblies.bat",
-        "../Packer/scripts/set-winrm-automatic.bat",
-        "../Packer/scripts/dis-updates.bat"
+        "../../Packer/scripts/pin-powershell.bat",
+        "../../Packer/scripts/compile-dotnet-assemblies.bat",
+        "../../Packer/scripts/set-winrm-automatic.bat",
+        "../../Packer/scripts/dis-updates.bat"
       ]
     }
   ],
-  "post-processors": [
-    {
-      "type": "vagrant",
-      "keep_input_artifact": false,
-      "output": "windows_10_{{.Provider}}.box",
-      "vagrantfile_template": "vagrantfile-windows_10.template"
-    }
-  ],
   "variables": {
+    "esxi_datastore": "",
+    "esxi_host": "",
+    "esxi_username": "",
+    "esxi_password": "",
     "iso_checksum": "ab4862ba7d1644c27f27516d24cb21e6b39234eb3301e5f1fb365a78b22f79b3",
     "iso_checksum_type": "sha256",
     "iso_url": "https://software-download.microsoft.com/download/pr/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
-    "autounattend": "../Packer/answer_files/10/Autounattend.xml",
+    "autounattend": "../../Packer/answer_files/10/Autounattend.xml",
     "disk_size": "61440"
   }
 }

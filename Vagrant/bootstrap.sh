@@ -62,6 +62,12 @@ fix_eth1_static_ip() {
     echo "[*] Using KVM, no need to fix DHCP for eth1 iface"
     return 0
   fi
+  if [ -f /sys/class/net/eth2/address ]; then
+    if [ "$(cat /sys/class/net/eth2/address)" == "00:50:56:a3:b1:c4" ]; then
+    echo "[*] Using ESXi, no need to change anything"
+    return 0
+    fi
+  fi
   # There's a fun issue where dhclient keeps messing with eth1 despite the fact
   # that eth1 has a static IP set. We workaround this by setting a static DHCP lease.
   echo -e 'interface "eth1" {

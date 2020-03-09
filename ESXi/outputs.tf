@@ -1,3 +1,11 @@
+output "logger_interfaces" {
+  value = esxi_guest.logger.network_interfaces
+}
+
+output "logger_ips" {
+  value = esxi_guest.logger.ip_address
+}
+
 output "dc_interfaces" {
   value = esxi_guest.dc.network_interfaces
 }

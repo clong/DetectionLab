@@ -14,13 +14,57 @@ provider "esxi" {
 #########################################
 #  ESXI Guest resource
 #########################################
-#
-#  This Guest VM is a clone of an existing Guest VM named "centos7" (must exist and
-#  be powered off), located in the "Templates" resource pool.  vmtest02 will be powered
-#  on by default by terraform.  The virtual network "VM Network", must already exist on
-#  your esxi host!
-#
-# https://github.com/josenk/vagrant-vmware-esxi/wiki/VMware-ESXi-6.5-guestOS-types
+resource "esxi_guest" "logger" {
+  guest_name = "logger"
+  disk_store = "datastore1"
+  guestos    = "ubuntu-64"
+
+  boot_disk_type = "thin"
+  boot_disk_size = "35"
+
+  memsize            = "4096"
+  numvcpus           = "2"
+  resource_pool_name = "/"
+  power              = "on"
+  clone_from_vm = "Ubuntu1804"
+
+    provisioner "remote-exec" {
+    inline = [
+      "sudo ifconfig up eth1 | echo 'eth1 up'",
+      "sudo ifconfig up eth2 || echo 'eth2 up'",
+      "sudo dhclient -v eth1 || echo 'eth1 dhcp'",
+      "sudo route add default gw 192.168.76.1 || echo 'route exists'"
+    ]
+
+    connection {
+      host        = self.ip_address
+      type        = "ssh"
+      user        = "vagrant"
+      password    = "vagrant"
+    }
+  }
+  # This is the network that bridges your host machine with the ESXi VM
+  network_interfaces {
+    virtual_network = var.vm_network
+    mac_address     = "00:50:56:a3:b1:c2"
+    nic_type        = "e1000"
+  }
+  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
+  network_interfaces {
+    virtual_network = var.nat_network
+    mac_address     = "00:50:56:a3:b1:c3"
+    nic_type        = "e1000"
+  }
+  # This is the local network that will be used for 192.168.38.x addressing
+  network_interfaces {
+    virtual_network = var.hostonly_network
+    mac_address     = "00:50:56:a3:b1:c4"
+    nic_type        = "e1000"
+  }
+  guest_startup_timeout  = 45
+  guest_shutdown_timeout = 30
+}
+
 resource "esxi_guest" "dc" {
   guest_name = "dc"
   disk_store = "datastore2"
@@ -33,23 +77,20 @@ resource "esxi_guest" "dc" {
   numvcpus           = "2"
   resource_pool_name = "/"
   power              = "on"
-
-  #  clone_from_vm uses ovftool to clone an existing Guest on your esxi host.  This example will clone a Guest VM named "centos7", located in the "Templates" resource pool.
-  #  ovf_source uses ovftool to produce a clone from an ovf or vmx image. (typically produced using the ovf_tool).
-  #    Basically clone_from_vm clones from sources on the esxi host and ovf_source clones from sources on your local hard disk or a URL.
-  #    These two options are mutually exclusive.
   clone_from_vm = "WindowsServer2016"
-
+  # This is the network that bridges your host machine with the ESXi VM
   network_interfaces {
     virtual_network = var.vm_network
     mac_address     = "00:50:56:a1:b1:c2"
     nic_type        = "e1000"
   }
+  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
   network_interfaces {
     virtual_network = var.nat_network
     mac_address     = "00:50:56:a1:b1:c3"
     nic_type        = "e1000"
   }
+  # This is the local network that will be used for 192.168.38.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
     mac_address     = "00:50:56:a1:b1:c4"
@@ -71,23 +112,20 @@ resource "esxi_guest" "wef" {
   numvcpus           = "2"
   resource_pool_name = "/"
   power              = "on"
-
-  #  clone_from_vm uses ovftool to clone an existing Guest on your esxi host.  This example will clone a Guest VM named "centos7", located in the "Templates" r$
-  #  ovf_source uses ovftool to produce a clone from an ovf or vmx image. (typically produced using the ovf_tool).
-  #    Basically clone_from_vm clones from sources on the esxi host and ovf_source clones from sources on your local hard disk or a URL.
-  #    These two options are mutually exclusive.
   clone_from_vm = "WindowsServer2016"
-
+  # This is the network that bridges your host machine with the ESXi VM
   network_interfaces {
     virtual_network = var.vm_network
     mac_address     = "00:50:56:a1:b2:c2"
     nic_type        = "e1000"
   }
+  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
   network_interfaces {
     virtual_network = var.nat_network
     mac_address     = "00:50:56:a1:b3:c3"
     nic_type        = "e1000"
   }
+  # This is the local network that will be used for 192.168.38.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
     mac_address     = "00:50:56:a1:b4:c4"
@@ -96,7 +134,6 @@ resource "esxi_guest" "wef" {
   guest_startup_timeout  = 45
   guest_shutdown_timeout = 30
 }
-
 
 resource "esxi_guest" "win10" {
   guest_name = "win10"
@@ -110,23 +147,20 @@ resource "esxi_guest" "win10" {
   numvcpus           = "2"
   resource_pool_name = "/"
   power              = "on"
-
-  #  clone_from_vm uses ovftool to clone an existing Guest on your esxi host.  This example will clone a Guest VM named "centos7", located in the "Templates" r$
-  #  ovf_source uses ovftool to produce a clone from an ovf or vmx image. (typically produced using the ovf_tool).
-  #    Basically clone_from_vm clones from sources on the esxi host and ovf_source clones from sources on your local hard disk or a URL.
-  #    These two options are mutually exclusive.
   clone_from_vm = "Windows10"
-
+  # This is the network that bridges your host machine with the ESXi VM
   network_interfaces {
     virtual_network = var.vm_network
     mac_address     = "00:50:56:a2:b1:c2"
     nic_type        = "e1000"
   }
+  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
   network_interfaces {
     virtual_network = var.nat_network
     mac_address     = "00:50:56:a2:b1:c3"
     nic_type        = "e1000"
   }
+  # This is the local network that will be used for 192.168.38.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
     mac_address     = "00:50:56:a2:b1:c4"

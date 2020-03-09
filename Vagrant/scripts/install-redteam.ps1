@@ -3,6 +3,9 @@
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Red Team Tooling..."
 
 # Windows Defender should be disabled already by O&O ShutUp10
+# Adding Defender exclusions just in case
+Add-MpPreference -ExclusionPath “C:\Tools”
+Add-MpPreference -ExclusionPath “C:\Users\vagrant\AppData\Local\Temp”
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Mimikatz..."
@@ -47,12 +50,5 @@ if (-not (Test-Path $atomicRedTeamRepoPath)) {
 } else {
   Write-Host "Atomic Red Team was already installed. Moving On."
 }
-
-Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Configuring Invoke-AtomicTest..."
-# Copy over a Powershell profile that includes the Atomic Red Team stuff
-Copy-Item "C:\vagrant\resources\windows\Microsoft.PowerShell_profile.ps1" "C:\Windows\System32\WindowsPowerShell\v1.0" -Force
-# Install prereqs
-Install-PackageProvider -Name NuGet -force
-Install-Module -Name powershell-yaml -Force
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Red Team tooling installation complete!"

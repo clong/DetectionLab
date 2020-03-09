@@ -1,7 +1,6 @@
 #
 #  See https://www.terraform.io/intro/getting-started/variables.html for more details.
 #
-
 #  Change these defaults to fit your needs!
 
 variable "esxi_hostname" {
