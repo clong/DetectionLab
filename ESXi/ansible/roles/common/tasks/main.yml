@@ -1,0 +1,36 @@
+---
+
+- name: Run Common Tasks
+  win_shell: ".\\{{ item }}"
+  args:
+    chdir: 'c:\vagrant\scripts'
+  with_items:
+    - "download_palantir_wef.ps1"
+    - "download_palantir_osquery.ps1"
+    - "install-osquery.ps1"
+    - "install-sysinternals.ps1"
+    - "install-autorunstowineventlog.ps1"
+    - "install-redteam.ps1"
+
+- name: Install utilities 
+  win_chocolatey:
+    name:
+    - NotepadPlusPlus
+    - GoogleChrome
+    - WinRar
+    - wireshark
+    - winpcap
+    state: present
+
+- name: Install classic-shell with chocolatey
+  win_chocolatey:
+    name:
+      - classic-shell
+    state: present
+    install_args: "ADDLOCAL=ClassicStartMenu"
+
+- name: DetectionLab Menu
+  win_shell: "\"C:\\Program Files\\Classic Shell\\ClassicStartMenu.exe -xml c:\\vagrant\\resources\\windows\\MenuSettings.xml\""
+
+
+

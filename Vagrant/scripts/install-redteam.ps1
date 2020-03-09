@@ -54,3 +54,4 @@ if (-not (Test-Path $atomicRedTeamRepoPath)) {
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Red Team tooling installation complete!"
+

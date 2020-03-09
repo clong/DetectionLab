@@ -122,8 +122,7 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
     {
         Write-Host "[$env:computername] ATA Gateway already installed. Moving On."
     }
-    Write-Host "Sleeping 5 minutes to allow ATA gateway to start up..."
-    Start-Sleep -Seconds 300
+    (Get-Service ATAGateway).WaitForStatus('Running', '00:10:00')
     If ((Get-Service "ATAGateway").Status -ne "Running")
     {
         throw "ATA lightweight gateway not running"

@@ -1,0 +1,72 @@
+---
+
+- name: Hostname -> WEF
+  win_hostname:
+    name: wef
+  register: res
+
+- name: Reboot
+  win_reboot:
+  when: res.reboot_required
+
+# This needs to be made idempodent
+- name: Set HostOnly IP Address
+  win_shell: "New-NetIPAddress –InterfaceAlias Ethernet2 –AddressFamily IPv4 -IPAddress 192.168.38.103 –PrefixLength 24 -DefaultGateway 192.168.38.1"
+
+# This needs to be made idempodent
+- name: Set HostOnly DNS Address
+  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet2 -ServerAddresses 192.168.38.102,8.8.8.8"
+
+- name: Install git
+  win_chocolatey:
+    name: git
+    state: present
+
+- name: Check if existing DetectionLab directory
+  win_stat:
+    path: 'c:\DetectionLab'
+  register: dir
+
+- name: Git clone Detectionlab
+  win_shell: git clone https://github.com/clong/DetectionLab.git
+  args:
+    chdir: 'c:\'
+  when: not dir.stat.exists
+
+- name: Copy scripts to c:\vagrant
+  win_shell: Copy-Item -Recurse c:\DetectionLab\Vagrant c:\vagrant
+
+- name: Join the Domain
+  win_shell: .\\provision.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+
+- name: reboot server
+  win_reboot:
+    msg: "Joining the domain. Rebooting..."
+    pre_reboot_delay: 15
+    reboot_timeout: 600
+    post_reboot_delay: 60
+
+- name: Clear Event Logs
+  win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
+
+- name: Configure WEF Host
+  win_shell: ".\\{{ item }}"
+  args:
+    chdir: 'c:\vagrant\scripts'
+  with_items:
+    - "download_palantir_wef.ps1"
+    - "install-wefsubscriptions.ps1"
+    - "install-splunkuf.ps1"
+    - "install-windows_ta.ps1"
+    - "configure-pslogstranscriptsshare.ps1"
+    - "install-microsoft-ata.ps1"
+
+- name: Configure WEF with raw Commands
+  win_shell: "{{ item }}"
+  with_items:
+    - "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
+    - "Set-SmbServerConfiguration -AuditSmb1Access $true -Force"
+
+
