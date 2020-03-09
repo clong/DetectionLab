@@ -34,7 +34,7 @@ These commands can be run in parallel from three separate terminal sessions.
 
 3. **(1 Minute)** Once the Packer builds finish, verify that you now see Windows10, WindowsServer2016, and Ubuntu1804 in your ESXi console
 ![Ansible](https://github.com/clong/DetectionLab/blob/master/img/esxi_console.png?raw=true)
-4. **(5 Minutes)** Edit the variables in `ESXi/variables.tf` to match your local ESXi configuration or [create a terraform.tfvars file] (RECOMMENDED)(https://www.terraform.io/docs/configuration/variables.html#variable-definitions-tfvars-files) to override them.
+4. **(5 Minutes)** Edit the variables in `ESXi/variables.tf` to match your local ESXi configuration or [create a terraform.tfvars file](https://www.terraform.io/docs/configuration/variables.html#variable-definitions-tfvars-files) (RECOMMENDED) to override them.
 5. **(25 Minutes)** From `DetectionLab/ESXi`, run `terraform init && terraform apply`
 6. Once Terraform has finished bringing the hosts online, change your directory to `DetectionLab/ESXi/ansible`
 7. **(1 Minute)** Edit `DetectionLab/ESXi/ansible/inventory.yml` and replace the IP Addresses with the respective IP Addresses of your ESXi VMs. **These IP addresses much be reachable from your host machine!**
