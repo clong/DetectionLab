@@ -1,4 +1,5 @@
 # Building DetectionLab on ESXi
+![Overview](https://github.com/clong/DetectionLab/blob/master/img/esxi_overview.jpeg?raw=true)
 
 NOTE: This is an early release and it's possible that certain features may not work perfectly for everyone yet
 
