@@ -38,7 +38,7 @@ These commands can be run in parallel from three separate terminal sessions.
 5. **(25 Minutes)** From `DetectionLab/ESXi`, run `terraform init && terraform apply`
 6. Once Terraform has finished bringing the hosts online, change your directory to `DetectionLab/ESXi/ansible`
 7. **(1 Minute)** Edit `DetectionLab/ESXi/ansible/inventory.yml` and replace the IP Addresses with the respective IP Addresses of your ESXi VMs. **These IP addresses much be reachable from your host machine!**
-8. **(3 Minute)s** Edit `DetectionLab/ESXi/ansible/resources/01-netcfg.yaml`. These are the IP addresses that will be applied to the logger network interfaces. These should be be able to be found in your ESXi console or from the Terraform outputs.
+8. **(3 Minute)s** Edit `DetectionLab/ESXi/resources/01-netcfg.yaml`. These are the IP addresses that will be applied to the logger network interfaces. These should be be able to be found in your ESXi console or from the Terraform outputs.
 9. **(3 Minute)** Before running any Ansible playbooks, I highly recommend taking snapshots of all your VMs! If anything goes wrong with provisioning, you can simply restore the snapshot and easily debug the issue.
 10. Change your directory to `DetectionLab/ESXi/ansible`
 11. **(30 Minutes)** Run `ansible-playbook -vvv detectionlab.yml` 
