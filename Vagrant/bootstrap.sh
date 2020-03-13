@@ -12,7 +12,7 @@ apt_install_prerequisites() {
   add-apt-repository -y ppa:apt-fast/stable
   # Add repository for yq
   add-apt-repository -y ppa:rmescandon/yq
-  　# Add repository for suricata
+  # Add repository for suricata
   add-apt-repository -y ppa:oisf/suricata-stable
   # Install prerequisites and useful tools
   echo "[$(date +%H:%M:%S)]: Running apt-get clean..."
