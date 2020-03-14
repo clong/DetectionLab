@@ -28,11 +28,11 @@ modify_motd() {
   echo "[$(date +%H:%M:%S)]: Updating the MOTD..."
   # Force color terminal
   sed -i 's/#force_color_prompt=yes/force_color_prompt=yes/g' /root/.bashrc
-  sed -i 's/#force_color_prompt=yes/force_color_prompt=yes/g' /home/vagrant/.bashrc
+  sed -i 's/#force_color_prompt=yes/force_color_prompt=yes/g' /home/Vagrant/.bashrc
   # Remove some stock Ubuntu MOTD content
   chmod -x /etc/update-motd.d/10-help-text
   # Copy the DetectionLab MOTD
-  cp /vagrant/resources/logger/20-detectionlab /etc/update-motd.d/
+  cp /Vagrant/resources/logger/20-detectionlab /etc/update-motd.d/
   chmod +x /etc/update-motd.d/20-detectionlab
 }
 
@@ -131,16 +131,16 @@ install_splunk() {
     /opt/splunk/bin/splunk add index zeek -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index threathunting -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_500.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_800.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_101.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/lookup-file-editor_331.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-zeek-aka-bro_400.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/force-directed-app-for-splunk_200.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_141.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_500.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_800.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/asn-lookup-generator_101.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/lookup-file-editor_331.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-add-on-for-zeek-aka-bro_400.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/force-directed-app-for-splunk_200.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/threathunting_141.tgz -auth 'admin:changeme'
 
     # Uncomment the following block to install BOTSv2
     # Thanks to @MHaggis for this addition!
@@ -149,25 +149,25 @@ install_splunk() {
     # More information on BOTSv2 can be found at https://github.com/splunk/botsv2
 
     ### BOTSv2 COMMENT BLOCK BEGINS ###
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/base64_11.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/jellyfisher_010.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/palo-alto-networks-add-on-for-splunk_611.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/SA-ctf_scoreboard_admin-master.zip  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/SA-ctf_scoreboard-master.zip  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sa-investigator-for-enterprise-security_200.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-apache-web-server_100.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-cloud-services_310.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-iis_101.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-windows_600.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-symantec-endpoint-protection_230.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-unix-and-linux_602.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-app-for-osquery_10.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-common-information-model-cim_4130.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-security-essentials_241.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-ta-for-suricata_233.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/ssl-certificate-checker_32.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/url-toolbox_16.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/website-monitoring_274.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/base64_11.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/jellyfisher_010.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/palo-alto-networks-add-on-for-splunk_611.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/SA-ctf_scoreboard_admin-master.zip  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/SA-ctf_scoreboard-master.zip  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/sa-investigator-for-enterprise-security_200.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-add-on-for-apache-web-server_100.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-add-on-for-microsoft-cloud-services_310.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-add-on-for-microsoft-iis_101.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-add-on-for-microsoft-windows_600.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-add-on-for-symantec-endpoint-protection_230.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-add-on-for-unix-and-linux_602.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-app-for-osquery_10.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-common-information-model-cim_4130.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-security-essentials_241.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/splunk-ta-for-suricata_233.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/ssl-certificate-checker_32.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/url-toolbox_16.tgz  -auth 'admin:changeme'
+    # /opt/splunk/bin/splunk install app /Vagrant/resources/splunk_server/website-monitoring_274.tgz  -auth 'admin:changeme'
 
     ### UNCOMMENT THIS BLOCK FOR THE ATTACK-ONLY DATASET (Recommended) ###
     # echo "[$(date +%H:%M:%S)]: Downloading Splunk BOTSv2 Attack Only Dataset..."
@@ -188,7 +188,7 @@ install_splunk() {
     ### BOTSv2 COMMENT BLOCK ENDS ###
 
     # Add custom Macro definitions for ThreatHunting App
-    cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
+    cp /Vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
     # Fix Windows TA macros
     mkdir /opt/splunk/etc/apps/Splunk_TA_windows/local
     cp /opt/splunk/etc/apps/Splunk_TA_windows/default/macros.conf /opt/splunk/etc/apps/Splunk_TA_windows/local
@@ -199,8 +199,8 @@ install_splunk() {
     # Add a Splunk TCP input on port 9997
     echo -e "[splunktcp://9997]\nconnection_host = ip" >/opt/splunk/etc/apps/search/local/inputs.conf
     # Add props.conf and transforms.conf
-    cp /vagrant/resources/splunk_server/props.conf /opt/splunk/etc/apps/search/local/
-    cp /vagrant/resources/splunk_server/transforms.conf /opt/splunk/etc/apps/search/local/
+    cp /Vagrant/resources/splunk_server/props.conf /opt/splunk/etc/apps/search/local/
+    cp /Vagrant/resources/splunk_server/transforms.conf /opt/splunk/etc/apps/search/local/
     cp /opt/splunk/etc/system/default/limits.conf /opt/splunk/etc/system/local/limits.conf
     # Bump the memtable limits to allow for the ASN lookup table
     sed -i.bak 's/max_memtable_bytes = 10000000/max_memtable_bytes = 30000000/g' /opt/splunk/etc/system/local/limits.conf
@@ -250,7 +250,7 @@ install_fleet() {
     echo -e "\n127.0.0.1       logger" >>/etc/hosts
     cd /opt && git clone https://github.com/kolide/kolide-quickstart.git
     cd /opt/kolide-quickstart || echo "Something went wrong while trying to clone the kolide-quickstart repository"
-    cp /vagrant/resources/fleet/server.* .
+    cp /Vagrant/resources/fleet/server.* .
     sed -i 's/ -it//g' demo.sh
     ./demo.sh up simple
     # Set the enrollment secret to match what we deploy to Windows hosts
@@ -365,7 +365,7 @@ install_zeek() {
   crudini --set $NODECFG worker-eth1 lb_procs "$(nproc)"
 
   # Setup Zeek to run at boot
-  cp /vagrant/resources/zeek/zeek.service /lib/systemd/system/zeek.service
+  cp /Vagrant/resources/zeek/zeek.service /lib/systemd/system/zeek.service
   systemctl enable zeek
   systemctl start zeek
 
@@ -407,7 +407,7 @@ install_suricata() {
   cd /opt/suricata-update || exit 1
   python setup.py install
 
-  cp /vagrant/resources/suricata/suricata.yaml /etc/suricata/suricata.yaml
+  cp /Vagrant/resources/suricata/suricata.yaml /etc/suricata/suricata.yaml
   crudini --set --format=sh /etc/default/suricata '' iface eth1
   # update suricata signature sources
   suricata-update update-sources
@@ -461,9 +461,9 @@ install_guacamole() {
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/binary/guacamole-1.0.0.war" -O guacamole.war
   mkdir /etc/guacamole
   mkdir /usr/share/tomcat8/.guacamole
-  cp /vagrant/resources/guacamole/user-mapping.xml /etc/guacamole/
-  cp /vagrant/resources/guacamole/guacamole.properties /etc/guacamole/
-  cp /vagrant/resources/guacamole/guacd.service /lib/systemd/system
+  cp /Vagrant/resources/guacamole/user-mapping.xml /etc/guacamole/
+  cp /Vagrant/resources/guacamole/guacamole.properties /etc/guacamole/
+  cp /Vagrant/resources/guacamole/guacd.service /lib/systemd/system
   sudo ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat8/.guacamole/
   sudo ln -s /etc/guacamole/user-mapping.xml /usr/share/tomcat8/.guacamole/
   systemctl enable guacd
