@@ -4,9 +4,10 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Red Team Tooling..."
 
 # Windows Defender should be disabled already by O&O ShutUp10
 If ($hostname -eq "win10") {
-# Adding Defender exclusions just in case
-Set-MpPreference -ExclusionPath “C:\Tools”
-Add-MpPreference -ExclusionPath “C:\Users\vagrant\AppData\Local\Temp”
+  # Adding Defender exclusions just in case
+  Set-MpPreference -ExclusionPath "C:\Tools"
+  Add-MpPreference -ExclusionPath "C:\Users\vagrant\AppData\Local\Temp"
+  Add-MpPreference -DisableRealtimeMonitoring $true
 }
 
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
@@ -16,13 +17,11 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Mimikat
 $tag = (Invoke-WebRequest "https://api.github.com/repos/gentilkiwi/mimikatz/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $mimikatzDownloadUrl = "https://github.com/gentilkiwi/mimikatz/releases/download/$tag/mimikatz_trunk.zip"
 $mimikatzRepoPath = 'C:\Users\vagrant\AppData\Local\Temp\mimikatz_trunk.zip'
-if (-not (Test-Path $mimikatzRepoPath))
-{
+if (-not (Test-Path $mimikatzRepoPath)) {
   Invoke-WebRequest -Uri "$mimikatzDownloadUrl" -OutFile $mimikatzRepoPath
   Expand-Archive -path "$mimikatzRepoPath" -destinationpath 'c:\Tools\Mimikatz' -Force
 }
-else
-{
+else {
   Write-Host "Mimikatz was already installed. Moving On."
 }
 
@@ -36,7 +35,8 @@ if (-not (Test-Path $powersploitRepoPath)) {
   Invoke-WebRequest -Uri "$powersploitDownloadUrl" -OutFile $powersploitRepoPath
   Expand-Archive -path "$powersploitRepoPath" -destinationpath 'c:\Tools\PowerSploit' -Force
   Copy-Item "c:\Tools\PowerSploit\PowerSploit-dev\*" "$Env:windir\System32\WindowsPowerShell\v1.0\Modules" -Recurse -Force
-} else {
+}
+else {
   Write-Host "PowerSploit was already installed. Moving On."
 }
 
@@ -49,7 +49,8 @@ $atomicRedTeamRepoPath = "C:\Users\vagrant\AppData\Local\Temp\atomic_red_team.zi
 if (-not (Test-Path $atomicRedTeamRepoPath)) {
   Invoke-WebRequest -Uri "$atomicRedTeamDownloadUrl" -OutFile "$atomicRedTeamRepoPath"
   Expand-Archive -path "$atomicRedTeamRepoPath" -destinationpath 'c:\Tools\Atomic Red Team' -Force
-} else {
+}
+else {
   Write-Host "Atomic Red Team was already installed. Moving On."
 }
 
