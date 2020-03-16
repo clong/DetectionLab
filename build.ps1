@@ -2,7 +2,7 @@
 
 <#
 .Synopsis
-   This script is used to deploy a fresh install of DetectionLab
+   This script is used to deploy a fresh install of DetectionLab - Stripped
 
 .DESCRIPTION
    This scripts runs a series of tests before running through the
