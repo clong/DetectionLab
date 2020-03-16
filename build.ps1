@@ -19,7 +19,7 @@
    If you encounter issues, feel free to open an issue at
    https://github.com/clong/DetectionLab/issues
 
-.PARAMETER ProviderName
+.PARAMETER ProviderName 
   The Hypervisor you're using for the lab. Valid options are 'virtualbox' or 'vmware_desktop'
 
 .PARAMETER PackerPath
@@ -352,15 +352,15 @@ function download {
 function post_build_checks {
 
   Write-Host '[post_build_checks] Running Splunk Check.'
-  $SPLUNK_CHECK = download -URL 'https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
+  $SPLUNK_CHECK = download -URL 'https://10.1.1.105:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
   Write-Host "[post_build_checks] Splunk Result: $SPLUNK_CHECK"
 
   Write-Host '[post_build_checks] Running Fleet Check.'
-  $FLEET_CHECK = download -URL 'https://192.168.38.105:8412' -PatternToMatch 'Kolide Fleet'
+  $FLEET_CHECK = download -URL 'https://10.1.1.105:8412' -PatternToMatch 'Kolide Fleet'
   Write-Host "[post_build_checks] Fleet Result: $FLEET_CHECK"
 
   Write-Host '[post_build_checks] Running MS ATA Check.'
-  $ATA_CHECK = download -URL 'https://192.168.38.103' -SuccessOn401
+  $ATA_CHECK = download -URL 'https://10.1.1.103' -SuccessOn401
   Write-Host "[post_build_checks] ATA Result: $ATA_CHECK"
 
   if ($SPLUNK_CHECK -eq $false) {

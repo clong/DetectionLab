@@ -24,8 +24,8 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
     -CreateDnsDelegation:$false `
     -DatabasePath "C:\Windows\NTDS" `
     -DomainMode "Win2012" `
-    -DomainName "windomain.local" `
-    -DomainNetbiosName "WINDOMAIN" `
+    -DomainName "deathstar.local" `
+    -DomainNetbiosName "deathstar" `
     -ForestMode "Win2012" `
     -InstallDns:$true `
     -LogPath "C:\Windows\NTDS" `

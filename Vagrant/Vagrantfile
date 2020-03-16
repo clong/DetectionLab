@@ -10,45 +10,13 @@ Vagrant.configure("2") do |config|
     cfg.vm.box = "bento/ubuntu-18.04"
     cfg.vm.hostname = "logger"
     cfg.vm.provision :shell, path: "bootstrap.sh"
-    cfg.vm.network :private_network, ip: "192.168.38.105", gateway: "192.168.38.1", dns: "8.8.8.8"
+    cfg.vm.network :private_network, ip: "10.1.1.105", gateway: "10.1.1.1", dns: "8.8.8.8"
 
     cfg.vm.provider "vmware_desktop" do |v, override|
       v.vmx["displayname"] = "logger"
       v.memory = 4096
       v.cpus = 2
       v.gui = true
-    end
-
-    cfg.vm.provider "virtualbox" do |vb, override|
-      vb.gui = true
-      vb.name = "logger"
-      vb.customize ["modifyvm", :id, "--memory", 4096]
-      vb.customize ["modifyvm", :id, "--cpus", 2]
-      vb.customize ["modifyvm", :id, "--vram", "32"]
-      vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
-      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-    end
-
-    cfg.vm.provider "libvirt" do |lv, override|
-      lv.graphics_type = "vnc"
-      lv.video_type = "vga"
-      lv.input :type => "tablet", :bus => "usb"
-      lv.video_vram = 32768
-      lv.memory = 4096
-      lv.cpus = 2
-      # This is required for Vagrant to properly configure the network interfaces.
-      # See https://github.com/clong/DetectionLab/wiki/LibVirt-Support for more information
-      lv.management_network_name = "VagrantMgmt"
-      lv.management_network_address = "192.168.123.0/24"
-      lv.management_network_mode = "none"
-      lv.cpu_mode = "host-passthrough"
-      # Which storage pool path to use. Default to /var/lib/libvirt/images or ~/.local/share/libvirt/images depending on if you are running a system or user QEMU/KVM session.
-      #libvirt.storage_pool_path = '/media/storage_nvme/system_session_vm_pool'
-      lv.storage_pool_name = 'default'
-      override.vm.box = "generic/ubuntu1604"
-      override.vm.synced_folder './', '/vagrant', type: 'rsync' 
     end
   end
 
@@ -61,10 +29,10 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.102", gateway: "192.168.38.1", dns: "8.8.8.8"
+    cfg.vm.network :private_network, ip: "10.1.1.102", gateway: "10.1.1.1", dns: "8.8.8.8"
 
     # Added DNS here because libvirt fails to properly configure the windows client otherwise... :(
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.102 -dns 8.8.8.8 -gateway 192.168.38.1" 
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 10.1.1.102 -dns 8.8.8.8 -gateway 10.1.1.1" 
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -86,37 +54,11 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
-      v.vmx["displayname"] = "dc.windomain.local"
+      v.vmx["displayname"] = "dc.deathstar.local"
       v.memory = 3072
       v.cpus = 2
       v.gui = true
       v.enable_vmrun_ip_lookup = false
-    end
-
-    cfg.vm.provider "virtualbox" do |vb, override|
-      vb.gui = true
-      vb.name = "dc.windomain.local"
-      vb.default_nic_type = "82545EM"
-      vb.customize ["modifyvm", :id, "--memory", 3072]
-      vb.customize ["modifyvm", :id, "--cpus", 2]
-      vb.customize ["modifyvm", :id, "--vram", "32"]
-      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-    end
-
-    cfg.vm.provider "libvirt" do |lv, override|
-      lv.graphics_type = "spice"
-      lv.video_type = "qxl"
-      lv.input :type => "tablet", :bus => "usb"
-
-      override.vm.box = "../Boxes/windows_2016_libvirt.box"
-      lv.video_vram = 32768
-      lv.memory = 3072
-      lv.cpus = 2
-      # This is NOT the right semantic for Vagrant synced folder. It's a workaround:
-      # https://github.com/Cimpress-MCP/vagrant-winrm-syncedfolders/issues/11
-      override.vm.synced_folder '.', '/', type: 'winrm' 
     end
   end
 
@@ -128,9 +70,9 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.103", gateway: "192.168.38.1", dns: "192.168.38.102"
+    cfg.vm.network :private_network, ip: "10.1.1.103", gateway: "10.1.1.1", dns: "10.1.1.102"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.103 -dns 8.8.8.8 -gateway 192.168.38.1" 
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 10.1.1.103 -dns 8.8.8.8 -gateway 10.1.1.1" 
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", inline: "cscript c:\\windows\\system32\\slmgr.vbs -rearm", privileged: false
     cfg.vm.provision "reload"
@@ -152,34 +94,11 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-microsoft-ata.ps1", privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
-      v.vmx["displayname"] = "wef.windomain.local"
+      v.vmx["displayname"] = "wef.deathstar.local"
       v.memory = 2048
       v.cpus = 2
       v.gui = true
       v.enable_vmrun_ip_lookup = false
-    end
-
-    cfg.vm.provider "virtualbox" do |vb, override|
-      vb.gui = true
-      vb.name = "wef.windomain.local"
-      vb.default_nic_type = "82545EM"
-      vb.customize ["modifyvm", :id, "--memory", 2048]
-      vb.customize ["modifyvm", :id, "--cpus", 2]
-      vb.customize ["modifyvm", :id, "--vram", "32"]
-      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-    end
-
-    cfg.vm.provider "libvirt" do |lv, override|
-      lv.graphics_type = "spice"
-      lv.video_type = "qxl"
-      lv.input :type => "tablet", :bus => "usb"
-      override.vm.box = "../Boxes/windows_2016_libvirt.box" 
-      lv.video_vram = 32768
-      lv.memory = 2048
-      lv.cpus = 2
-      override.vm.synced_folder '.', '/', type: 'winrm' 
     end
   end
 
@@ -191,9 +110,9 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 1200
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.104", gateway: "192.168.38.1", dns: "192.168.38.102"
+    cfg.vm.network :private_network, ip: "10.1.1.104", gateway: "10.1.1.1", dns: "10.1.1.102"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.104 -dns 8.8.8.8 -gateway 192.168.38.1" 
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 10.1.1.104 -dns 8.8.8.8 -gateway 10.1.1.1" 
     cfg.vm.provision "shell", path: "scripts/MakeWindows10GreatAgain.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", inline: "cscript c:\\windows\\system32\\slmgr.vbs -rearm", privileged: false
@@ -210,35 +129,13 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
-      v.vmx["displayname"] = "win10.windomain.local"
+      v.vmx["displayname"] = "win10.deathstar.local"
       v.vmx["gui.fullscreenatpoweron"] = "FALSE"
       v.vmx["gui.viewModeAtPowerOn"] = "windowed"
       v.memory = 2048
       v.cpus = 1
       v.gui = true
       v.enable_vmrun_ip_lookup = false
-    end
-
-    cfg.vm.provider "virtualbox" do |vb, override|
-      vb.gui = true
-      vb.name = "win10.windomain.local"
-      vb.default_nic_type = "82545EM"
-      vb.customize ["modifyvm", :id, "--memory", 2048]
-      vb.customize ["modifyvm", :id, "--cpus", 1]
-      vb.customize ["modifyvm", :id, "--vram", "32"]
-      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-    end
-    cfg.vm.provider "libvirt" do |lv, override|
-      lv.graphics_type = "spice"
-      lv.video_type = "qxl"
-      lv.input :type => "tablet", :bus => "usb"
-      override.vm.box = "../Boxes/windows_10_libvirt.box"
-      lv.video_vram = 32768
-      lv.memory = 2048
-      lv.cpus = 2
-      override.vm.synced_folder '.', '/', type: 'winrm' 
     end
   end
 end

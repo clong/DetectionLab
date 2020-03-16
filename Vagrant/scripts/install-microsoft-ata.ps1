@@ -78,7 +78,7 @@ if (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center
 
 Start-Sleep -Seconds 60
 
-Invoke-Command -computername dc -Credential (new-object pscredential("windomain\vagrant",(ConvertTo-SecureString -AsPlainText -Force -String "vagrant"))) -ScriptBlock {
+Invoke-Command -computername dc -Credential (new-object pscredential("deathstar\vagrant",(ConvertTo-SecureString -AsPlainText -Force -String "vagrant"))) -ScriptBlock {
 
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [$env:computername] Installing ATA Lightweight gateway..."
 
