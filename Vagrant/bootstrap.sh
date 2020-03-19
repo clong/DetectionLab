@@ -221,7 +221,7 @@ install_splunk() {
     # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-common-information-model-cim_4150.tgz -auth 'admin:changeme'
     # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-es-content-update_1052.tgz -auth 'admin:changeme'
     # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-security-essentials_306.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-stream_720.tgz -auth 'admin:changeme'
+    ## /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-stream_720.tgz -auth 'admin:changeme'
     # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/ta-for-code42-app-for-splunk_3012.tgz -auth 'admin:changeme'
     # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/url-toolbox_18.tgz -auth 'admin:changeme'
     # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/virustotal-workflow-actions-for-splunk_020.tgz -auth 'admin:changeme'
