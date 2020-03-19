@@ -187,7 +187,7 @@ install_splunk() {
 
     ### BOTSv2 COMMENT BLOCK ENDS ###
 
-        # Uncomment the following block to install BOTSv3
+    # Uncomment the following block to install BOTSv3
     # Thanks to @MHaggis for this addition!
     # More information on BOTSv3 can be found at https://github.com/splunk/botsv3
 
@@ -226,16 +226,13 @@ install_splunk() {
     # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/url-toolbox_18.tgz -auth 'admin:changeme'
     # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/virustotal-workflow-actions-for-splunk_020.tgz -auth 'admin:changeme'
 
-    ### UNCOMMENT THIS BLOCK FOR THE ATTACK-ONLY DATASET (Recommended) ###
+    ### UNCOMMENT THIS BLOCK FOR BOTSv3 DATASET ###
     # echo "[$(date +%H:%M:%S)]: Downloading Splunk BOTSv3 Attack Only Dataset..."
     # wget --progress=bar:force -P /opt/ https://botsdataset.s3.amazonaws.com/botsv3/botsv3_data_set.tgz
     # echo "[$(date +%H:%M:%S)]: Download Complete."
     # echo "[$(date +%H:%M:%S)]: Extracting to Splunk Apps directory"
     # tar zxvf /opt/botsv3_data_set.tgz -C /opt/splunk/etc/apps/
-    ### ATTACK-ONLY COMMENT BLOCK ENDS ###
-
-    ### BOTSv3 COMMENT BLOCK ENDS ###
-    
+    ### BOTSv3 COMMENT BLOCK ENDS ###    
 
     # Add custom Macro definitions for ThreatHunting App
     cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
