@@ -324,7 +324,7 @@ install_zeek() {
   # Install tools to build and configure Zeek
   apt-get -qq -ym install zeek crudini python-pip
   export PATH=$PATH:/opt/zeek/bin
-  pip install zkg
+  pip install zkg==2.0.7
   zkg refresh
   zkg autoconfig
   zkg install --force salesforce/ja3
