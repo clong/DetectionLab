@@ -232,7 +232,7 @@ install_splunk() {
     # echo "[$(date +%H:%M:%S)]: Download Complete."
     # echo "[$(date +%H:%M:%S)]: Extracting to Splunk Apps directory"
     # tar zxvf /opt/botsv3_data_set.tgz -C /opt/splunk/etc/apps/
-    ### BOTSv3 COMMENT BLOCK ENDS ###    
+    ### BOTSv3 COMMENT BLOCK ENDS ###
 
     # Add custom Macro definitions for ThreatHunting App
     cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
@@ -371,7 +371,7 @@ install_zeek() {
   # Install tools to build and configure Zeek
   apt-get -qq -ym install zeek crudini python-pip
   export PATH=$PATH:/opt/zeek/bin
-  pip install zkg
+  pip install zkg==2.1.1
   zkg refresh
   zkg autoconfig
   zkg install --force salesforce/ja3
