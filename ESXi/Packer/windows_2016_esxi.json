@@ -37,7 +37,7 @@
         "../../Packer/scripts/win-updates.ps1"
       ],
       "vmx_data": {
-        "ethernet0.networkName": "{{ esxi_network_with_dhcp_and_internet }}",
+        "ethernet0.networkName": "{{user `esxi_network_with_dhcp_and_internet`}}",
         "memsize": "2048",
         "numvcpus": "2",
         "scsi0.virtualDev": "lsisas1068"
