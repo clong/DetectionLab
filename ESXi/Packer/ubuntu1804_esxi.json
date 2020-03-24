@@ -45,6 +45,7 @@
             "ssh_password": "vagrant",
             "ssh_port": 22,
             "ssh_username": "vagrant",
+            "ssh_timeout": "10000s",
             "pause_before_connecting": "10m",
             "tools_upload_flavor": "linux",
             "type": "vmware-iso",
