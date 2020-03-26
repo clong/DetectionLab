@@ -335,13 +335,6 @@ import_osquery_config_into_fleet() {
   sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
   sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
   sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
-  # These can be removed after this PR is merged: https://github.com/palantir/osquery-configuration/pull/14
-  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/packs/windows-application-security.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/packs/windows-compliance.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/packs/windows-registry-monitoring.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows\n    - macOS/g" osquery-configuration/Fleet/Endpoints/packs/performance-metrics.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows\n    - macOS/g" osquery-configuration/Fleet/Endpoints/packs/security-tooling-checks.yaml
 
   # Use fleetctl to import YAML files
   fleetctl apply -f osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
