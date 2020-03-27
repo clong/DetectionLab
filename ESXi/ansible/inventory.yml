@@ -2,7 +2,7 @@
 
 logger:
   hosts:
-    192.168.3.151:
+    192.168.3.158:
       ansible_user: vagrant
       ansible_password: vagrant
       ansible_port: 22

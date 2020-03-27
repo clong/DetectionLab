@@ -142,98 +142,6 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_141.tgz -auth 'admin:changeme'
 
-    # Uncomment the following block to install BOTSv2
-    # Thanks to @MHaggis for this addition!
-    # It is recommended to only uncomment the attack-only dataset comment block.
-    # You may also link to the full dataset which is ~12GB if you prefer.
-    # More information on BOTSv2 can be found at https://github.com/splunk/botsv2
-
-    ### BOTSv2 COMMENT BLOCK BEGINS ###
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/base64_11.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/jellyfisher_010.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/palo-alto-networks-add-on-for-splunk_620.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/SA-ctf_scoreboard_admin-master.zip  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/SA-ctf_scoreboard-master.zip  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sa-investigator-for-enterprise-security_200.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-apache-web-server_100.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-cloud-services_310.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-iis_101.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-windows_700.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-symantec-endpoint-protection_230.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-unix-and-linux_701.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/osquery-app-for-splunk_060.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-common-information-model-cim_4150.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-security-essentials_306.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-ta-for-suricata_233.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/ssl-certificate-checker_32.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/url-toolbox_18.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/website-monitoring_274.tgz  -auth 'admin:changeme'
-
-    ### UNCOMMENT THIS BLOCK FOR THE ATTACK-ONLY DATASET (Recommended) ###
-    # echo "[$(date +%H:%M:%S)]: Downloading Splunk BOTSv2 Attack Only Dataset..."
-    # wget --progress=bar:force -P /opt/ https://s3.amazonaws.com/botsdataset/botsv2/botsv2_data_set_attack_only.tgz
-    # echo "[$(date +%H:%M:%S)]: Download Complete."
-    # echo "[$(date +%H:%M:%S)]: Extracting to Splunk Apps directory"
-    # tar zxvf /opt/botsv2_data_set_attack_only.tgz -C /opt/splunk/etc/apps/
-    ### ATTACK-ONLY COMMENT BLOCK ENDS ###
-
-    ### UNCOMMENT THIS BLOCK FOR THE FULL 12GB DATASET (Not recommended) ###
-    # echo "[$(date +%H:%M:%S)]: Downloading Splunk BOTSv2..."
-    # wget --progress=bar:force https://s3.amazonaws.com/botsdataset/botsv2/botsv2_data_set.tgz /opt/
-    # echo "[$(date +%H:%M:%S)]: Download Complete."
-    # echo "[$(date +%H:%M:%S)]: Extracting to Splunk Apps directory"
-    # tar zxvf botsv2_data_set.tgz /opt/splunk/etc/apps
-    ### FULL DATASET COMMENT BLOCK ENDS ###
-
-    ### BOTSv2 COMMENT BLOCK ENDS ###
-
-    # Uncomment the following block to install BOTSv3
-    # Thanks to @MHaggis for this addition!
-    # More information on BOTSv3 can be found at https://github.com/splunk/botsv3
-
-    ### BOTSv3 COMMENT BLOCK BEGINS ###
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/base64_11.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/jellyfisher_010.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/palo-alto-networks-add-on-for-splunk_620.tgz  -auth 'admin:changeme'    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/SA-ctf_scoreboard_admin-master.zip  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/SA-ctf_scoreboard-master.zip  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sa-investigator-for-enterprise-security_200.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-apache-web-server_100.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-iis_101.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-ta-for-suricata_233.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/ssl-certificate-checker_32.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/website-monitoring_274.tgz  -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/amazon-guardduty-add-on-for-splunk_104.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/cisco-anyconnect-network-visibility-module-nvm-app-for-splunk_20187.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/code42-for-splunk_3012.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/decrypt_20.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/microsoft-365-app-for-splunk_301.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/microsoft-azure-add-on-for-splunk_202.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/osquery-app-for-splunk_060.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-amazon-web-services_500.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-cisco-asa_340.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-cloud-services_401.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-office-365_201.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-sysmon_1062.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-windows_700.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-symantec-endpoint-protection_301.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-tenable_514.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-unix-and-linux_701.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-common-information-model-cim_4150.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-es-content-update_1052.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-security-essentials_306.tgz -auth 'admin:changeme'
-    ## /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-stream_720.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/ta-for-code42-app-for-splunk_3012.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/url-toolbox_18.tgz -auth 'admin:changeme'
-    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/virustotal-workflow-actions-for-splunk_020.tgz -auth 'admin:changeme'
-
-    ### UNCOMMENT THIS BLOCK FOR BOTSv3 DATASET ###
-    # echo "[$(date +%H:%M:%S)]: Downloading Splunk BOTSv3 Attack Only Dataset..."
-    # wget --progress=bar:force -P /opt/ https://botsdataset.s3.amazonaws.com/botsv3/botsv3_data_set.tgz
-    # echo "[$(date +%H:%M:%S)]: Download Complete."
-    # echo "[$(date +%H:%M:%S)]: Extracting to Splunk Apps directory"
-    # tar zxvf /opt/botsv3_data_set.tgz -C /opt/splunk/etc/apps/
-    ### BOTSv3 COMMENT BLOCK ENDS ###
-
     # Add custom Macro definitions for ThreatHunting App
     cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
     # Fix Windows TA macros
@@ -258,27 +166,23 @@ install_splunk() {
     mkdir -p /opt/splunk/etc/users/admin/search/local
     echo -e "[search-tour]\nviewed = 1" >/opt/splunk/etc/system/local/ui-tour.conf
     # Source: https://answers.splunk.com/answers/660728/how-to-disable-the-modal-pop-up-help-us-to-improve.html
+    if [ ! -d "/opt/splunk/etc/users/admin/user-prefs/local" ]; then
+      mkdir -p "/opt/splunk/etc/users/admin/user-prefs/local"
+    fi
     echo '[general]
-render_version_messages = 0
-hideInstrumentationOptInModal = 1
-dismissedInstrumentationOptInVersion = 1
-[general_default]
-hideInstrumentationOptInModal = 1
-showWhatsNew = 0
-notification_python_3_impact = false' >/opt/splunk/etc/system/local/user-prefs.conf
-    echo '[general]
-render_version_messages = 0
-hideInstrumentationOptInModal = 1
-dismissedInstrumentationOptInVersion = 1
-[general_default]
-hideInstrumentationOptInModal = 1
-showWhatsNew = 0
-notification_python_3_impact = false' >/opt/splunk/etc/apps/user-prefs/local/user-prefs.conf
+render_version_messages = 1
+dismissedInstrumentationOptInVersion = 4
+notification_python_3_impact = false
+display.page.home.dashboardId = /servicesNS/nobody/search/data/ui/views/logger_dashboard' > /opt/splunk/etc/users/admin/user-prefs/local/user-prefs.conf
     # Disable the instrumentation popup
     echo -e "showOptInModal = 0\noptInVersionAcknowledged = 4" >>/opt/splunk/etc/apps/splunk_instrumentation/local/telemetry.conf
-
     # Enable SSL Login for Splunk
     echo -e "[settings]\nenableSplunkWebSSL = true" >/opt/splunk/etc/system/local/web.conf
+    # Copy over the Logger Dashboard
+    if [ ! -d "/opt/splunk/etc/apps/search/local/data/ui/views" ]; then
+      mkdir -p "/opt/splunk/etc/apps/search/local/data/ui/views"
+    fi
+    cp /vagrant/resources/splunk_server/logger_dashboard.xml /opt/splunk/etc/apps/search/local/data/ui/views || echo "Unable to find dashboard"
     # Reboot Splunk to make changes take effect
     /opt/splunk/bin/splunk restart
     /opt/splunk/bin/splunk enable boot-start
@@ -335,13 +239,11 @@ import_osquery_config_into_fleet() {
   sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
   sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
   sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
-  # These can be removed after this PR is merged: https://github.com/palantir/osquery-configuration/pull/14
-  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/packs/windows-application-security.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/packs/windows-compliance.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows/g" osquery-configuration/Fleet/Endpoints/packs/windows-registry-monitoring.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows\n    - macOS/g" osquery-configuration/Fleet/Endpoints/packs/performance-metrics.yaml
-  sed -i "s/labels: null/labels:\n    - MS Windows\n    - macOS/g" osquery-configuration/Fleet/Endpoints/packs/security-tooling-checks.yaml
+
+  # Don't log osquery INFO messages
+  fleetctl get options > /tmp/options.yaml
+  /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_min_status' '1'
+  fleetctl apply -f /tmp/options.yaml
 
   # Use fleetctl to import YAML files
   fleetctl apply -f osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
