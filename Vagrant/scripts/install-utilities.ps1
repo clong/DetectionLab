@@ -14,8 +14,6 @@ If ($(hostname) -eq "win10") {
   choco install -y --limit-output --no-progress classic-shell -installArgs ADDLOCAL=ClassicStartMenu
   & "C:\Program Files\Classic Shell\ClassicStartMenu.exe" "-xml" "c:\vagrant\resources\windows\MenuSettings.xml"
 }
-choco install -y --limit-output --no-progress NotepadPlusPlus
-choco install -y --limit-output --no-progress GoogleChrome
-choco install -y --limit-output --no-progress WinRar
+choco install -y --limit-output --no-progress NotepadPlusPlus GoogleChrome WinRar
 
 Write-Host "Utilties installation complete!"

@@ -318,7 +318,6 @@
     sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
     sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
 
-    # Dont log osquery INFO messages
     fleetctl get options > /tmp/options.yaml
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_min_status' '1'
     fleetctl apply -f /tmp/options.yaml
