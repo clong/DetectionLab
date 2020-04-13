@@ -2,6 +2,12 @@
 
 # This script is used to manually prepare an Ubuntu 16.04 server for DetectionLab building
 
+    # eth1:
+    #   dhcp4: true
+    #   gateway4: 192.168.76.1
+    #   nameservers:
+    #     addresses: [8.8.8.8,8.8.4.4]
+
 export DEBIAN_FRONTEND=noninteractive
 export SERIALNUMBER="SECRET"
 export LICENSEFILE="SECRET"
@@ -14,9 +20,9 @@ apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apa
 pip install awscli --upgrade --user
 cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
 
-wget -O VMware-Workstation-Full-15.5.1-15018445.x86_64.bundle "https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-15.5.1-15018445.x86_64.bundle"
-chmod +x VMware-Workstation-Full-15.5.1-15018445.x86_64.bundle
-sudo sh VMware-Workstation-Full-15.5.1-15018445.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
+wget -O VMware-Workstation-Full-15.5.2-15785246.x86_64.bundle "https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-15.5.2-15785246.x86_64.bundle"
+chmod +x VMware-Workstation-Full-15.5.2-15785246.x86_64.bundle
+sudo sh VMware-Workstation-Full-15.5.2-15785246.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
 
 # Set up firewall
 ufw allow ssh
@@ -28,8 +34,8 @@ git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab
 # Install Vagrant
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.6/vagrant_2.2.6_x86_64.deb
-dpkg -i vagrant_2.2.6_x86_64.deb
+wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.7/vagrant_2.2.7_x86_64.deb
+dpkg -i vagrant_2.2.7_x86_64.deb
 # Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
 echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf > /dev/null

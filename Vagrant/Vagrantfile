@@ -1,10 +1,4 @@
-
-
 Vagrant.configure("2") do |config|
-
-  config.vm.provider "libvirt" do |libvirt|
-
-  end
 
   config.vm.define "logger" do |cfg|
     cfg.vm.box = "bento/ubuntu-18.04"
@@ -84,6 +78,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
     cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
+    cfg.vm.provision "shell", inline: 'cscript c:\windows\system32\slmgr.vbs /dlv', privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
       v.vmx["displayname"] = "dc.windomain.local"
@@ -132,7 +127,6 @@ Vagrant.configure("2") do |config|
 
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.103 -dns 8.8.8.8 -gateway 192.168.38.1" 
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
-    cfg.vm.provision "shell", inline: "cscript c:\\windows\\system32\\slmgr.vbs -rearm", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
@@ -150,6 +144,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-microsoft-ata.ps1", privileged: false
+    cfg.vm.provision "shell", inline: 'cscript c:\windows\system32\slmgr.vbs /dlv', privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
       v.vmx["displayname"] = "wef.windomain.local"
@@ -196,7 +191,6 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.104 -dns 8.8.8.8 -gateway 192.168.38.1" 
     cfg.vm.provision "shell", path: "scripts/MakeWindows10GreatAgain.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
-    cfg.vm.provision "shell", inline: "cscript c:\\windows\\system32\\slmgr.vbs -rearm", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
@@ -208,6 +202,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
+    cfg.vm.provision "shell", inline: 'cscript c:\windows\system32\slmgr.vbs /dlv', privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|
       v.vmx["displayname"] = "win10.windomain.local"
