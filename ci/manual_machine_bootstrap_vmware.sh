@@ -2,11 +2,10 @@
 
 # This script is used to manually prepare an Ubuntu 16.04 server for DetectionLab building
 
-    # eth1:
-    #   dhcp4: true
-    #   gateway4: 192.168.76.1
-    #   nameservers:
-    #     addresses: [8.8.8.8,8.8.4.4]
+# Put this code in bootstrap.sh
+# echo -e "    eth1:\n      dhcp4: true\n      nameservers:\n        addresses: [8.8.8.8,8.8.4.4]" >> /etc/netplan/01-netcfg.yaml
+# netplan apply
+# sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr +i /etc/resolv.conf
 
 export DEBIAN_FRONTEND=noninteractive
 export SERIALNUMBER="SECRET"

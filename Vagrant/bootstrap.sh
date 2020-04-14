@@ -129,7 +129,15 @@ install_splunk() {
       # Download Hardcoded Splunk
       wget --progress=bar:force -O /opt/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb 'https://download.splunk.com/products/splunk/releases/8.0.2/linux/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb&wget=true'
     fi
-    dpkg -i /opt/splunk*.deb
+    if ! ls /opt/splunk*.deb 1> /dev/null 2>&1; then
+      echo "Something went wrong while trying to download Splunk. This script cannot continue. Exiting."
+      exit 1
+    fi
+    if ! dpkg -i /opt/splunk*.deb > /dev/null; then
+      echo "Something went wrong while trying to install Splunk. This script cannot continue. Exiting."
+      exit 1
+    fi
+
     /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
     /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
     /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'

@@ -1,7 +1,7 @@
 # Import the registry keys
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Making Windows 10 Great again"
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Importing registry keys..."
-regedit /s a:\MakeWindows10GreatAgain.reg
+regedit /s c:\vagrant\scripts\MakeWindows10GreatAgain.reg
 
 # Remove OneDrive from the System
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Removing OneDrive..."
