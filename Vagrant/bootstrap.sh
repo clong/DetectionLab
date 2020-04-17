@@ -1,5 +1,10 @@
 #! /bin/bash
 
+# Override existing DNS Settings
+echo -e "    eth1:\n      dhcp4: true\n      nameservers:\n        addresses: [8.8.8.8,8.8.4.4]" >> /etc/netplan/01-netcfg.yaml
+netplan apply
+sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr +i /etc/resolv.conf
+
 # Get a free Maxmind license here: https://www.maxmind.com/en/geolite2/signup
 # Required for the ASNgen app to work: https://splunkbase.splunk.com/app/3531/
 export MAXMIND_LICENSE=
