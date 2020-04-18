@@ -1,14 +1,17 @@
 #! /bin/bash
 
 # This script is used to manually prepare an Ubuntu 16.04 server for DetectionLab building
-
+export DEBIAN_FRONTEND=noninteractive
 sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
 
-# Install Virtualbox 5.2
-echo "deb http://download.virtualbox.org/virtualbox/debian xenial contrib" >> /etc/apt/sources.list
+# Install Virtualbox 6.1
+echo "deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian $(lsb_release -sc) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-apt-get update
-apt-get install -y linux-headers-"$(uname -r)" virtualbox-5.2 build-essential unzip git ufw apache2 python-pip
+wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
+echo "[$(date +%H:%M:%S)]: Running apt-get update..."
+apt-get -qq update
+echo "[$(date +%H:%M:%S)]: Running apt-get install..."
+apt-get -qq install -y linux-headers-"$(uname -r)" virtualbox-6.1 build-essential unzip git ufw apache2 python-pip
 pip install awscli --upgrade --user
 cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
 

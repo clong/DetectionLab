@@ -241,8 +241,6 @@ resource "aws_instance" "wef" {
   provisioner "remote-exec" {
     inline = [
       "choco install -force -y winpcap",
-      "cscript c:\\windows\\system32\\slmgr.vbs -rearm",
-      "shutdown -r",
     ]
 
     connection {
@@ -273,7 +271,10 @@ resource "aws_instance" "win10" {
   instance_type = "t2.medium"
 
   provisioner "remote-exec" {
-    inline = ["choco install -force -y winpcap"]
+    inline = [
+      "choco install -force -y winpcap",
+      "cscript c:\\windows\\system32\\slmgr.vbs /ato",
+    ]
 
     connection {
       type     = "winrm"
