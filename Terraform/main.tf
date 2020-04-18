@@ -208,7 +208,8 @@ resource "aws_instance" "dc" {
     inline = [
       "choco install -force -y winpcap",
       "powershell -c \"$ifindex = get-netipinterface | where-object InterfaceAlias -eq 'Ethernet' | where-object AddressFamily -eq 2 | select-object -ExpandProperty ifIndex; set-dnsclientserveraddress -InterfaceIndex $ifindex -ServerAddresses ('127.0.0.1','8.8.8.8')\"",
-      "ipconfig /all"
+      "ipconfig /all",
+      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'\"",
       ]
 
     connection {
