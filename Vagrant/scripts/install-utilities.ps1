@@ -13,7 +13,7 @@ If ($(hostname) -eq "win10") {
   # Because the Windows10 start menu sucks
   choco install -y --limit-output --no-progress classic-shell -installArgs ADDLOCAL=ClassicStartMenu
   & "C:\Program Files\Classic Shell\ClassicStartMenu.exe" "-xml" "c:\vagrant\resources\windows\MenuSettings.xml"
-  regedit /s c:\vagrant\resources\MenuStyle_Default_Win7.reg
+  regedit /s c:\vagrant\resources\windows\MenuStyle_Default_Win7.reg
 }
 choco install -y --limit-output --no-progress NotepadPlusPlus GoogleChrome WinRar
 
