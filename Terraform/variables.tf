@@ -8,7 +8,7 @@ variable "profile" {
 
 variable "availability_zone" {
   description = "https://www.terraform.io/docs/providers/aws/d/availability_zone.html"
-  default     = "us-west-1b"
+  default     = ""
 }
 
 variable "shared_credentials_file" {
