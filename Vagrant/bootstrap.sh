@@ -88,7 +88,7 @@ fix_eth1_static_ip() {
   }' >>/etc/dhcp/dhclient.conf
   netplan apply
   # Fix eth1 if the IP isn't set correctly
-  ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+  ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
   if [ "$ETH1_IP" != "192.168.38.105" ]; then
     echo "Incorrect IP Address settings detected. Attempting to fix."
     ifdown eth1
