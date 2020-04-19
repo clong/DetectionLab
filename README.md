@@ -60,14 +60,14 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
     - Note: Virtualbox is free, the [VMWare Desktop Vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80 and is required to use Vagrant with VMware.
 
 There are currently three ways to build the lab:
-* **Recommended**: Use the boxes hosted on [Vagrant Cloud](https://app.vagrantup.com/detectionlab). This method should take **~2 hours** total to download the boxes and provision the lab.
-* Build the boxes yourself using Packer. This method will take ~4 hours to build the boxes and another ~90-120 minutes to provision them for a total of **5-6 hours**.
+* **Recommended**: Use the boxes hosted on [Vagrant Cloud](https://app.vagrantup.com/detectionlab). This method should take **~1 hour 20 minutes** total to download the boxes and provision the lab.
+* Build the boxes yourself using Packer. This method will take ~1-2 hours to build the boxes and another ~90-120 minutes to provision them for a total of **2.5 - 4 hours**.
 * [Provision the lab in AWS using Terraform](Terraform/README.md). The lab can be brought online in under **30 minutes**.
 
 If you choose to use the boxes hosted on Vagrant Cloud, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
 
 
-2. `cd` to the Packer directory and build the Windows 10 and Windows Server 2016 boxes using the commands below. Each build will take about 1 hour. As far as I know, you can only build one box at a time.
+2. `cd` to the Packer directory and build the Windows 10 and Windows Server 2016 boxes using the commands below. Each build will take about 45 minutes.
 
 ```
 $ cd detectionlab/Packer
