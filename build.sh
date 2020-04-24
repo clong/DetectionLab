@@ -29,10 +29,10 @@ check_vagrant_path() {
     (echo >&2 "Please correct this before continuing. Quitting.")
     exit 1
   fi
-  # Ensure Vagrant >= 2.2.2
+  # Ensure Vagrant >= 2.2.7
   # https://unix.stackexchange.com/a/285928
   VAGRANT_VERSION="$(vagrant --version | cut -d ' ' -f 2)"
-  REQUIRED_VERSION="2.2.2"
+  REQUIRED_VERSION="2.2.7"
   # If the version of Vagrant is not greater than the required version
   if ! [ "$(printf '%s\n' "$REQUIRED_VERSION" "$VAGRANT_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
     (echo >&2 "WARNING: It is highly recommended to use Vagrant $REQUIRED_VERSION or above before continuing")

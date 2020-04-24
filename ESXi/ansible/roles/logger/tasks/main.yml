@@ -160,6 +160,14 @@
     executable: /bin/bash
   become: yes
   shell: |
+    # Get a free Maxmind license here: https://www.maxmind.com/en/geolite2/signup
+    # Required for the ASNgen app to work: https://splunkbase.splunk.com/app/3531/
+    export MAXMIND_LICENSE=
+    if [ -z $MAXMIND_LICENSE ]; then
+      echo "Note: You have not entered a MaxMind license key on line 5 of bootstrap.sh, so the ASNgen Splunk app may not work correctly."
+      echo "However, it is not required and everything else should function correctly."
+    fi
+
     # Check if Splunk is already installed
     if [ -f "/opt/splunk/bin/splunk" ]; then
       echo "[$(date +%H:%M:%S)]: Splunk is already installed"
@@ -183,7 +191,14 @@
         # Download Hardcoded Splunk
         wget --progress=bar:force -O /opt/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb 'https://download.splunk.com/products/splunk/releases/8.0.2/linux/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb&wget=true'
       fi
-      dpkg -i /opt/splunk*.deb
+      if ! ls /opt/splunk*.deb 1> /dev/null 2>&1; then
+        echo "Something went wrong while trying to download Splunk. This script cannot continue. Exiting."
+        exit 1
+      fi
+      if ! dpkg -i /opt/splunk*.deb > /dev/null; then
+        echo "Something went wrong while trying to install Splunk. This script cannot continue. Exiting."
+        exit 1
+      fi
       /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd changeme
       /opt/splunk/bin/splunk add index wineventlog -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index osquery -auth 'admin:changeme'
@@ -193,9 +208,9 @@
       /opt/splunk/bin/splunk add index zeek -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index threathunting -auth 'admin:changeme'
-      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_500.tgz -auth 'admin:changeme'
-      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/add-on-for-microsoft-sysmon_800.tgz -auth 'admin:changeme'
-      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_101.tgz -auth 'admin:changeme'
+      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_700.tgz -auth 'admin:changeme'
+      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-sysmon_1062.tgz -auth 'admin:changeme'
+      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_110.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/lookup-file-editor_331.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-zeek-aka-bro_400.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/force-directed-app-for-splunk_200.tgz -auth 'admin:changeme'
@@ -203,6 +218,13 @@
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_141.tgz -auth 'admin:changeme'
+
+      # Install the Maxmind license key for the ASNgen App
+      if [ ! -z $MAXMIND_LICENSE ]; then
+        mkdir /opt/splunk/etc/apps/TA-asngen/local 
+        cp /opt/splunk/etc/apps/TA-asngen/default/asngen.conf /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
+        sed -i "s/license_key =/license_key = $MAXMIND_LICENSE/g" /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
+      fi
 
       # Add custom Macro definitions for ThreatHunting App
       cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
@@ -385,7 +407,7 @@
     echo "[$(date +%H:%M:%S)]: Installing Zeek..."
     sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
     wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_18.04/Release.key -O /tmp/Release.key
-    apt-key add - </tmp/Release.key
+    apt-key add - </tmp/Release.key &>/dev/null
 
 - name: Install Zeek Packages
   become: yes
@@ -483,7 +505,7 @@
     cd /opt
     apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
     wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz" -O guacamole-server-1.0.0.tar.gz
-    tar -xvf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0
+    tar -xf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0
     ./configure &>/dev/null && make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
     ldconfig
     cd /var/lib/tomcat8/webapps
@@ -510,6 +532,6 @@
     # Include Splunk and Zeek in the PATH
     echo export PATH="$PATH:/opt/splunk/bin:/opt/zeek/bin" >>~/.bashrc
     # Ping DetectionLab server for usage statistics
-    curl -A "DetectionLab-logger" "https://detectionlab.network/logger"
+    curl -s -A "DetectionLab-logger" "https://detectionlab.network/logger"
 
 

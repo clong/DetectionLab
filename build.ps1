@@ -98,12 +98,12 @@ function check_vagrant {
     break
   }
 
-  # Check Vagrant version >= 2.2.2
+  # Check Vagrant version >= 2.2.7
   [System.Version]$vagrant_version = $(vagrant --version).Split(' ')[1]
-  [System.Version]$version_comparison = 2.2.2
+  [System.Version]$version_comparison = 2.2.7
 
   if ($vagrant_version -lt $version_comparison) {
-    Write-Warning 'It is highly recommended to use Vagrant 2.2.2 or above before continuing'
+    Write-Warning 'It is highly recommended to use Vagrant 2.2.7 or above before continuing'
   }
 }
 
