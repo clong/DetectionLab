@@ -1,5 +1,8 @@
 # Purpose: Installs Mimikatz and Powersploit into c:\Tools\Mimikatz. Used to install redteam related tooling.
 
+# Ensure the GPO to disable Windows Defender is applied before continuing
+gpupdate /force
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Red Team Tooling..."
 
 # Windows Defender should be disabled already by O&O ShutUp10
