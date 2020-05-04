@@ -28,11 +28,15 @@ Machine Name,Policy Target,Subcategory,Subcategory GUID,Inclusion Setting,Exclus
 ,System,Audit File System,{0cce921d-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit Filtering Platform Connection,{0cce9226-69ae-11d9-bed3-505054503030},Failure,,2
 ,System,Audit Kernel Object,{0cce921f-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Registry,{0cce921e-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit Removable Storage,{0cce9245-69ae-11d9-bed3-505054503030},Success,,1
 ,System,Audit Audit Policy Change,{0cce922f-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit Authentication Policy Change,{0cce9230-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit MPSSVC Rule-Level Policy Change,{0cce9232-69ae-11d9-bed3-505054503030},Success,,1
+,System,Audit Non Sensitive Privilege Use,{0cce9229-69ae-11d9-bed3-505054503030},Failure,,2
+,System,Audit Sensitive Privilege Use,{0cce9228-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit IPsec Driver,{0cce9213-69ae-11d9-bed3-505054503030},Success and Failure,,3
+,System,Audit Other System Events,{0cce9214-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit Security State Change,{0cce9210-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit Security System Extension,{0cce9211-69ae-11d9-bed3-505054503030},Success and Failure,,3
 ,System,Audit System Integrity,{0cce9212-69ae-11d9-bed3-505054503030},Success and Failure,,3

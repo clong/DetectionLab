@@ -154,7 +154,8 @@
     {
       "type": "powershell",
       "scripts": [
-        "./scripts/debloat-windows.ps1"
+        "./scripts/debloat-windows.ps1",
+        "./scripts/install-aws-ena.ps1"
       ]
     },
     {
