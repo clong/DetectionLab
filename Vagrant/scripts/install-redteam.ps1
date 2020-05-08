@@ -12,10 +12,6 @@ If ($hostname -eq "win10") {
 
 # Windows Defender should be disabled already by the GPO, sometimes it doesnt work
 If ($hostname -ne "win10") {
-  # Adding Defender exclusions just in case
-  Set-MpPreference -ExclusionPath "C:\Tools"
-  Add-MpPreference -ExclusionPath "C:\Users\vagrant\AppData\Local\Temp"
-  Add-MpPreference -DisableRealtimeMonitoring $true
   # Uninstalling Windows Defender (https://github.com/StefanScherer/packer-windows/issues/201)
   Uninstall-WindowsFeature Windows-Defender
   Uninstall-WindowsFeature Windows-Defender-Features
