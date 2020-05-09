@@ -1,6 +1,7 @@
 # Purpose: Installs Mimikatz and Powersploit into c:\Tools\Mimikatz. Used to install redteam related tooling.
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Red Team Tooling..."
+$hostname = $(hostname)
 
 # Windows Defender should be disabled already by O&O ShutUp10 and the GPO
 If ($hostname -eq "win10") {
