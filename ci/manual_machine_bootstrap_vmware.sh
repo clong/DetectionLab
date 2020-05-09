@@ -42,8 +42,8 @@ vagrant plugin install vagrant-reload
 vagrant plugin install vagrant-vmware-desktop
 echo $LICENSEFILE | base64 -d > /tmp/license.lic
 vagrant plugin license vagrant-vmware-desktop /tmp/license.lic
-wget --progress=bar:force "https://releases.hashicorp.com/vagrant-vmware-utility/1.0.7/vagrant-vmware-utility_1.0.7_x86_64.deb"
-dpkg -i vagrant-vmware-utility_1.0.7_x86_64.deb
+wget --progress=bar:force "https://releases.hashicorp.com/vagrant-vmware-utility/1.0.9/vagrant-vmware-utility_1.0.9_x86_64.deb"
+dpkg -i vagrant-vmware-utility_1.0.9_x86_64.deb
 
 # Make the Vagrant instances headless
 cd /opt/DetectionLab/Vagrant || exit 1
