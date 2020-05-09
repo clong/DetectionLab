@@ -167,7 +167,7 @@ resource "aws_instance" "logger" {
   key_name               = aws_key_pair.auth.key_name
   private_ip             = "192.168.38.105"
 
-  # Provision the AWS Ubuntu 16.04 AMI from scratch.
+  # Provision the AWS Ubuntu 18.04 AMI from scratch.
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get -qq update && sudo apt-get -qq install -y git",
