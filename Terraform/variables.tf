@@ -46,7 +46,7 @@ variable "external_dns_servers" {
   default     = ["8.8.8.8"]
 }
 
-# Use Data Sources to resolve the AMI-ID for the Ubuntu 16.04 AMI
+# Use Data Sources to resolve the AMI-ID for the Ubuntu 18.04 AMI
 data "aws_ami" "logger_ami" {
   owners = ["099720109477"]
 

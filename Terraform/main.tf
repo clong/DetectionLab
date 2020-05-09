@@ -155,7 +155,7 @@ resource "aws_key_pair" "auth" {
 }
 
 resource "aws_instance" "logger" {
-  instance_type = "t2.medium"
+  instance_type = "t3.medium"
   ami           = coalesce(var.logger_ami, data.aws_ami.logger_ami.image_id)
 
   tags = {
@@ -167,8 +167,7 @@ resource "aws_instance" "logger" {
   key_name               = aws_key_pair.auth.key_name
   private_ip             = "192.168.38.105"
 
-  # Provision the AWS Ubuntu 16.04 AMI from scratch.
-  # Provision the AWS Ubuntu 16.04 AMI from scratch.
+  # Provision the AWS Ubuntu 18.04 AMI from scratch.
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get -qq update && sudo apt-get -qq install -y git",
@@ -177,8 +176,9 @@ resource "aws_instance" "logger" {
       "sudo mkdir /home/vagrant/.ssh && sudo cp /home/ubuntu/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys && sudo chown -R vagrant:vagrant /home/vagrant/.ssh",
       "echo 'vagrant    ALL=(ALL:ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers",
       "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
-      "sudo sed -i 's/eth1/eth0/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
-      "sudo sed -i 's/ETH1/ETH0/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
+      "sudo sed -i 's/eth1/ens5/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
+      "sudo sed -i 's/ETH1/ens5/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
+      "sudo sed -i 's/eth1/ens5/g' /opt/DetectionLab/Vagrant/resources/suricata/suricata.yaml",
       "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/bootstrap.sh",
       "sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config",
       "sudo service ssh restart",
@@ -202,7 +202,7 @@ resource "aws_instance" "logger" {
 }
 
 resource "aws_instance" "dc" {
-  instance_type = "t2.medium"
+  instance_type = "t3.medium"
 
   provisioner "remote-exec" {
     inline = [
@@ -237,7 +237,7 @@ resource "aws_instance" "dc" {
 }
 
 resource "aws_instance" "wef" {
-  instance_type = "t2.medium"
+  instance_type = "t3.medium"
 
   provisioner "remote-exec" {
     inline = [
