@@ -8,7 +8,7 @@ If ($hostname -eq "win10") {
   # Adding Defender exclusions just in case
   Set-MpPreference -ExclusionPath "C:\Tools"
   Add-MpPreference -ExclusionPath "C:\Users\vagrant\AppData\Local\Temp"
-  Add-MpPreference -DisableRealtimeMonitoring $true
+  Set-MpPreference -DisableRealtimeMonitoring $true
 }
 
 # Windows Defender should be disabled already by the GPO, sometimes it doesnt work
