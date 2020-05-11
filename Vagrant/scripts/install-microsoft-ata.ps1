@@ -50,13 +50,13 @@ if (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center
         If (-not ($actualHash -eq $fileHash))
         {
             Write-Host "$title.iso was not downloaded correctly: hash from downloaded file: $actualHash, should've been: $fileHash. Re-trying using BitsAdmin now..."
-        }
-        Remove-Item -Path "$env:temp\$title.iso" -Force
-        bitsadmin /Transfer ATA $downloadUrl "$env:temp\$title.iso"
-        $actualHash = (Get-FileHash -Algorithm SHA256 -Path "$env:temp\$title.iso").Hash
-        If (-not ($actualHash -eq $fileHash))
-        {
-            throw "$title.iso was not downloaded correctly after a retry: hash from downloaded file: $actualHash, should've been: $fileHash - Giving up."
+            Remove-Item -Path "$env:temp\$title.iso" -Force
+            bitsadmin /Transfer ATA $downloadUrl "$env:temp\$title.iso"
+            $actualHash = (Get-FileHash -Algorithm SHA256 -Path "$env:temp\$title.iso").Hash
+            If (-not ($actualHash -eq $fileHash))
+            {
+                throw "$title.iso was not downloaded correctly after a retry: hash from downloaded file: $actualHash, should've been: $fileHash - Giving up."
+            }
         }
     }
     $Mount = Mount-DiskImage -ImagePath "$env:temp\$title.iso" -StorageType ISO -Access ReadOnly -PassThru
