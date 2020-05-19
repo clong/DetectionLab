@@ -40,8 +40,8 @@ sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
 # Install Packer
 mkdir /opt/packer
 cd /opt/packer || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/packer/1.4.1/packer_1.4.1_linux_amd64.zip
-unzip packer_1.4.1_linux_amd64.zip
+wget --progress=bar:force https://releases.hashicorp.com/packer/1.5.6/packer_1.5.6_linux_amd64.zip
+unzip packer_1.5.6_linux_amd64.zip
 cp packer /usr/local/bin/packer
 
 # Make the Packer images headless
