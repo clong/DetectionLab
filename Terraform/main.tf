@@ -207,8 +207,7 @@ resource "aws_instance" "dc" {
   provisioner "remote-exec" {
     inline = [
       "choco install -force -y winpcap",
-      "powershell -c \"$ifindex = get-netipinterface | where-object InterfaceAlias -eq 'Ethernet' | where-object AddressFamily -eq 2 | select-object -ExpandProperty ifIndex; set-dnsclientserveraddress -InterfaceIndex $ifindex -ServerAddresses ('127.0.0.1','8.8.8.8')\"",
-      "ipconfig /all",
+      "ipconfig /renew",
       "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'\"",
       ]
 
@@ -242,6 +241,9 @@ resource "aws_instance" "wef" {
   provisioner "remote-exec" {
     inline = [
       "choco install -force -y winpcap",
+      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'\"",
+      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'\"",
+      "ipconfig /renew",
     ]
 
     connection {
@@ -274,7 +276,9 @@ resource "aws_instance" "win10" {
   provisioner "remote-exec" {
     inline = [
       "choco install -force -y winpcap",
-      "cscript c:\\windows\\system32\\slmgr.vbs /ato",
+      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'\"",
+      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'\"",
+      "ipconfig /renew",
     ]
 
     connection {

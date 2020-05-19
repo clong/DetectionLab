@@ -7,6 +7,9 @@ $box = $box.ComputerName.ToString().ToLower()
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting timezone to UTC..."
 c:\windows\system32\tzutil.exe /s "UTC"
 
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Checking if Windows evaluation is expiring soon or expired..."
+. c:\vagrant\scripts\fix-windows-expiration.ps1
+
 # Ping DetectionLab server for usage statistics
 curl -userAgent "DetectionLab-$box" "https://detectionlab.network/$box" -UseBasicParsing | out-null
 
@@ -44,14 +47,12 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
   } else {
     . c:\vagrant\scripts\join-domain.ps1
   }
-  Write-Host -fore red 'Hint: vagrant reload' $box '--provision'
-
 } else {
 
   Write-Host -fore green "$('[{0:HH:mm}]' -f (Get-Date)) I am domain joined!"
 
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
-    Write-Host 'Install bginfo'
+    Write-Host 'Installing bginfo...'
     . c:\vagrant\scripts\install-bginfo.ps1
   }
 

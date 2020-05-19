@@ -2,11 +2,6 @@
 
 # This script is used to manually prepare an Ubuntu 16.04 server for DetectionLab building
 
-# Put this code in bootstrap.sh
-# echo -e "    eth1:\n      dhcp4: true\n      nameservers:\n        addresses: [8.8.8.8,8.8.4.4]" >> /etc/netplan/01-netcfg.yaml
-# netplan apply
-# sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr +i /etc/resolv.conf
-
 export DEBIAN_FRONTEND=noninteractive
 export SERIALNUMBER="SECRET"
 export LICENSEFILE="SECRET"
@@ -52,8 +47,8 @@ sed -i 's/v.gui = true/v.gui = false/g' Vagrantfile
 # Install Packer
 mkdir /opt/packer
 cd /opt/packer || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/packer/1.4.1/packer_1.4.1_linux_amd64.zip
-unzip packer_1.4.1_linux_amd64.zip
+wget --progress=bar:force https://releases.hashicorp.com/packer/1.5.6/packer_1.5.6_linux_amd64.zip
+unzip packer_1.5.6_linux_amd64.zip
 cp packer /usr/local/bin/packer
 
 # Make the Packer images headless
