@@ -62,5 +62,22 @@ else {
   Write-Host "Atomic Red Team was already installed. Moving On."
 }
 
+# Download and unzip a copy of BadBlood
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading BadBlood..."
+# GitHub requires TLS 1.2 as of 2/27
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$badbloodDownloadUrl = "https://github.com/davidprowe/BadBlood/archive/master.zip"
+$badbloodRepoPath = "C:\Users\vagrant\AppData\Local\Temp\badblood.zip"
+if (-not (Test-Path $badbloodRepoPath)) {
+  Invoke-WebRequest -Uri "$badbloodDownloadUrl" -OutFile "$badbloodRepoPath"
+  Expand-Archive -path "$badbloodRepoPath" -destinationpath 'c:\Tools\BadBlood' -Force
+  # Lower the number of default users to be created by BadBlood
+  $invokeBadBloodPath = "c:\Tools\BadBlood\BadBlood-master\Invoke-BadBlood.ps1"
+  ((Get-Content -path $invokeBadBloodPath -Raw) -replace '1000..5000','500..1500') | Set-Content -Path $invokeBadBloodPath
+}
+else {
+  Write-Host "BadBlood was already installed. Moving On."
+}
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Red Team tooling installation complete!"
 
