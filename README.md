@@ -106,3 +106,5 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [ThreatHunting](https://github.com/olafhartong/ThreatHunting)
 * [sysmon-modular](https://github.com/olafhartong/sysmon-modular)
 * [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team)
+* [Hunting for Beacons](http://findingbad.blogspot.com/2020/05/hunting-for-beacons-part-2.html)
+* [BadBlood](https://github.com/davidprowe/BadBlood)
