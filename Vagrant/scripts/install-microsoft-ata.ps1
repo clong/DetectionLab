@@ -87,7 +87,7 @@ Start-Sleep -Seconds 60
 
 Invoke-Command -computername dc -Credential (new-object pscredential("windomain\vagrant",(ConvertTo-SecureString -AsPlainText -Force -String "vagrant"))) -ScriptBlock {
 
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [$env:computername] Installing ATA Lightweight gateway..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [$env:computername] Installing the ATA Lightweight gateway on DC..."
 
     # Enable web requests to endpoints with invalid SSL certs (like self-signed certs)
     if (-not("SSLValidator" -as [type])) {
@@ -138,7 +138,7 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null
 }
 
-# set dc as domain synchronizer
+# set DC as domain synchronizer
 $config = Invoke-RestMethod -Uri "https://localhost/api/management/systemProfiles/gateways" -UseDefaultCredentials -UseBasicParsing
 $config[0].Configuration.DirectoryServicesResolverConfiguration.UpdateDirectoryEntityChangesConfiguration.IsEnabled = $true
 
