@@ -267,6 +267,7 @@ import_osquery_config_into_fleet() {
   sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
 
   # Don't log osquery INFO messages
+  # Fix snapshot event formatting
   fleetctl get options > /tmp/options.yaml
   /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_min_status' '1'
   /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' '2'
