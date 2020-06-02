@@ -72,7 +72,7 @@ resource "esxi_guest" "dc" {
   boot_disk_type = "thin"
   boot_disk_size = "35"
 
-  memsize            = "2048"
+  memsize            = "4096"
   numvcpus           = "2"
   resource_pool_name = "/"
   power              = "on"

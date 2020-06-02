@@ -269,6 +269,7 @@ import_osquery_config_into_fleet() {
   # Don't log osquery INFO messages
   fleetctl get options > /tmp/options.yaml
   /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_min_status' '1'
+  /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' '2'
   fleetctl apply -f /tmp/options.yaml
 
   # Use fleetctl to import YAML files
