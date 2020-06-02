@@ -26,6 +26,8 @@ If (-not ($service)) {
   (Get-Content "c:\Program Files\osquery\osquery.flags") -replace 'path\\to\\file\\containing\\secret.txt', 'Program Files\osquery\kolide_secret.txt' | Set-Content "c:\Program Files\osquery\osquery.flags"
   ## Change path to certfile
   (Get-Content "c:\Program Files\osquery\osquery.flags") -replace 'c:\\ProgramData\\osquery\\certfile.crt', 'c:\Program Files\osquery\certfile.crt' | Set-Content "c:\Program Files\osquery\osquery.flags"
+  ## Remove the verbose flag and replace it with the logger_min_status=1 option (See https://github.com/osquery/osquery/issues/5212)
+  (Get-Content "c:\Program Files\osquery\osquery.flags") -replace '--verbose=true', '--logger_min_status=1' | Set-Content "c:\Program Files\osquery\osquery.flags"
   ## Add certfile.crt
   Copy-Item "c:\vagrant\resources\fleet\server.crt" "c:\Program Files\osquery\certfile.crt"
   ## Start the service
