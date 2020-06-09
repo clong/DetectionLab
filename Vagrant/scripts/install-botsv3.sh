@@ -43,4 +43,7 @@ echo "[$(date +%H:%M:%S)]: Download Complete."
 echo "[$(date +%H:%M:%S)]: Extracting to Splunk Apps directory"
 tar zxvf /opt/botsv3_data_set.tgz -C /opt/splunk/etc/apps/
 
+echo "[$(date +%H:%M:%S)]: Restarting Splunk..."
+/opt/splunk/bin/splunk restart
+
 echo "BOTSv3 Installation complete!"
