@@ -20,6 +20,15 @@ try {
 }
 catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
   New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
+  Write-Host "Created Servers OU."
+}
+catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
+  Write-Host "Unable to reach Active Directory. Attmepting one more time..."
+  Start-Sleep 3
+  New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
+}
+catch {
+  Write-Host "Something went wrong attempting to reach AD or create the OU.
 }
 
 # Create the Workstations OU if it doesn't exist
@@ -30,6 +39,15 @@ try {
 }
 catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
   New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
+  Write-Host "Created Workstations OU."
+}
+catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
+  Write-Host "Unable to reach Active Directory. Attmepting one more time..."
+  Start-Sleep 3
+  New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
+}
+catch {
+  Write-Host "Something went wrong attempting to reach AD or create the OU.
 }
 
 # Sysprep breaks auto-login. Let's restore it here:
