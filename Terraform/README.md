@@ -19,14 +19,3 @@ One method for spinning up DetectionLab in AWS is to begin by using Virtualbox o
 This method has the benefit of allowing users to customize the VMs before importing them to AWS.
 
 The instructions for deploying DetectionLab in AWS via this method are available here: [Build Your Own AMIs README](./VM_to_AMIs.md)
-
-
-### Current AMI Listing
-| Region | Name | AMI-ID |
-|--------|------|--------|
-| us-west-1 | detectionlab-dc    | ami-03e2df055c632a0dd |
-| us-west-1 | detectionlab-wef   | ami-03c82482c03a740c5 |
-| us-west-1 | detectionlab-win10 | ami-0a4644e74768900f7 |
-| us-east-1 | detectionlab-dc    | ami-0eba8a430eb9c0d92 |
-| us-east-1 | detectionlab-wef   | ami-077981880d8b81b6b |
-| us-east-1 | detectionlab-win10 | ami-0d1b75d4a41ff0e0a |
