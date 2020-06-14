@@ -28,7 +28,7 @@ catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
   New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
 }
 catch {
-  Write-Host "Something went wrong attempting to reach AD or create the OU.
+  Write-Host "Something went wrong attempting to reach AD or create the OU."
 }
 
 # Create the Workstations OU if it doesn't exist
@@ -47,7 +47,7 @@ catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
   New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
 }
 catch {
-  Write-Host "Something went wrong attempting to reach AD or create the OU.
+  Write-Host "Something went wrong attempting to reach AD or create the OU."
 }
 
 # Sysprep breaks auto-login. Let's restore it here:
