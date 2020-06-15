@@ -1,5 +1,5 @@
-ansible_user: vagrant
-ansible_password: Vagrant123
+ansible_user: ansible
+ansible_password: Ansible123
 ansible_port: 5985
 ansible_connection: winrm
 ansible_winrm_transport: basic

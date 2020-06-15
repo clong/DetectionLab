@@ -8,3 +8,5 @@ Boxes/*
 *.tfstate
 *.tfstate.*
 *.tfvars
+Azure/Ansible/inventory.yml
+Azure/Ansible/inventory.yml.bak

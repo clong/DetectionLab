@@ -62,6 +62,7 @@ We're going to use Ansible to fininsh provisioning the rest of the Windows hosts
 1. **(5 Minutes)** - Configure the `inventory.yml` file
    1. Navigate to `Azure/Ansible` and open `inventory.yml` for editing. 
    2. Take the `public_ip` values from `terraform output` and replace the `x.x.x.x` values with the public IP of each host
+   NOTE: I've added a script at `DetectionLab/Azure/build_ansible_inventory.sh` to help automate this.
 
 Now that Ansible is configured for provisioning, there are two ways to go about this:
 
