@@ -391,7 +391,7 @@ resource "azurerm_virtual_machine" "dc" {
       pass         = "oobeSystem"
       component    = "Microsoft-Windows-Shell-Setup"
       setting_name = "FirstLogonCommands"
-      content      = file("./files/FirstLogonCommands.xml")
+      content      = file("${path.module}/files/FirstLogonCommands.xml")
     }
   }
 
@@ -448,7 +448,7 @@ resource "azurerm_virtual_machine" "wef" {
       pass         = "oobeSystem"
       component    = "Microsoft-Windows-Shell-Setup"
       setting_name = "FirstLogonCommands"
-      content      = file("./files/FirstLogonCommands.xml")
+      content      = file("${path.module}/files/FirstLogonCommands.xml")
     }
   }
 
@@ -505,7 +505,7 @@ resource "azurerm_virtual_machine" "win10" {
       pass         = "oobeSystem"
       component    = "Microsoft-Windows-Shell-Setup"
       setting_name = "FirstLogonCommands"
-      content      = file("./files/FirstLogonCommands.xml")
+      content      = file("${path.module}/files/FirstLogonCommands.xml")
     }
   }
 
