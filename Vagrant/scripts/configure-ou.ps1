@@ -23,9 +23,10 @@ catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
   Write-Host "Created Servers OU."
 }
 catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
-  Write-Host "Unable to reach Active Directory. Attmepting one more time..."
-  Start-Sleep 3
+  Write-Host "Unable to reach Active Directory. Sleeping for 10 and attmepting one more time..."
+  Start-Sleep 10
   New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
+  Write-Host "Created Servers OU after a retry."
 }
 catch {
   Write-Host "Something went wrong attempting to reach AD or create the OU."
@@ -42,9 +43,10 @@ catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
   Write-Host "Created Workstations OU."
 }
 catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
-  Write-Host "Unable to reach Active Directory. Attmepting one more time..."
-  Start-Sleep 3
+  Write-Host "Unable to reach Active Directory. Sleeping for 10 and attmepting one more time..."
+  Start-Sleep 10
   New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
+  Write-Host "Created Workstations OU after a retry."
 }
 catch {
   Write-Host "Something went wrong attempting to reach AD or create the OU."
