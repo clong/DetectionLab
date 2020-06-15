@@ -1,0 +1,144 @@
+---
+
+- name: Set DNS Address
+  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet -ServerAddresses 127.0.0.1,8.8.8.8"
+
+- name: Install git
+  win_chocolatey:
+    name: git
+    state: present
+
+- name: Check if existing DetectionLab directory
+  win_stat:
+    path: 'c:\DetectionLab'
+  register: dir
+
+- name: Git clone Detectionlab
+  win_shell: git clone https://github.com/clong/DetectionLab.git
+  args:
+    chdir: 'c:\'
+  when: not dir.stat.exists
+
+- name: Copy scripts to c:\vagrant
+  win_shell: Copy-Item -Recurse c:\DetectionLab\Vagrant c:\vagrant
+
+- name: Create an Administrator user
+  win_user:
+    name: Administrator
+    password: Vagrant123
+    state: present
+    groups:
+      - Users,Administrators
+    password_never_expires: yes
+  
+- name: Create the Domain
+  win_shell: .\\provision.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: domain_creation
+  changed_when: "'Status         : Success' in domain_creation.stdout"
+
+- name: Reboot Afer Domain Creation
+  win_reboot:
+    msg: "Installing AD. Rebooting..."
+    pre_reboot_delay: 15
+    reboot_timeout: 600
+    post_reboot_delay: 60
+
+- name: Configure OU
+  win_shell: .\\configure-ou.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: ou_creation
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: windomain.local\vagrant
+    ansible_become_password: vagrant
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+  failed_when: "'Exception' in ou_creation.stderr"
+
+- debug: msg="{{ ou_creation.stdout_lines }}"
+
+- name: Configure WEF GPO
+  win_shell: .\\configure-wef-gpo.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: wef_gpo
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: windomain.local\vagrant
+    ansible_become_password: vagrant
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+  failed_when: "'Exception' in wef_gpo.stderr"
+
+- debug: msg="{{ wef_gpo.stdout_lines }}"
+
+- name: Configure Powershell Logging GPO
+  win_shell: .\\configure-powershelllogging.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: powershell_gpo
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: windomain.local\vagrant
+    ansible_become_password: vagrant
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+  failed_when: "'Exception' in powershell_gpo.stderr"
+
+- debug: msg="{{ powershell_gpo.stdout_lines }}"
+
+- name: Configure Auditing Policy GPO
+  win_shell: .\\configure-AuditingPolicyGPOs.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: audit_policy
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: windomain.local\vagrant
+    ansible_become_password: vagrant
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+  failed_when: "'Exception' in audit_policy.stderr"
+
+- debug: msg="{{ audit_policy.stdout_lines }}"
+
+- name: Disable Windows Defender GPO
+  win_shell: .\\configure-disable-windows-defender-gpo.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: disable_win_def
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: windomain.local\vagrant
+    ansible_become_password: vagrant
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+  failed_when: "'Exception' in disable_win_def.stderr"
+
+- debug: msg="{{ disable_win_def.stdout_lines }}"
+
+- name: Configure RDP Permissions GPO
+  win_shell: .\\configure-rdp-user-gpo.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: rdp_gpo
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: windomain.local\vagrant
+    ansible_become_password: vagrant
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+  failed_when: "'Exception' in rdp_gpo.stderr"
+
+- debug: msg="{{ rdp_gpo.stdout_lines }}"
+
+- name: Configure DC with raw Commands
+  win_shell: "{{ item }}"
+  with_items:
+    - "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
+    - "Set-SmbServerConfiguration -AuditSmb1Access $true -Force"
+
+
