@@ -51,6 +51,8 @@ wef_public_ip = 52.191.136.x
 win10_public_ip = 52.229.34.x
 ```
 
+![](../img/azure_terraform1.png)
+
 We're going to use this output in the next step.
 
 ---
@@ -76,8 +78,7 @@ If you'd like to take the faster route, I recommend opening 3 terminal windows t
 3. In the second window, run `ansible-playbook -v detectionlab.yml --tags "wef"`
 4. In the third window, run `ansible-playbook -v detectionlab.yml --tags "win10"`
 
-. If all goes well, you should see the following and your lab is complete!
-![Ansible](https://github.com/clong/DetectionLab/blob/master/img/esxi_ansible.png?raw=true)
+![](../img/azure_ansible1.png)
 
 If you run into any issues along the way, please open an issue on Github and I'll do my best to find a solution.
 
