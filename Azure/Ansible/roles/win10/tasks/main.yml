@@ -1,0 +1,80 @@
+---
+- name: Set HostOnly DNS Address
+  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet -ServerAddresses 192.168.38.102,8.8.8.8"
+
+- name: Install git
+  win_chocolatey:
+    name: git
+    state: present
+
+- name: Check if existing DetectionLab directory
+  win_stat:
+    path: 'c:\DetectionLab'
+  register: dir
+
+- name: Git clone Detectionlab
+  win_shell: git clone https://github.com/clong/DetectionLab.git
+  args:
+    chdir: 'c:\'
+  when: not dir.stat.exists
+
+- name: Copy scripts to c:\vagrant
+  win_shell: Copy-Item -Recurse c:\DetectionLab\Vagrant c:\vagrant
+
+- name: Making Windows10 Great Again
+  win_shell:  .\\MakeWindows10GreatAgain.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+
+- name: Join the Domain
+  win_shell: .\\provision.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+
+- name: Update group policy
+  win_shell: "gpupdate /force"
+
+- name: Reboot Server
+  win_reboot:
+    msg: "Joined the domain. Rebooting..."
+    pre_reboot_delay: 15
+    reboot_timeout: 600
+    post_reboot_delay: 60
+
+- name: Clear Event Logs
+  win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
+
+- name: DetectionLab Menu
+  win_shell: |
+      "\"C:\\Program Files\\Classic Shell\\ClassicStartMenu.exe -xml c:\\vagrant\\resources\\windows\\MenuSettings.xml\""
+      regedit /s c:\vagrant\resources\windows\MenuStyle_Default_Win7.reg
+
+- name: Disable password complexity policy
+  win_shell: |
+      secedit /export /cfg C:\secpol.cfg
+      (gc C:\secpol.cfg).replace("PasswordComplexity = 1", "PasswordComplexity = 0") | Out-File C:\secpol.cfg
+      secedit /configure /db C:\Windows\security\local.sdb /cfg C:\secpol.cfg /areas SECURITYPOLICY
+      rm -force C:\secpol.cfg -confirm:$false
+  become: yes
+  become_method: enable
+
+- name: Add Ansible user
+  win_user:
+    name: ansible
+    password: Ansible123
+    groups:
+      - Administrators
+
+- name: Switch to Ansible user
+  set_fact:
+    ansible_user: ansible
+    ansible_password: Ansible123
+
+- name: Change password for vagrant account back to vagrant
+  win_user:
+    name: vagrant
+    password: vagrant
+
+
+
+

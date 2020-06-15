@@ -1,0 +1,18 @@
+---
+- hosts: dc
+  roles:
+    - dc
+    - common
+  tags: dc
+
+- hosts: wef
+  roles:
+    - wef
+    - common
+  tags: wef
+
+- hosts: win10
+  roles:
+    - win10
+    - common
+  tags: win10
