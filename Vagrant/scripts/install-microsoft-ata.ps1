@@ -113,6 +113,7 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
 
     If (-not (Test-Path "$env:temp\gatewaysetup.zip"))
     {
+        Write-Host "[$env:computername] ATA Gateway not yet downloaded. Downloading now..."
         Invoke-WebRequest -uri https://wef/api/management/softwareUpdates/gateways/deploymentPackage -UseBasicParsing -OutFile "$env:temp\gatewaysetup.zip" -Credential (new-object pscredential("wef\vagrant",(convertto-securestring -AsPlainText -Force -String "vagrant")))
         Expand-Archive -Path "$env:temp\gatewaysetup.zip" -DestinationPath "$env:temp\gatewaysetup" -Force
     }
@@ -122,17 +123,20 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
     }
     if (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics"))
     {
+        Write-Host "[$env:computername] ATA Gateway not yet installed. Attempting to install now..."
         Set-Location "$env:temp\gatewaysetup"
         Start-Process -Wait -FilePath ".\Microsoft ATA Gateway Setup.exe" -ArgumentList "/q NetFrameworkCommandLineArguments=`"/q`" ConsoleAccountName=`"wef\vagrant`" ConsoleAccountPassword=`"vagrant`""
+        Write-Host "[$env:computername] ATA Gateway installation complete!"
     }
     else
     {
         Write-Host "[$env:computername] ATA Gateway already installed. Moving On."
     }
+    Write-Host "[$env:computername] Waiting for the ATA Gateway service to start..."
     (Get-Service ATAGateway).WaitForStatus('Running', '00:10:00')
     If ((Get-Service "ATAGateway").Status -ne "Running")
     {
-        throw "ATA lightweight gateway not running"
+        throw "ATA Gateway service failed to start on DC"
     }
     # Disable invalid web requests to endpoints with invalid SSL certs again
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null
