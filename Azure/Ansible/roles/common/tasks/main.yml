@@ -64,12 +64,7 @@
     - winpcap
     state: present
 
-- name: Install classic-shell with chocolatey
-  win_chocolatey:
-    name:
-      - classic-shell
-    state: present
-    install_args: "ADDLOCAL=ClassicStartMenu"
+
 
 
 
