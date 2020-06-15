@@ -12,7 +12,7 @@ jobs:
             unzip terraform.zip
             sudo mv terraform /usr/local/bin/terraform
 
-      - run: for dir in $(find . -name \*.tf -exec dirname {} \; | sort | uniq); do echo ${dir} && terraform init ${dir} && terraform validate ${dir}; done
+      - run: for dir in $(find . -name \*.tf -exec dirname {} \; | sort | uniq | grep -v './ESXi'); do echo ${dir} && terraform init ${dir} && terraform validate ${dir}; done
       - run: terraform fmt -check
 
   hold:
