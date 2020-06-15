@@ -6,9 +6,9 @@ dc:
 
 wef:
   hosts:
-    x.x.x.x:
+    y.y.y.y:
 
 win10:
   hosts:
-    x.x.x.x:
+    z.z.z.z:
 
