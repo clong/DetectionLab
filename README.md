@@ -25,16 +25,16 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 
 ## Primary Lab Features:
 * Microsoft Advanced Threat Analytics (https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics) is installed on the WEF machine, with the lightweight ATA gateway installed on the DC
-* Splunk forwarders are pre-installed and all indexes are pre-created. Technology add-ons for Windows are also preconfigured.
+* A Splunk forwarder is pre-installed and all indexes are pre-created. Technology add-ons are also preconfigured.
 * A custom Windows auditing configuration is set via GPO to include command line process auditing and additional OS-level logging
 * [Palantir's Windows Event Forwarding](http://github.com/palantir/windows-event-forwarding)  subscriptions and custom channels are implemented
 * Powershell transcript logging is enabled. All logs are saved to `\\wef\pslogs`
 * osquery comes installed on each host and is pre-configured to connect to a [Fleet](https://kolide.co/fleet) server via TLS. Fleet is preconfigured with the configuration from [Palantir's osquery Configuration](https://github.com/palantir/osquery-configuration)
-* Sysmon is installed and configured using SwiftOnSecurity’s open-sourced configuration
+* Sysmon is installed and configured using [Olaf Hartong's open-sourced Sysmon configuration](https://github.com/olafhartong/sysmon-modular)
 * All autostart items are logged to Windows Event Logs via [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog)
 * SMBv1 Auditing is enabled
 
-## Requirements
+## Requirements for VMware or Virtualbox
 * 55GB+ of free disk space
 * 16GB+ of RAM
 * Packer 1.3.2 or newer
@@ -48,6 +48,7 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 Please view the quickstart guides based on the operating system you are using. The AWS/Terraform DetectionLab can be launched from any operating system.
 
 * [AWS via Terraform](https://github.com/clong/DetectionLab/wiki/Quickstart---AWS-(Terraform))
+* [Azure via Terraform & Ansible](https://github.com/clong/DetectionLab/tree/master/Azure)
 * [MacOS](https://github.com/clong/DetectionLab/wiki/Quickstart---MacOS)
 * [Windows](https://github.com/clong/DetectionLab/wiki/Quickstart---Windows)
 * [Linux](https://github.com/clong/DetectionLab/wiki/Quickstart-Linux)
