@@ -18,7 +18,12 @@ if ($regex.Matches.Value -eq "grace time expired") {
   # If activation was successful, the regex should match 90 or 180 (Win10 or Win2016)
   $regex = cscript c:\windows\system32\slmgr.vbs /dlv | select-string -Pattern "\((\d+) day\(s\)"
 }  
-$days_left = $regex.Matches.Groups[1].Value
+try {
+  $days_left = $regex.Matches.Groups[1].Value
+} catch {
+  Write-Host "Unable to successfully parse the output from slmgr, not rearming"
+  $days_left = 90
+}
 
 if ($days_left -as [int] -lt 30) {
   write-host "Less than 30 days remaining before Windows expiration. Attempting to rearm..."
