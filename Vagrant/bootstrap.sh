@@ -289,10 +289,6 @@ install_zeek() {
   echo "[$(date +%H:%M:%S)]: Installing Zeek..."
   # Environment variables
   NODECFG=/opt/zeek/etc/node.cfg
-  SPLUNK_ZEEK_JSON=/opt/splunk/etc/apps/Splunk_TA_bro
-  SPLUNK_ZEEK_MONITOR='monitor:///opt/zeek/spool/manager'
-  SPLUNK_SURICATA_MONITOR='monitor:///var/log/suricata'
-  SPLUNK_SURICATA_SOURCETYPE='json_suricata'
   sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
   wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_18.04/Release.key -O /tmp/Release.key
   apt-key add - </tmp/Release.key &>/dev/null
@@ -346,22 +342,16 @@ install_zeek() {
   systemctl enable zeek
   systemctl start zeek
 
-  mkdir -p $SPLUNK_ZEEK_JSON/local
-  cp $SPLUNK_ZEEK_JSON/default/inputs.conf $SPLUNK_ZEEK_JSON/local/inputs.conf
-
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR index zeek
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR sourcetype bro:json
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR whitelist '.*\.log$'
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR blacklist '.*(communication|stderr)\.log$'
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_ZEEK_MONITOR disabled 0
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR index suricata
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR sourcetype suricata:json
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR whitelist 'eve.json'
-  crudini --set $SPLUNK_ZEEK_JSON/local/inputs.conf $SPLUNK_SURICATA_MONITOR disabled 0
-  crudini --set $SPLUNK_ZEEK_JSON/local/props.conf $SPLUNK_SURICATA_SOURCETYPE TRUNCATE 0
+  # Configure the Splunk inputs 
+  mkdir -p /opt/splunk/etc/apps/Splunk_TA_bro/local && touch /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager index zeek
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager sourcetype bro:json
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager whitelist '.*\.log$'
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager blacklist '.*(communication|stderr)\.log$'
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager disabled 0
 
   # Ensure permissions are correct and restart splunk
-  chown -R splunk $SPLUNK_ZEEK_JSON
+  chown -R splunk /opt/splunk/etc/apps/Splunk_TA_bro
   /opt/splunk/bin/splunk restart
 
   # Verify that Zeek is running
@@ -393,6 +383,14 @@ install_suricata() {
   # enable et-open and attackdetection sources
   suricata-update enable-source et/open
   suricata-update enable-source ptresearch/attackdetection
+
+  # Configure the Splunk inputs
+  mkdir -p /opt/splunk/etc/apps/SplunkLightForwarder/local && touch /opt/splunk/etc/apps/SplunkLightForwarder/local/inputs.conf
+  crudini --set /opt/splunk/etc/apps/SplunkLightForwarder/local/inputs.conf monitor:///var/log/suricata index suricata
+  crudini --set /opt/splunk/etc/apps/SplunkLightForwarder/local/inputs.conf monitor:///var/log/suricata sourcetype suricata:json
+  crudini --set /opt/splunk/etc/apps/SplunkLightForwarder/local/inputs.conf monitor:///var/log/suricata whitelist 'eve.json'
+  crudini --set /opt/splunk/etc/apps/SplunkLightForwarder/local/inputs.conf monitor:///var/log/suricata disabled 0
+  crudini --set /opt/splunk/etc/apps/SplunkLightForwarder/local/props.conf json_suricata TRUNCATE 0
 
   # Update suricata and restart
   suricata-update
@@ -431,10 +429,10 @@ install_guacamole() {
   cd /opt || exit 1
   apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz" -O guacamole-server-1.0.0.tar.gz
-  tar -xf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0 || echo "[-] Unable to find the Guacamole folder. Exiting."; exit 1
+  tar -xf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0 || echo "[-] Unable to find the Guacamole folder."
   ./configure &>/dev/null && make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
   ldconfig
-  cd /var/lib/tomcat8/webapps || echo "[-] Unable to find the tomcat8/webapps folder. Exiting."; exit 1
+  cd /var/lib/tomcat8/webapps || echo "[-] Unable to find the tomcat8/webapps folder."
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/binary/guacamole-1.0.0.war" -O guacamole.war
   mkdir /etc/guacamole
   mkdir /usr/share/tomcat8/.guacamole
