@@ -127,7 +127,7 @@ install_splunk() {
     echo "[$(date +%H:%M:%S)]: Attempting to autoresolve the latest version of Splunk..."
     LATEST_SPLUNK=$(curl https://www.splunk.com/en_us/download/splunk-enterprise.html | grep -i deb | grep -Eo "data-link=\"................................................................................................................................" | cut -d '"' -f 2)
     # Sanity check what was returned from the auto-parse attempt
-    if [[ "$(echo \"$LATEST_SPLUNK\" | grep -c "^https:")" -eq 1 ]] && [[ "$(echo \"$LATEST_SPLUNK\" | grep -c "\.deb$")" -eq 1 ]]; then
+    if [[ "$(echo "$LATEST_SPLUNK" | grep -c "^https:")" -eq 1 ]] && [[ "$(echo "$LATEST_SPLUNK" | grep -c "\.deb$")" -eq 1 ]]; then
       echo "[$(date +%H:%M:%S)]: The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
       echo "[$(date +%H:%M:%S)]: Attempting to download..."
       wget --progress=bar:force -P /opt "$LATEST_SPLUNK"
