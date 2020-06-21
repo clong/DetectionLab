@@ -19,6 +19,7 @@ while ($servers_ou_created -ne 1) {
   try {
     Get-ADOrganizationalUnit -Identity 'OU=Servers,DC=windomain,DC=local' | Out-Null
     Write-Host "Servers OU already exists. Moving On."
+    $servers_ou_created = 1
   }
   catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
     New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
@@ -41,10 +42,12 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Workstations OU"
   try {
     Get-ADOrganizationalUnit -Identity 'OU=Workstations,DC=windomain,DC=local' | Out-Null
     Write-Host "Workstations OU already exists. Moving On."
+    $workstations_ou_created = 1
   }
   catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
     New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
     Write-Host "Created Workstations OU."
+    $workstations_ou_created = 1
   }
   catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
     Write-Host "Unable to reach Active Directory. Sleeping for 5 and trying again..."
