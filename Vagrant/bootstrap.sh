@@ -10,7 +10,7 @@ sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr
 # Get a free Maxmind license here: https://www.maxmind.com/en/geolite2/signup
 # Required for the ASNgen app to work: https://splunkbase.splunk.com/app/3531/
 export MAXMIND_LICENSE=
-if [ -z $MAXMIND_LICENSE ]; then
+if [ -z "$MAXMIND_LICENSE" ]; then
   echo "Note: You have not entered a MaxMind license key on line 5 of bootstrap.sh, so the ASNgen Splunk app may not work correctly."
   echo "However, it is not required and everything else should function correctly."
 fi
@@ -72,7 +72,7 @@ test_prerequisites() {
 
 fix_eth1_static_ip() {
   USING_KVM=$(sudo lsmod | grep kvm)
-  if [ ! -z "$USING_KVM" ]; then
+  if [ -n "$USING_KVM" ]; then
     echo "[*] Using KVM, no need to fix DHCP for eth1 iface"
     return 0
   fi
@@ -127,7 +127,7 @@ install_splunk() {
     echo "[$(date +%H:%M:%S)]: Attempting to autoresolve the latest version of Splunk..."
     LATEST_SPLUNK=$(curl https://www.splunk.com/en_us/download/splunk-enterprise.html | grep -i deb | grep -Eo "data-link=\"................................................................................................................................" | cut -d '"' -f 2)
     # Sanity check what was returned from the auto-parse attempt
-    if [[ "$(echo $LATEST_SPLUNK | grep -c "^https:")" -eq 1 ]] && [[ "$(echo $LATEST_SPLUNK | grep -c "\.deb$")" -eq 1 ]]; then
+    if [[ "$(echo \"$LATEST_SPLUNK\" | grep -c "^https:")" -eq 1 ]] && [[ "$(echo \"$LATEST_SPLUNK\" | grep -c "\.deb$")" -eq 1 ]]; then
       echo "[$(date +%H:%M:%S)]: The URL to the latest Splunk version was automatically resolved as: $LATEST_SPLUNK"
       echo "[$(date +%H:%M:%S)]: Attempting to download..."
       wget --progress=bar:force -P /opt "$LATEST_SPLUNK"
@@ -166,7 +166,7 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_141.tgz -auth 'admin:changeme'
 
     # Install the Maxmind license key for the ASNgen App
-    if [ ! -z $MAXMIND_LICENSE ]; then
+    if [ ! -z "$MAXMIND_LICENSE" ]; then
       mkdir /opt/splunk/etc/apps/TA-asngen/local 
       cp /opt/splunk/etc/apps/TA-asngen/default/asngen.conf /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
       sed -i "s/license_key =/license_key = $MAXMIND_LICENSE/g" /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
@@ -249,7 +249,7 @@ download_palantir_osquery_config() {
 }
 
 import_osquery_config_into_fleet() {
-  cd /opt
+  cd /opt || exit 1
   wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.4.0/fleet.zip
   unzip fleet.zip -d fleet
   cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
@@ -428,13 +428,13 @@ test_suricata_prerequisites() {
 
 install_guacamole() {
   echo "[$(date +%H:%M:%S)]: Installing Guacamole..."
-  cd /opt
+  cd /opt || exit 1
   apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz" -O guacamole-server-1.0.0.tar.gz
-  tar -xf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0
+  tar -xf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0 || echo "[-] Unable to find the Guacamole folder. Exiting."; exit 1
   ./configure &>/dev/null && make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
   ldconfig
-  cd /var/lib/tomcat8/webapps
+  cd /var/lib/tomcat8/webapps || echo "[-] Unable to find the tomcat8/webapps folder. Exiting."; exit 1
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/binary/guacamole-1.0.0.war" -O guacamole.war
   mkdir /etc/guacamole
   mkdir /usr/share/tomcat8/.guacamole
