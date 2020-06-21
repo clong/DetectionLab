@@ -13,43 +13,46 @@ ping /n 1 windomain.local
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server and Workstation OUs..."
 # Create the Servers OU if it doesn't exist
-Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server OU"
-try {
-  Get-ADOrganizationalUnit -Identity 'OU=Servers,DC=windomain,DC=local' | Out-Null
-  Write-Host "Servers OU already exists. Moving On."
-}
-catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
-  New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
-  Write-Host "Created Servers OU."
-}
-catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
-  Write-Host "Unable to reach Active Directory. Sleeping for 10 and attmepting one more time..."
-  Start-Sleep 10
-  New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
-  Write-Host "Created Servers OU after a retry."
-}
-catch {
-  Write-Host "Something went wrong attempting to reach AD or create the OU."
+$servers_ou_created = 0
+while ($servers_ou_created != 1) {
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server OU"
+  try {
+    Get-ADOrganizationalUnit -Identity 'OU=Servers,DC=windomain,DC=local' | Out-Null
+    Write-Host "Servers OU already exists. Moving On."
+  }
+  catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+    New-ADOrganizationalUnit -Name "Servers" -Server "dc.windomain.local"
+    Write-Host "Created Servers OU."
+    $servers_ou_created = 1
+  }
+  catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
+    Write-Host "Unable to reach Active Directory. Sleeping for 5 and trying again..."
+    Start-Sleep 5
+  }
+  catch {
+    Write-Host "Something went wrong attempting to reach AD or create the OU."
+  }
 }
 
 # Create the Workstations OU if it doesn't exist
+$workstations_ou_created = 0
+while ($workstations_ou_created != 1) {
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Workstations OU"
-try {
-  Get-ADOrganizationalUnit -Identity 'OU=Workstations,DC=windomain,DC=local' | Out-Null
-  Write-Host "Workstations OU already exists. Moving On."
-}
-catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
-  New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
-  Write-Host "Created Workstations OU."
-}
-catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
-  Write-Host "Unable to reach Active Directory. Sleeping for 10 and attmepting one more time..."
-  Start-Sleep 10
-  New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
-  Write-Host "Created Workstations OU after a retry."
-}
-catch {
-  Write-Host "Something went wrong attempting to reach AD or create the OU."
+  try {
+    Get-ADOrganizationalUnit -Identity 'OU=Workstations,DC=windomain,DC=local' | Out-Null
+    Write-Host "Workstations OU already exists. Moving On."
+  }
+  catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+    New-ADOrganizationalUnit -Name "Workstations" -Server "dc.windomain.local"
+    Write-Host "Created Workstations OU."
+  }
+  catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
+    Write-Host "Unable to reach Active Directory. Sleeping for 5 and trying again..."
+    Start-Sleep 5
+  }
+  catch {
+    Write-Host "Something went wrong attempting to reach AD or create the OU."
+  }
 }
 
 # Sysprep breaks auto-login. Let's restore it here:
