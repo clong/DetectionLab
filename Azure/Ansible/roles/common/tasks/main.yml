@@ -9,15 +9,6 @@
 
 - debug: msg="{{ palantir_wef.stdout_lines }}"
   
-- name: Downloading the Palantir osquery Configuration
-  win_shell: ".\\download_palantir_osquery.ps1"
-  args:
-    chdir: 'c:\vagrant\scripts'
-  register: palantir_osquery
-  failed_when: "'Exception' in palantir_osquery.stdout"
-
-- debug: msg="{{ palantir_osquery.stdout_lines }}"
-  
 - name: Installing osquery
   win_shell: ".\\install-osquery.ps1"
   args:
