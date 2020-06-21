@@ -14,7 +14,7 @@ ping /n 1 windomain.local
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server and Workstation OUs..."
 # Create the Servers OU if it doesn't exist
 $servers_ou_created = 0
-while ($servers_ou_created != 1) {
+while ($servers_ou_created -ne 1) {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server OU"
   try {
     Get-ADOrganizationalUnit -Identity 'OU=Servers,DC=windomain,DC=local' | Out-Null
@@ -36,7 +36,7 @@ while ($servers_ou_created != 1) {
 
 # Create the Workstations OU if it doesn't exist
 $workstations_ou_created = 0
-while ($workstations_ou_created != 1) {
+while ($workstations_ou_created -ne 1) {
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Workstations OU"
   try {
     Get-ADOrganizationalUnit -Identity 'OU=Workstations,DC=windomain,DC=local' | Out-Null
