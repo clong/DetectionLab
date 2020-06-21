@@ -14,7 +14,7 @@ name: Lint Code Base
 ######################################
 # Start the job on all pull requests #
 ######################################
-on: pull-request
+on: pull_request
 
 ###############
 # Set the Job #
