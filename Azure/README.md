@@ -84,8 +84,7 @@ If you'd like to take the faster route, I recommend opening 3 terminal windows t
 If you run into any issues along the way, please open an issue on Github and I'll do my best to find a solution.
 
 ## Debugging / Troubleshooting / Known Issues
-* If an Ansible playbook fails (and they often do), you can pick up where it left off with `ansible-playbook -vvv detectionlab.yml --tags="hostname-goes-here" --start-at-task="taskname"`
-* The "Configure OU" Ansible step often fails because the cmdlet can't find AD. Re-running it often fixes the issue (for unknown reasons): `ansible-playbook -vvv detectionlab.yml --tags="dc" --start-at-task="Configure OU"`
+* If an Ansible playbook fails (and they sometimes do), you can pick up where it left off with `ansible-playbook -vvv detectionlab.yml --tags="hostname-goes-here" --start-at-task="taskname"`
 * "Installing Red Team Tooling" hangs if AV isn't disabled successfully
 * It seems like sometimes the logger provisioning "errors" somewhere and causes the box to become tained, despite the provision being successful. Work around this by untainting it: `terraform untaint azurerm_virtual_machine.dc`
 
