@@ -14,9 +14,9 @@ apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apa
 pip install awscli --upgrade --user
 cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
 
-wget -O VMware-Workstation-Full-15.5.2-15785246.x86_64.bundle "https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-15.5.2-15785246.x86_64.bundle"
-chmod +x VMware-Workstation-Full-15.5.2-15785246.x86_64.bundle
-sudo sh VMware-Workstation-Full-15.5.2-15785246.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
+wget -O VMware-Workstation-Full-15.5.6-16341506.x86_64.bundle "https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-15.5.6-16341506.x86_64.bundle"
+chmod +x VMware-Workstation-Full-15.5.6-16341506.x86_64.bundle
+sudo sh VMware-Workstation-Full-15.5.6-16341506.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
 
 # Set up firewall
 ufw allow ssh
@@ -47,8 +47,8 @@ sed -i 's/v.gui = true/v.gui = false/g' Vagrantfile
 # Install Packer
 mkdir /opt/packer
 cd /opt/packer || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/packer/1.5.6/packer_1.5.6_linux_amd64.zip
-unzip packer_1.5.6_linux_amd64.zip
+wget --progress=bar:force https://releases.hashicorp.com/packer/1.6.0/packer_1.6.0_linux_amd64.zip
+unzip packer_1.6.0_linux_amd64.zip
 cp packer /usr/local/bin/packer
 
 # Make the Packer images headless
