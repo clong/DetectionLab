@@ -12,7 +12,7 @@ variable "custom-tags" {
   default = {}
 }
 
-variable "tag_prefix" {
+variable "instance_name_prefix" {
   description = "Optional string to prefix at the front of instance names in case you need to run multiple DetectionLab environments in the same AWS account"
   default     = ""
 }
@@ -120,4 +120,3 @@ variable "win10_ami" {
   type    = string
   default = ""
 }
-
