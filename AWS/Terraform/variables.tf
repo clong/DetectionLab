@@ -6,6 +6,12 @@ variable "profile" {
   default = "terraform"
 }
 
+variable "custom-tags" {
+  type = map(string)
+  description = "Optional mapping for additional tags to apply to all related AWS resources"
+  default = {}
+}
+
 variable "tag_prefix" {
   description = "Optional string to prefix at the front of instance names in case you need to run multiple DetectionLab environments in the same AWS account"
   default     = ""
