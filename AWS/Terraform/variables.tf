@@ -6,6 +6,17 @@ variable "profile" {
   default = "terraform"
 }
 
+variable "custom-tags" {
+  type = map(string)
+  description = "Optional mapping for additional tags to apply to all related AWS resources"
+  default = {}
+}
+
+variable "instance_name_prefix" {
+  description = "Optional string to prefix at the front of instance names in case you need to run multiple DetectionLab environments in the same AWS account"
+  default     = ""
+}
+
 variable "availability_zone" {
   description = "https://www.terraform.io/docs/providers/aws/d/availability_zone.html"
   default     = ""
@@ -109,4 +120,3 @@ variable "win10_ami" {
   type    = string
   default = ""
 }
-
