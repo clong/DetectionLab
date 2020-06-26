@@ -4,7 +4,7 @@
 $regex = cscript c:\windows\system32\slmgr.vbs /dlv | select-string -Pattern "\((\d+) day\(s\)|grace time expired"
 if ($regex.Matches.Value -eq "grace time expired") {
   # If it shows expired, it's likely it wasn't properly activated
-  Write-Host "It appears Windows was not properly activated. Attempting to resolve..."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) It appears Windows was not properly activated. Attempting to resolve..."
   try {
     # The TrustedInstaller service MUST be running for activation to succeed
     Set-Service TrustedInstaller -StartupType Automatic
@@ -13,7 +13,7 @@ if ($regex.Matches.Value -eq "grace time expired") {
     # Attempt to activate
     cscript c:\windows\system32\slmgr.vbs /ato
   } catch {
-    Write-Host "Something went wrong trying to reactivate Windows..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong trying to reactivate Windows..."
   }
   # If activation was successful, the regex should match 90 or 180 (Win10 or Win2016)
   $regex = cscript c:\windows\system32\slmgr.vbs /dlv | select-string -Pattern "\((\d+) day\(s\)"
@@ -21,17 +21,18 @@ if ($regex.Matches.Value -eq "grace time expired") {
 try {
   $days_left = $regex.Matches.Groups[1].Value
 } catch {
-  Write-Host "Unable to successfully parse the output from slmgr, not rearming"
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Unable to successfully parse the output from slmgr, not rearming"
   $days_left = 90
 }
 
 if ($days_left -as [int] -lt 30) {
-  write-host "Less than 30 days remaining before Windows expiration. Attempting to rearm..."
+  write-host "$('[{0:HH:mm}]' -f (Get-Date)) $days_left days remaining before expiration"
+  write-host "$('[{0:HH:mm}]' -f (Get-Date)) Less than 30 days remaining before Windows expiration. Attempting to rearm..."
   try {
     cscript c:\windows\system32\slmgr.vbs /rearm
   } catch {
-    Write-Host "Something went wrong trying to re-arm the image..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong trying to re-arm the image..."
   }
 } else {
-  Write-Host "$days_left days left until expiration, no need to rearm."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) $days_left days left until expiration, no need to rearm."
 }
