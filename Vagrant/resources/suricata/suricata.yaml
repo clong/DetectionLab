@@ -117,9 +117,9 @@ logging:
   default-log-level: notice
   default-output-filter:
   outputs:
-  - console:
+    - console:
       enabled: y
-  - syslog:
+    - syslog:
       enabled: no
       facility: local5
       format: "[%i] <%d> -- "
@@ -148,7 +148,6 @@ app-layer:
       enabled: yes
     ftp:
       enabled: yes
-      enabled: yes
       detection-ports:
         dp: 139, 445
     nfs:
@@ -167,16 +166,16 @@ app-layer:
     http:
       enabled: yes
       libhtp:
-         default-config:
-           personality: IDS
-           request-body-limit: 100kb
-           response-body-limit: 100kb
-           request-body-minimal-inspect-size: 32kb
-           request-body-inspect-window: 4kb
-           response-body-minimal-inspect-size: 40kb
-           response-body-inspect-window: 16kb
-           response-body-decompress-layer-limit: 2
-           http-body-inline: auto
+        default-config:
+          personality: IDS
+          request-body-limit: 100kb
+          response-body-limit: 100kb
+          request-body-minimal-inspect-size: 32kb
+          request-body-inspect-window: 4kb
+          response-body-minimal-inspect-size: 40kb
+          response-body-inspect-window: 16kb
+          response-body-decompress-layer-limit: 2
+          http-body-inline: auto
     modbus:
       enabled: no
       detection-ports:
@@ -269,12 +268,12 @@ detect:
     - management-cpu-set:
     - receive-cpu-set:
     - worker-cpu-set:
-        cpu: [ "all" ]
+        cpu: ["all"]
         mode: "exclusive"
         prio:
-          low: [ 0 ]
-          medium: [ "1-2" ]
-          high: [ 3 ]
+          low: [0]
+          medium: ["1-2"]
+          high: [3]
           default: "medium"
   detect-thread-ratio: 1.0
 luajit:
@@ -298,8 +297,8 @@ nflog:
     max-size: 20000
 capture:
 netmap:
- - interface: eth2
- - interface: default
+  - interface: eth2
+  - interface: default
 pfring:
   - interface: eth0
     threads: auto
@@ -307,10 +306,10 @@ pfring:
     cluster-type: cluster_flow
   - interface: default
 ipfw:
-    streams: ["0-3"]
-    auto-config: yes
-    ports: [all]
-    hashmode: hash5tuplesorted
+  streams: ["0-3"]
+  auto-config: yes
+  ports: [all]
+  hashmode: hash5tuplesorted
 default-rule-path: /var/lib/suricata/rules
 rule-files:
   - suricata.rules
