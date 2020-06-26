@@ -18,16 +18,16 @@ if ! which terraform >/dev/null; then
   exit 1
 fi
 
-cd ./Terraform
+cd ./Terraform || exit 1
 TF_OUTPUT=$(terraform output)
 
-DC_IP=$(echo $TF_OUTPUT | egrep -o "dc_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
-WEF_IP=$(echo $TF_OUTPUT | egrep -o "wef_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
-WIN10_IP=$(echo $TF_OUTPUT | egrep -o "win10_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
+DC_IP=$(echo "$TF_OUTPUT" | egrep -o "dc_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
+WEF_IP=$(echo "$TF_OUTPUT" | egrep -o "wef_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
+WIN10_IP=$(echo "$TF_OUTPUT" | egrep -o "win10_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
 
 # Don't update unless there's default values in inventory.yml
-GREP_COUNT=$(egrep -c 'x\.x\.x\.x|y\.y\.y\.y|z\.z\.z\.z' ../Ansible/inventory.yml)
-if [ $GREP_COUNT -ne 3 ]; then
+GREP_COUNT=$(grep -E -c 'x\.x\.x\.x|y\.y\.y\.y|z\.z\.z\.z' ../Ansible/inventory.yml)
+if [ "$GREP_COUNT" -ne 3 ]; then
   echo "This script is expecting the default values of x.x.x.x, y.y.y.y, and z.z.z.z for the dc, wef, and win10 hosts respectively in Ansible/inventory.yml."
   echo "You can restore the file to this state by running 'git checkout -- Ansible/inventory.yml'"
   echo "Rerun this script once that is complete."

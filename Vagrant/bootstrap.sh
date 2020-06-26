@@ -166,7 +166,7 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_141.tgz -auth 'admin:changeme'
 
     # Install the Maxmind license key for the ASNgen App
-    if [ ! -z "$MAXMIND_LICENSE" ]; then
+    if [ -n "$MAXMIND_LICENSE" ]; then
       mkdir /opt/splunk/etc/apps/TA-asngen/local 
       cp /opt/splunk/etc/apps/TA-asngen/default/asngen.conf /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
       sed -i "s/license_key =/license_key = $MAXMIND_LICENSE/g" /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
