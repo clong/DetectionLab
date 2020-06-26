@@ -10,7 +10,7 @@ sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr
 # Get a free Maxmind license here: https://www.maxmind.com/en/geolite2/signup
 # Required for the ASNgen app to work: https://splunkbase.splunk.com/app/3531/
 export MAXMIND_LICENSE=
-if [ -z "$MAXMIND_LICENSE" ]; then
+if [ -n "$MAXMIND_LICENSE" ]; then
   echo "Note: You have not entered a MaxMind license key on line 5 of bootstrap.sh, so the ASNgen Splunk app may not work correctly."
   echo "However, it is not required and everything else should function correctly."
 fi

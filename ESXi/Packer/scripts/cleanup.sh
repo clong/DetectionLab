@@ -12,7 +12,7 @@ dpkg --list \
 dpkg --list \
     | awk '{ print $2 }' \
     | grep 'linux-image-.*-generic' \
-    | grep -v `uname -r` \
+    | grep -v "$(uname -r)" \
     | xargs apt-get -y purge;
 
 # Delete Linux source

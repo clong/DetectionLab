@@ -1,5 +1,6 @@
-![DetectionLab](./img/DetectionLab.png)
 # Detection Lab
+![DetectionLab](./img/DetectionLab.png)
+
 DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to ensure that builds are passing.
 
 [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.svg?style=shield)](https://circleci.com/gh/clong/DetectionLab/tree/master)
@@ -37,15 +38,15 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 ## Requirements for VMware or Virtualbox
 * 55GB+ of free disk space
 * 16GB+ of RAM
-* Packer 1.3.2 or newer
-* Vagrant 2.2.7 or newer
+* Packer 1.6.0 or newer
+* Vagrant 2.2.9 or newer
 * Virtualbox or VMWare Fusion/Workstation
 
 ---
 
 ## Building Detection Lab
 
-Please view the quickstart guides based on the operating system you are using. The AWS/Terraform DetectionLab can be launched from any operating system.
+Please view the quickstart guides based on the operating system you are using. The AWS and Azure deployment options for DetectionLab can be launched from any operating system.
 
 * [AWS via Terraform](https://github.com/clong/DetectionLab/wiki/Quickstart---AWS-(Terraform))
 * [Azure via Terraform & Ansible](https://github.com/clong/DetectionLab/tree/master/Azure)
