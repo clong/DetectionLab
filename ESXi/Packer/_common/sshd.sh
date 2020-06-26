@@ -3,6 +3,7 @@
 SSHD_CONFIG="/etc/ssh/sshd_config"
 
 # ensure that there is a trailing newline before attempting to concatenate
+# shellcheck disable=SC1003
 sed -i -e '$a\' "$SSHD_CONFIG"
 
 USEDNS="UseDNS no"

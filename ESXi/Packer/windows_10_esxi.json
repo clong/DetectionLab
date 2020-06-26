@@ -92,8 +92,7 @@
     "esxi_host": "",
     "esxi_username": "",
     "esxi_password": "",
-    "iso_checksum": "ab4862ba7d1644c27f27516d24cb21e6b39234eb3301e5f1fb365a78b22f79b3",
-    "iso_checksum_type": "sha256",
+    "iso_checksum": "sha256:ab4862ba7d1644c27f27516d24cb21e6b39234eb3301e5f1fb365a78b22f79b3",
     "iso_url": "https://software-download.microsoft.com/download/pr/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
     "autounattend": "../../Packer/answer_files/10/Autounattend.xml",
     "disk_size": "61440"
