@@ -3,6 +3,7 @@
 DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to ensure that builds are passing.
 
 [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.svg?style=shield)](https://circleci.com/gh/clong/DetectionLab/tree/master)
+![Lint Code Base](https://github.com/clong/DetectionLab/workflows/Lint%20Code%20Base/badge.svg)
 [![license](https://img.shields.io/github/license/clong/DetectionLab.svg?style=flat-square)](https://github.com/clong/DetectionLab/blob/master/license.md)
 ![Maintenance](https://img.shields.io/maintenance/yes/2020.svg?style=flat-square)
 [![GitHub last commit](https://img.shields.io/github/last-commit/clong/DetectionLab.svg?style=flat-square)](https://github.com/clong/DetectionLab/commit/master)
