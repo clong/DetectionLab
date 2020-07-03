@@ -1,5 +1,4 @@
-# Purpose: Installs osquery on the host
-# Note: by default, osquery will be configured to connect to the Fleet server on the "logger" host via TLS.
+# Purpose: Installs osquery on the host. Osquery conntects to Fleet via TLS.
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing osquery..."
 $flagfile = "c:\Program Files\osquery\osquery.flags"
@@ -16,7 +15,12 @@ If (-not ($service)) {
 
   ## Use the TLS config
   ## Add entry to hosts file for Kolide for SSL validation
+  If (Select-String -Path "c:\windows\system32\drivers\etc\hosts" -Pattern "kolide") {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Hosts file already updated. Moving on."
+  } Else {
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Adding kolide to the hosts file"
   Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.105    kolide"
+  }
   ## Add kolide secret and avoid BOM
   $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
   [System.IO.File]::WriteAllLines("c:\Program Files\osquery\kolide_secret.txt", "enrollmentsecret", $Utf8NoBomEncoding)

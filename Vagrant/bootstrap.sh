@@ -351,13 +351,42 @@ install_zeek() {
   crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager disabled 0
 
   # Ensure permissions are correct and restart splunk
-  chown -R splunk /opt/splunk/etc/apps/Splunk_TA_bro
+  chown -R splunk:splunk /opt/splunk/etc/apps/Splunk_TA_bro
   /opt/splunk/bin/splunk restart
 
   # Verify that Zeek is running
   if ! pgrep -f zeek >/dev/null; then
     echo "Zeek attempted to start but is not running. Exiting"
     exit 1
+  fi
+}
+
+install_velociraptor() {
+  echo "[$(date +%H:%M:%S)]: Installing Velociraptor..."
+  mkdir /opt/install_velociraptor
+  echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
+  LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
+  echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
+  echo "[$(date +%H:%M:%S)]: Attempting to download..."
+  wget -P /opt/velociraptor "$LATEST_VELOCIRAPTOR_LINUX_URL"
+  if [ "$(file velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
+    echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
+  else
+    echo "[$(date +%H:%M:%S)]: Failed to download the latest version of Velociraptor. Please open a DetectionLab issue on Github."
+    return
+  fi
+  
+  mv velociraptor-*-linux-amd64 velociraptor
+  chmod +x velociraptor
+  cp /vagrant/resources/velociraptor/server.config.yaml /opt/velociraptor
+  echo "[$(date +%H:%M:%S)]: Creating Velociraptor dpkg..."
+  ./velociraptor --config ~/server.config.yaml debian server
+  echo "[$(date +%H:%M:%S)]: Installing the dpkg..."
+  if dpkg -i velociraptor_*_server.deb > /dev/null; then
+    echo "[$(date +%H:%M:%S)]: Installation complete!"
+  else
+    echo "[$(date +%H:%M:%S)]: Failed to install the dpkg"
+    return
   fi
 }
 
@@ -450,6 +479,7 @@ install_guacamole() {
 postinstall_tasks() {
   # Include Splunk and Zeek in the PATH
   echo export PATH="$PATH:/opt/splunk/bin:/opt/zeek/bin" >>~/.bashrc
+  echo "export SPLUNK_HOME=/opt/splunk" >>~/.bashrc
   # Ping DetectionLab server for usage statistics
   curl -s -A "DetectionLab-logger" "https://detectionlab.network/logger"
 }
@@ -463,6 +493,7 @@ main() {
   install_fleet
   download_palantir_osquery_config
   import_osquery_config_into_fleet
+  install_velociraptor
   install_suricata
   install_zeek
   install_guacamole
