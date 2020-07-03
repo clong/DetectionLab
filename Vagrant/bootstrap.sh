@@ -369,14 +369,15 @@ install_velociraptor() {
   echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
   echo "[$(date +%H:%M:%S)]: Attempting to download..."
   wget -P /opt/velociraptor "$LATEST_VELOCIRAPTOR_LINUX_URL"
-  if [ "$(file velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
+  if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
     echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
   else
     echo "[$(date +%H:%M:%S)]: Failed to download the latest version of Velociraptor. Please open a DetectionLab issue on Github."
     return
   fi
   
-  mv velociraptor-*-linux-amd64 velociraptor
+  cd /opt/velociraptor || exit 1
+  mv /opt/velociraptor-*-linux-amd64 velociraptor
   chmod +x velociraptor
   cp /vagrant/resources/velociraptor/server.config.yaml /opt/velociraptor
   echo "[$(date +%H:%M:%S)]: Creating Velociraptor dpkg..."
