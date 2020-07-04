@@ -27,6 +27,15 @@
 
 - debug: msg="{{ sysinternals.stdout_lines }}"
 
+- name: Installing Velociraptor
+  win_shell: ".\\install-velociraptor.ps1"
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: velociraptor
+  failed_when: "'Exception' in velociraptor.stdout"
+
+- debug: msg="{{ velociraptor.stdout_lines }}"
+
 - name: Installing AutorunsToWineventlog
   win_shell: ".\\install-autorunstowineventlog.ps1"
   args:
