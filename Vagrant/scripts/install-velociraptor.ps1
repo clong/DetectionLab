@@ -15,12 +15,13 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Velocir
 $tag = (Invoke-WebRequest "https://api.github.com/repos/Velocidex/velociraptor/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $velociraptorDownloadUrl = "https://github.com/Velocidex/velociraptor/releases/download/$tag/velociraptor-$tag-windows-amd64.msi"
 $velociraptorMSIPath = 'C:\Users\vagrant\AppData\Local\Temp\velociraptor.msi'
-If (-not (Test-Path "C:\Program Files\Velociraptor")) {
+$velociraptorLogFile = 'c:\Users\vagrant\AppData\Local\Temp\velociraptor_install.log'
+If (-not (Test-Path $velociraptorLogFile)) {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Velociraptor..."
   Invoke-WebRequest -Uri "$velociraptorDownloadUrl" -OutFile $velociraptorMSIPath
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Velociraptor..."
-  msiexec /i $velociraptorMSIPath /quiet /qn /norestart /log c:\Users\vagrant\AppData\Local\Temp\velociraptor_install.log
-  Copy-File "c:\vagrant\resources\velociraptor\Velociraptor.config.yaml" "C:\Program Files\Velociraptor"
+  Start-Process C:\Windows\System32\msiexec.exe -ArgumentList "/i $velociraptorMSIPath /quiet /qn /norestart /log $velociraptorLogFile" -wait
+  Copy-Item "c:\vagrant\resources\velociraptor\Velociraptor.config.yaml" "C:\Program Files\Velociraptor"
   Restart-Service Velociraptor
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Velociraptor successfully installed!"
 } Else {

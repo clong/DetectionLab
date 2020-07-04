@@ -377,11 +377,11 @@ install_velociraptor() {
   fi
   
   cd /opt/velociraptor || exit 1
-  mv /opt/velociraptor-*-linux-amd64 velociraptor
+  mv velociraptor-*-linux-amd64 velociraptor
   chmod +x velociraptor
   cp /vagrant/resources/velociraptor/server.config.yaml /opt/velociraptor
   echo "[$(date +%H:%M:%S)]: Creating Velociraptor dpkg..."
-  ./velociraptor --config ~/server.config.yaml debian server
+  ./velociraptor --config /opt/velociraptor/server.config.yaml debian server
   echo "[$(date +%H:%M:%S)]: Installing the dpkg..."
   if dpkg -i velociraptor_*_server.deb > /dev/null; then
     echo "[$(date +%H:%M:%S)]: Installation complete!"
