@@ -23,13 +23,13 @@ locals {
 
 resource "azurerm_resource_group" "detectionlab" {
   name = "DetectionLab-terraform"
-  location = "West US 2"
+  location = var.region
 }
 
 resource "azurerm_virtual_network" "detectionlab-network" {
   name = "DetectionLab-vnet"
   address_space = ["192.168.0.0/16"]
-  location = "West US 2"
+  location = var.region
   resource_group_name = azurerm_resource_group.detectionlab.name
 }
 
@@ -43,7 +43,7 @@ resource "azurerm_subnet" "detectionlab-subnet" {
 
 resource "azurerm_network_security_group" "detectionlab-nsg" {
   name                = "DetectionLab-nsg"
-  location = "West US 2"
+  location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
 
   # SSH access
@@ -159,7 +159,7 @@ resource "azurerm_subnet_network_security_group_association" "detectionlab-nsga"
 
 resource "azurerm_public_ip" "logger-publicip" {
   name                = "logger-public-ip"
-  location            = "West US 2"
+  location            = var.region
   resource_group_name = azurerm_resource_group.detectionlab.name
   allocation_method   = "Static"
 
@@ -170,7 +170,7 @@ resource "azurerm_public_ip" "logger-publicip" {
 
 resource "azurerm_network_interface" "logger-nic" {
   name                = "logger-nic"
-  location            = "West US 2"
+  location            = var.region
   resource_group_name = azurerm_resource_group.detectionlab.name
 
   ip_configuration {
@@ -193,7 +193,7 @@ resource "random_id" "randomId" {
 
 resource "azurerm_storage_account" "detectionlab-storageaccount" {
   name                = "diag${random_id.randomId.hex}"
-  location = "West US 2"
+  location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
   account_replication_type = "LRS"
   account_tier = "Standard"
@@ -202,7 +202,7 @@ resource "azurerm_storage_account" "detectionlab-storageaccount" {
 # Linux VM
 resource "azurerm_virtual_machine" "logger" {
   name = "logger"
-  location = "West US 2"
+  location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
   network_interface_ids = [azurerm_network_interface.logger-nic.id]
   vm_size               = "Standard_D1_v2"
@@ -278,7 +278,7 @@ resource "azurerm_virtual_machine" "logger" {
 # Windows VM
 resource "azurerm_network_interface" "dc-nic" {
   name = "dc-nic"
-  location = "West US 2"
+  location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
 
   ip_configuration {
@@ -292,7 +292,7 @@ resource "azurerm_network_interface" "dc-nic" {
 
 resource "azurerm_public_ip" "dc-publicip" {
   name                = "dc-public-ip"
-  location            = "West US 2"
+  location            = var.region
   resource_group_name = azurerm_resource_group.detectionlab.name
   allocation_method   = "Static"
 
@@ -303,7 +303,7 @@ resource "azurerm_public_ip" "dc-publicip" {
 
 resource "azurerm_network_interface" "wef-nic" {
   name = "wef-nic"
-  location = "West US 2"
+  location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
 
   ip_configuration {
@@ -317,7 +317,7 @@ resource "azurerm_network_interface" "wef-nic" {
 
 resource "azurerm_public_ip" "wef-publicip" {
   name                = "wef-public-ip"
-  location            = "West US 2"
+  location            = var.region
   resource_group_name = azurerm_resource_group.detectionlab.name
   allocation_method   = "Static"
 
@@ -328,7 +328,7 @@ resource "azurerm_public_ip" "wef-publicip" {
 
 resource "azurerm_network_interface" "win10-nic" {
   name = "win10-nic"
-  location = "West US 2"
+  location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
 
   ip_configuration {
@@ -342,7 +342,7 @@ resource "azurerm_network_interface" "win10-nic" {
 
 resource "azurerm_public_ip" "win10-publicip" {
   name                = "win10-public-ip"
-  location            = "West US 2"
+  location            = var.region
   resource_group_name = azurerm_resource_group.detectionlab.name
   allocation_method   = "Static"
 
@@ -353,7 +353,7 @@ resource "azurerm_public_ip" "win10-publicip" {
 
 resource "azurerm_virtual_machine" "dc" {
   name = "dc.windomain.local"
-  location = "West US 2"
+  location = var.region
   resource_group_name   = azurerm_resource_group.detectionlab.name
   network_interface_ids = [azurerm_network_interface.dc-nic.id]
   vm_size               = "Standard_D1_v2"
@@ -409,7 +409,7 @@ resource "azurerm_virtual_machine" "dc" {
 
 resource "azurerm_virtual_machine" "wef" {
   name = "wef.windomain.local"
-  location = "West US 2"
+  location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
   network_interface_ids = [azurerm_network_interface.wef-nic.id]
   vm_size               = "Standard_D1_v2"
@@ -466,7 +466,7 @@ resource "azurerm_virtual_machine" "wef" {
 
 resource "azurerm_virtual_machine" "win10" {
   name = "win10.windomain.local"
-  location = "West US 2"
+  location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
   network_interface_ids = [azurerm_network_interface.win10-nic.id]
   vm_size               = "Standard_D1_v2"
