@@ -150,6 +150,19 @@ resource "azurerm_network_security_group" "detectionlab-nsg" {
     source_address_prefixes    = var.ip_whitelist
     destination_address_prefix = "*"
   }
+
+  # Velociraptor access
+  security_rule {
+    name                       = "Velociraptor"
+    priority                   = 1009
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "9999"
+    source_address_prefixes    = var.ip_whitelist
+    destination_address_prefix = "*"
+  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "detectionlab-nsga" {

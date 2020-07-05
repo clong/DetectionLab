@@ -9,3 +9,6 @@ Boxes/*
 *.tfstate.*
 *.tfvars
 inventory.yml
+inventory.yml.bak
+*.box
+manifest.xml
