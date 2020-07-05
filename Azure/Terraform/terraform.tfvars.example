@@ -1,5 +1,5 @@
 # https://azure.microsoft.com/en-us/global-infrastructure/locations/
-region = "US WEST 2" 
+region = "westus2" 
 public_key_name = "id_logger" # This can be changed to whatever you want
 # These values must point to a valid keypair. 
 # You'll log into the logger host via: ssh -i /home/user/.ssh/id_logger vagrant@<public_logger_ip>
