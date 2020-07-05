@@ -91,6 +91,14 @@ resource "aws_security_group" "logger" {
     cidr_blocks = var.ip_whitelist
   }
 
+  # Velociraptor access
+    ingress {
+    from_port   = 9999
+    to_port     = 9999
+    protocol    = "tcp"
+    cidr_blocks = var.ip_whitelist
+  }
+
   # Allow all traffic from the private subnet
   ingress {
     from_port   = 0

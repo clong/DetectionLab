@@ -144,13 +144,13 @@
       "remote_path": "/tmp/script.bat",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "./scripts/vm-guest-tools.bat",
         "./scripts/enable-rdp.bat"
       ]
     },
     {
       "type": "powershell",
       "scripts": [
+        "./scripts/vm-guest-tools.ps1",
         "./scripts/debloat-windows.ps1"
       ]
     },
