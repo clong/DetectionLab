@@ -33,3 +33,7 @@ output "splunk_url" {
 output "guacamole_url" {
   value = local.guacamole_url
 }
+
+output "velociraptor_url" {
+  value = local.velociraptor_url
+}
