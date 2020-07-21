@@ -69,7 +69,7 @@ if ("$env:PACKER_BUILDER_TYPE" -eq "virtualbox-iso") {
     }
 
     cmd /c ""C:\PROGRA~1\7-Zip\7z.exe" x C:\Windows\Temp\VBoxGuestAdditions.iso -oC:\Windows\Temp\virtualbox"
-    cmd /c for %%i in (C:\Windows\Temp\virtualbox\cert\vbox*.cer) do C:\Windows\Temp\virtualbox\cert\VBoxCertUtil add-trusted-publisher %%i --root %%i
+    Get-ChildItem "C:\Windows\Temp\virtualbox\cert\" -Filter vbox*.cer | Foreach-Object { C:\Windows\Temp\virtualbox\cert\VBoxCertUtil add-trusted-publisher $_.FullName --root $_.FullName }
     cmd /c C:\Windows\Temp\virtualbox\VBoxWindowsAdditions.exe /S
     cmd /c rd /S /Q "C:\Windows\Temp\virtualbox"
 }
