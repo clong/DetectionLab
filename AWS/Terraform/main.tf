@@ -166,7 +166,6 @@ resource "aws_security_group" "windows" {
 resource "aws_key_pair" "auth" {
   key_name   = var.public_key_name
   public_key = file(var.public_key_path)
-  tags = var.custom-tags
 }
 
 resource "aws_instance" "logger" {
