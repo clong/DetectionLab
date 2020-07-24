@@ -22,27 +22,24 @@
 .PARAMETER ProviderName
   The Hypervisor you're using for the lab. Valid options are 'virtualbox' or 'vmware_desktop'
 
-.PARAMETER PackerPath
-  The full path to the packer executable. Default is C:\Hashicorp\packer.exe
-
 .PARAMETER PackerOnly
-  This switch skips deploying boxes with vagrant after being built by packer
+  This switch skips deploying boxes with vagrant after being built by Packer
 
 .PARAMETER VagrantOnly
-  This switch skips building packer boxes and instead downloads from Vagrant Cloud
+  This switch skips building Packer boxes and instead downloads from Vagrant Cloud
 
 .EXAMPLE
   build.ps1 -ProviderName virtualbox
 
-  This builds the DetectionLab using virtualbox and the default path for packer (C:\Hashicorp\packer.exe)
+  This builds DetectionLab using virtualbox and the default path for Packer (C:\Hashicorp\packer.exe)
 .EXAMPLE
-  build.ps1 -ProviderName vmware_desktop -PackerPath 'C:\packer.exe'
+  build.ps1 -ProviderName vmware_desktop
 
-  This builds the DetectionLab using VMware and sets the packer path to 'C:\packer.exe'
+  This builds the DetectionLab using VMware and sets the Packer path to 'C:\packer.exe'
 .EXAMPLE
   build.ps1 -ProviderName vmware_desktop -VagrantOnly
 
-  This command builds the DetectionLab using vmware and skips the packer process, downloading the boxes instead.
+  This command builds the DetectionLab using VMware and skips the Packer process, downloading the boxes instead.
 #>
 
 [cmdletbinding()]
@@ -50,7 +47,6 @@ Param(
   # Vagrant provider to use.
   [ValidateSet('virtualbox', 'vmware_desktop')]
   [string]$ProviderName,
-  [string]$PackerPath = 'C:\Hashicorp\packer.exe',
   [switch]$PackerOnly,
   [switch]$VagrantOnly
 )
@@ -74,79 +70,75 @@ function install_checker {
 }
 
 function check_packer {
-  # Check for packer using Get-Command
-  if ((Get-Command packer).Path) {
-    $PackerPath = (Get-Command packer).Path
-    Write-Output "Packer found at $PackerPath"
-  }
-  # Check for packer at $PackerPath
-  if (!(Test-Path $PackerPath)) {
-    Write-Error "Packer not found at $PackerPath"
-    Write-Output 'Re-run the script setting the PackerPath parameter to the location of packer'
-    Write-Output "Example: build.ps1 -PackerPath 'C:\packer.exe'"
-    Write-Output 'Exiting..'
+  # Check if Packer is in path
+  Try {
+    Get-Command packer.exe -ErrorAction Stop | Out-Null
+  } Catch {
+    Write-Error 'Packer was not found in your PATH. Please correct this before continuing.' -ForegroundColor yellow
+    Write-Error 'Please note that packer is not required if you pass the "-VagrantOnly" flag to the build.ps1 script.' -ForegroundColor yellow
+    Write-Error 'Packer is only required if you prefer to create boxes from scratch rather than using the pre-built ones.' -ForegroundColor yellow
     break
   }
 }
 function check_vagrant {
-  # Check if vagrant is in path
-  try {
+  # Check if Vagrant is in path
+  Try {
     Get-Command vagrant.exe -ErrorAction Stop | Out-Null
   }
-  catch {
-    Write-Error 'Vagrant was not found. Please correct this before continuing.'
-    break
+  Catch {
+    Write-Error 'Vagrant was not found. Please correct this before continuing.' -ForegroundColor red
+    Break
   }
 
-  # Check Vagrant version >= 2.2.7
+  # Check Vagrant version >= 2.2.9
   [System.Version]$vagrant_version = $(vagrant --version).Split(' ')[1]
-  [System.Version]$version_comparison = 2.2.7
+  [System.Version]$version_comparison = 2.2.9
 
   if ($vagrant_version -lt $version_comparison) {
-    Write-Warning 'It is highly recommended to use Vagrant 2.2.7 or above before continuing'
+    Write-Warning 'It is highly recommended to use Vagrant 2.2.9 or above before continuing' -ForegroundColor yellow
   }
 }
 
 # Returns false if not installed or true if installed
 function check_virtualbox_installed {
-  Write-Host '[check_virtualbox_installed] Running..'
+  Write-Host '[check_virtualbox_installed] Running..' -ForegroundColor green
   if (install_checker -Name "VirtualBox") {
-    Write-Host '[check_virtualbox_installed] Virtualbox found.'
+    Write-Host '[check_virtualbox_installed] Virtualbox found.' -ForegroundColor green
     return $true
   }
   else {
-    Write-Host '[check_virtualbox_installed] Virtualbox not found.'
+    Write-Host '[check_virtualbox_installed] Virtualbox not found.' -ForegroundColor green
     return $false
   }
 }
 function check_vmware_workstation_installed {
-  Write-Host '[check_vmware_workstation_installed] Running..'
+  Write-Host '[check_vmware_workstation_installed] Running..' -ForegroundColor green
   if (install_checker -Name "VMware Workstation") {
-    Write-Host '[check_vmware_workstation_installed] VMware Workstation found.'
+    Write-Host '[check_vmware_workstation_installed] VMware Workstation found.' -ForegroundColor green
     return $true
   }
   else {
-    Write-Host '[check_vmware_workstation_installed] VMware Workstation not found.'
+    Write-Host '[check_vmware_workstation_installed] VMware Workstation not found.' -ForegroundColor green
     return $false
   }
 }
 
 function check_vmware_vagrant_plugin_installed {
-  Write-Host '[check_vmware_vagrant_plugin_installed] Running..'
-  if (vagrant plugin list | Select-String 'vagrant-vmware-desktop') {
-    Write-Host 'The vagrant VMware Workstation plugin is no longer supported.'
-    Write-Host 'Please upgrade to the VMware Desktop plugin: https://www.vagrantup.com/docs/vmware/installation.html'
+  Write-Host '[check_vmware_vagrant_plugin_installed] Running..' -ForegroundColor green
+  if (vagrant plugin list | Select-String 'vagrant-vmware-workstation') {
+    Write-Host 'The vagrant VMware Workstation plugin is no longer supported.' -ForegroundColor red
+    Write-Host 'Please upgrade to the VMware Desktop plugin: https://www.vagrantup.com/docs/vmware/installation.html' -ForegroundColor red
     return $false
   }
   if (vagrant plugin list | Select-String 'vagrant-vmware-desktop') {
-    Write-Host '[check_vmware_vagrant_plugin_installed] Vagrant VMware Desktop plugin found.'
+    Write-Host '[check_vmware_vagrant_plugin_installed] Vagrant VMware Desktop plugin found.' -ForegroundColor green
     return $true
   }
   else {
-    Write-Host 'VMware Workstation is installed, but the Vagrant plugin is not.'
-    Write-Host 'Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase and install it'
-    Write-Host 'VMware Workstation will not be listed as a provider until the Vagrant plugin has been installed.'
-    Write-Host 'NOTE: The plugin does not work with trial versions of VMware Workstation'
+    Write-Host 'VMware Workstation is installed, but the vagrant-vmware-desktop plugin is not.' -ForegroundColor yellow
+    Write-Host 'Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase ($80) and install it' -ForegroundColor yellow
+    Write-Host 'VMware Workstation will not be listed as a provider until the Vagrant plugin has been installed.' -ForegroundColor yellow
+    Write-Host 'NOTE: The plugin does not work with trial versions of VMware Workstation' -ForegroundColor yellow
     return $false
   }
 }
@@ -154,21 +146,38 @@ function check_vmware_vagrant_plugin_installed {
 function list_providers {
   [cmdletbinding()]
   param()
-
-  Write-Host 'Available Providers: '
+  
+  $vboxInstalled = 0
+  $vmwareInstalled = 0
   if (check_virtualbox_installed) {
-    Write-Host '[*] virtualbox'
+    $vboxInstalled=1
   }
   if (check_vmware_workstation_installed) {
     if (check_vmware_vagrant_plugin_installed) {
-      Write-Host '[*] vmware_desktop'
+      $vmwareInstalled=1
     }
   }
-  if ((-Not (check_virtualbox_installed)) -and (-Not (check_vmware_workstation_installed))) {
-    Write-Error 'You need to install a provider such as VirtualBox or VMware Workstation to continue.'
+  # Warn users if Virtualbox and VMware Workstation are both installed.
+  if (( $vboxInstalled -eq 1 ) -and ( $vmwareInstalled -eq 1 )) {
+    Write-Host "NOTE:" -ForegroundColor yellow
+    Write-Host "Both VMware Workstation and Virtualbox appear to be installed on this system." -ForegroundColor yellow
+    Write-Host "Please consider setting the VAGRANT_DEFAULT_PROVIDER environment variable to prevent confusion." -ForegroundColor yellow
+    Write-Host "More details can be found here: https://www.vagrantup.com/docs/providers/default" -ForegroundColor yellow
+    Write-Host "Additionally, please ensure only one providers' network adapters are active at any given time." -ForegroundColor yellow
+  }
+  if (($vboxInstalled -eq 0) -and ($vmwareInstalled -eq 0)) {
+    Write-Error 'You need to install a provider such as VirtualBox or VMware Workstation to continue.' -ForegroundColor red
+    Write-Error 'Virtualbox is free, the VMware Vagrant Plugin costs $80.' -ForegroundColor red
     break
   }
   while (-Not ($ProviderName -eq 'virtualbox' -or $ProviderName -eq 'vmware_desktop')) {
+    Write-Host "Available Providers: "
+    if ($vboxInstalled -eq 1) {
+      Write-Host '[*] virtualbox' -ForegroundColor green
+    }
+    if ($vmwareInstalled -eq 1) {
+      Write-Host '[*] vmware_desktop' -ForegroundColor green
+    }
     $ProviderName = Read-Host 'Which provider would you like to use?'
     Write-Debug "ProviderName = $ProviderName"
     if (-Not ($ProviderName -eq 'virtualbox' -or $ProviderName -eq 'vmware_desktop')) {
@@ -179,43 +188,47 @@ function list_providers {
 }
 
 function preflight_checks {
-  Write-Host '[preflight_checks] Running..'
-  # Check to see that no boxes exist
-  if (-Not ($VagrantOnly)) {
-    Write-Host '[preflight_checks] Checking if Packer is installed'
-    check_packer
-
-    # Check Packer Version against known bad
-    Write-Host '[preflight_checks] Checking for bad packer version..'
-    [System.Version]$PackerVersion = $(& $PackerPath "--version")
-    [System.Version]$PackerKnownBad = 1.1.2
-
-    if ($PackerVersion -eq $PackerKnownBad) {
-      Write-Error 'Packer 1.1.2 is not supported. Please upgrade to a newer version and see https://github.com/hashicorp/packer/issues/5622 for more information.'
-      break
+  Write-Host '[preflight_checks] Running..' -ForegroundColor green
+  # Verify CredentialGuard isn't enabled
+  if (('CredentialGuard' -match ((Get-ComputerInfo).DeviceGuardSecurityServicesConfigured) -eq "True")) {
+    Write-Host "WARNING: CredentialGuard appears to be enabled on this system which can cause issues with Virtualbox." -ForegroundColor yellow
+    Write-Host "See this thread for more info: https://forums.virtualbox.org/viewtopic.php?f=25&t=82106" -ForegroundColor yellow
+    $Confirmation = Read-Host "Please type 'y' to continue or any other key to exit: "
+    If ($Confirmation.ToLower() -ne "y") {
+      Write-Host "You entered \"$Confirmation\", exiting." -ForegroundColor red
+      exit 0
     }
   }
-  if (!($PackerOnly)) {
-    Write-Host '[preflight_checks] Checking if Vagrant is installed'
+  
+  if (-Not ($VagrantOnly)) {
+    Write-Host '[preflight_checks] Checking if Packer is installed' -ForegroundColor green
+    check_packer
+  }
+  if (-Not ($PackerOnly)) {
+    Write-Host '[preflight_checks] Checking if Vagrant is installed' -ForegroundColor green
     check_vagrant
 
-    Write-Host '[preflight_checks] Checking for pre-existing boxes..'
+    Write-Host '[preflight_checks] Checking for pre-existing boxes..' -ForegroundColor green
     if ((Get-ChildItem "$DL_DIR\Boxes\*.box").Count -gt 0) {
-      Write-Host 'You seem to have at least one .box file present in the Boxes directory already. If you would like fresh boxes downloaded, please remove all files from the Boxes directory and re-run this script.'
+      Write-Host 'You seem to have at least one .box file present in the Boxes directory already. If you would like fresh boxes downloaded, please remove all .box files from the Boxes directory and re-run this script.' -ForegroundColor yellow
     }
 
-    # Check to see that no vagrant instances exist
-    Write-Host '[preflight_checks] Checking for vagrant instances..'
+    # Check to see that no Vagrant instances exist
+    Write-Host '[preflight_checks] Checking for vagrant instances..' -ForegroundColor green
     $CurrentDir = Get-Location
     Set-Location "$DL_DIR\Vagrant"
     if (($(vagrant status) | Select-String -Pattern "not[ _]created").Count -ne 4) {
-      Write-Error 'You appear to have already created at least one Vagrant instance. This script does not support already created instances. Please either destroy the existing instances or follow the build steps in the README to continue.'
-      break
+      vagrant status
+      Write-Host 'You appear to have already created at least one Vagrant instance. This script does not support already created instances.' -ForegroundColor red
+      Write-Host 'To continue, cd to the Vagrant directory and run "vagrant destroy -f"' -ForegroundColor red
+      Write-Host 'After that completes, "cd .." and re-run this script.' -ForegroundColor red
+      Set-Location "$DL_DIR"
+      exit 1
     }
     Set-Location $CurrentDir
 
     # Check available disk space. Recommend 80GB free, warn if less
-    Write-Host '[preflight_checks] Checking disk space..'
+    Write-Host '[preflight_checks] Checking disk space..' -ForegroundColor green
     $drives = Get-PSDrive | Where-Object {$_.Provider -like '*FileSystem*'}
     $drivesList = @()
 
@@ -226,25 +239,25 @@ function preflight_checks {
     }
 
     if ($DrivesList.Count -gt 0) {
-      Write-Output "The following drives have less than 80GB of free space. They should not be used for deploying DetectionLab"
+      Write-Host "The following drives have less than 80GB of free space. They should not be used for deploying DetectionLab" -ForegroundColor yellow
       forEach ($drive in $DrivesList) {
-        Write-Output "[*] $($drive.Name)"
+        Write-Host "[*] $($drive.Name)"
       }
-      Write-Output "You can safely ignore this warning if you are deploying DetectionLab to a different drive."
+      Write-Host "You can safely ignore this warning if you are deploying DetectionLab to a different drive." -ForegroundColor yellow
     }
 
     # Ensure the vagrant-reload plugin is installed
-    Write-Host '[preflight_checks] Checking if vagrant-reload is installed..'
+    Write-Host '[preflight_checks] Checking if vagrant-reload is installed..' -ForegroundColor green
     if (-Not (vagrant plugin list | Select-String 'vagrant-reload')) {
-      Write-Output 'The vagrant-reload plugin is required and not currently installed. This script will attempt to install it now.'
+      Write-Host 'The vagrant-reload plugin is required and not currently installed. This script will attempt to install it now.' -ForegroundColor yellow
       (vagrant plugin install 'vagrant-reload')
       if ($LASTEXITCODE -ne 0) {
-        Write-Error 'Unable to install the vagrant-reload plugin. Please try to do so manually and re-run this script.'
+        Write-Error 'Unable to install the vagrant-reload plugin. Please try to do so manually and re-run this script.' -ForegroundColor red
         break
       }
     }
   }
-  Write-Host '[preflight_checks] Finished.'
+  Write-Host '[preflight_checks] Finished.' -ForegroundColor green
 }
 
 function packer_build_box {
@@ -252,49 +265,49 @@ function packer_build_box {
     [string]$Box
   )
 
-  Write-Host "[packer_build_box] Running for $Box"
+  Write-Host "[packer_build_box] Running for $Box" -ForegroundColor green
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Packer"
-  Write-Output "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware."
+  Write-Host "Using Packer to build the $BOX Box. This can take 90-180 minutes depending on bandwidth and hardware." -ForegroundColor green
   $env:PACKER_LOG=1
   $env:PACKER_LOG_PATH="$DL_DIR\Packer\packer.log"
-  &$PackerPath @('build', "--only=$PackerProvider-iso", "$box.json")
-  Write-Host "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE"
+  &packer @('build', "--only=$PackerProvider-iso", "$box.json")
+  Write-Host "[packer_build_box] Finished for $Box. Got exit code: $LASTEXITCODE" -ForegroundColor green
 
   if ($LASTEXITCODE -ne 0) {
     Write-Error "Something went wrong while attempting to build the $BOX box."
-    Write-Output "To file an issue, please visit https://github.com/clong/DetectionLab/issues/"
+    Write-Host "To file an issue, please visit https://github.com/clong/DetectionLab/issues/"
     break
   }
   Set-Location $CurrentDir
 }
 
 function move_boxes {
-  Write-Host "[move_boxes] Running.."
+  Write-Host "[move_boxes] Running.." -ForegroundColor green
   Move-Item -Path $DL_DIR\Packer\*.box -Destination $DL_DIR\Boxes
   if (-Not (Test-Path "$DL_DIR\Boxes\windows_10_$PackerProvider.box")) {
-    Write-Error "Windows 10 box is missing from the Boxes directory. Quitting."
+    Write-Host "Windows 10 box is missing from the Boxes directory. Quitting." -ForegroundColor red
     break
   }
   if (-Not (Test-Path "$DL_DIR\Boxes\windows_2016_$PackerProvider.box")) {
-    Write-Error "Windows 2016 box is missing from the Boxes directory. Quitting."
+    Write-Error "Windows 2016 box is missing from the Boxes directory. Quitting." -ForegroundColor red
     break
   }
-  Write-Host "[move_boxes] Finished."
+  Write-Host "[move_boxes] Finished." -ForegroundColor green
 }
 
 function vagrant_up_host {
   param(
     [string]$VagrantHost
   )
-  Write-Host "[vagrant_up_host] Running for $VagrantHost"
-  Write-Host "Attempting to bring up the $VagrantHost host using Vagrant"
+  Write-Host "[vagrant_up_host] Running for $VagrantHost" -ForegroundColor green
+  Write-Host "Attempting to bring up the $VagrantHost host using Vagrant" -ForegroundColor green
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Vagrant"
   set VAGRANT_LOG=info
   &vagrant.exe @('up', $VagrantHost, '--provider', "$ProviderName") 2>&1 | Out-File -FilePath ".\vagrant_up_$VagrantHost.log"
   Set-Location $CurrentDir
-  Write-Host "[vagrant_up_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE"
+  Write-Host "[vagrant_up_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE" -ForegroundColor green
   return $LASTEXITCODE
 }
 
@@ -302,12 +315,12 @@ function vagrant_reload_host {
   param(
     [string]$VagrantHost
   )
-  Write-Host "[vagrant_reload_host] Running for $VagrantHost"
+  Write-Host "[vagrant_reload_host] Running for $VagrantHost" -ForegroundColor green
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Vagrant"
   &vagrant.exe @('reload', $VagrantHost, '--provision') 2>&1 | Out-File -FilePath ".\vagrant_up_$VagrantHost.log" -Append
   Set-Location $CurrentDir
-  Write-Host "[vagrant_reload_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE"
+  Write-Host "[vagrant_reload_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE" -ForegroundColor green
   return $LASTEXITCODE
 }
 
@@ -318,7 +331,7 @@ function download {
     [switch]$SuccessOn401
 
   )
-  Write-Host "[download] Running for $URL, looking for $PatternToMatch"
+  Write-Host "[download] Running for $URL, looking for $PatternToMatch" -ForegroundColor green
   [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -327,11 +340,11 @@ function download {
   {
     $result = $wc.DownloadString($URL)
     if ($result -like "*$PatternToMatch*") {
-      Write-Host "[download] Found $PatternToMatch at $URL"
+      Write-Host "[download] Found $PatternToMatch at $URL" -ForegroundColor green
       return $true
     }
     else {
-      Write-Host "[download] Could not find $PatternToMatch at $URL"
+      Write-Host "[download] Could not find $PatternToMatch at $URL" -ForegroundColor red
       return $false
     }
   }
@@ -343,7 +356,7 @@ function download {
     }
     else
     {
-      Write-Host "Error occured on webrequest: $_"
+      Write-Host "Error occured on webrequest: $_" -ForegroundColor red
       return $false
     }
   }
@@ -364,13 +377,13 @@ function post_build_checks {
   Write-Host "[post_build_checks] ATA Result: $ATA_CHECK"
 
   if ($SPLUNK_CHECK -eq $false) {
-    Write-Warning 'Splunk failed post-build tests and may not be functioning correctly.'
+    Write-Warning 'Splunk failed post-build tests and may not be functioning correctly.' -ForegroundColor yellow
   }
   if ($FLEET_CHECK -eq $false) {
-    Write-Warning 'Fleet failed post-build tests and may not be functioning correctly.'
+    Write-Warning 'Fleet failed post-build tests and may not be functioning correctly.' -ForegroundColor yellow
   }
   if ($ATA_CHECK -eq $false) {
-    Write-Warning 'MS ATA failed post-build tests and may not be functioning correctly.'
+    Write-Warning 'MS ATA failed post-build tests and may not be functioning correctly.' -ForegroundColor yellow
   }
 }
 
@@ -401,26 +414,26 @@ if (!($VagrantOnly)) {
 if (!($PackerOnly)) {
   # Vagrant up each box and attempt to reload one time if it fails
   forEach ($VAGRANT_HOST in $LAB_HOSTS) {
-    Write-Host "[main] Running vagrant_up_host for: $VAGRANT_HOST"
+    Write-Host "[main] Running vagrant_up_host for: $VAGRANT_HOST" -ForegroundColor green
     $result = vagrant_up_host -VagrantHost $VAGRANT_HOST
-    Write-Host "[main] vagrant_up_host finished. Exitcode: $result"
+    Write-Host "[main] vagrant_up_host finished. Exitcode: $result" -ForegroundColor green
     if ($result -eq '0') {
-      Write-Output "Good news! $VAGRANT_HOST was built successfully!"
+      Write-Host "Good news! $VAGRANT_HOST was built successfully!" -ForegroundColor green
     }
     else {
-      Write-Warning "Something went wrong while attempting to build the $VAGRANT_HOST box."
-      Write-Output "Attempting to reload and reprovision the host..."
-      Write-Host "[main] Running vagrant_reload_host for: $VAGRANT_HOST"
+      Write-Warning "Something went wrong while attempting to build the $VAGRANT_HOST box." -ForegroundColor yellow
+      Write-Host "Attempting to reload and reprovision the host..." -ForegroundColor green
+      Write-Host "[main] Running vagrant_reload_host for: $VAGRANT_HOST" -ForegroundColor green
       $retryResult = vagrant_reload_host -VagrantHost $VAGRANT_HOST
       if ($retryResult -ne 0) {
-        Write-Error "Failed to bring up $VAGRANT_HOST after a reload. Exiting"
+        Write-Error "Failed to bring up $VAGRANT_HOST after a reload. Exiting" -ForegroundColor red
         break
       }
     }
-    Write-Host "[main] Finished for: $VAGRANT_HOST"
+    Write-Host "[main] Finished for: $VAGRANT_HOST" -ForegroundColor green
   }
 
-  Write-Host "[main] Running post_build_checks"
+  Write-Host "[main] Running post_build_checks" -ForegroundColor green
   post_build_checks
-  Write-Host "[main] Finished post_build_checks"
+  Write-Host "[main] Finished post_build_checks" -ForegroundColor green
 }
