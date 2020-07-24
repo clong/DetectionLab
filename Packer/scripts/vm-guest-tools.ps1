@@ -30,12 +30,12 @@ if ("$env:PACKER_BUILDER_TYPE" -eq "vmware-iso") {
             Write-Host "Unable to determine the latest version of VMware tools. Falling back to hardcoded URL."
             (New-Object System.Net.WebClient).DownloadFile('https://softwareupdate.vmware.com/cds/vmw-desktop/ws/15.5.5/16285975/windows/packages/tools-windows.tar', 'C:\Windows\Temp\vmware-tools.tar')
         }
-        cmd /c "C:\Program Files\7-Zip\7z.exe" x C:\Windows\Temp\vmware-tools.tar -oC:\Windows\Temp 
+        cmd /c "C:\PROGRA~1\7-Zip\7z.exe" x C:\Windows\Temp\vmware-tools.tar -oC:\Windows\Temp 
         Move-Item c:\windows\temp\VMware-tools-windows-*.iso c:\windows\temp\windows.iso
         Try { Remove-Item "C:\Program Files (x86)\VMWare" -Recurse -Force -ErrorAction Stop } Catch { Write-Host "Directory didn't exist to be removed." }
     }
 
-    cmd /c "C:\Program Files\7-Zip\7z.exe" x "C:\Windows\Temp\windows.iso" -oC:\Windows\Temp\VMWare
+    cmd /c "C:\PROGRA~1\7-Zip\7z.exe" x "C:\Windows\Temp\windows.iso" -oC:\Windows\Temp\VMWare
     cmd /c C:\Windows\Temp\VMWare\setup.exe /S /v"/qn REBOOT=R\"
 
     Remove-Item -Force "C:\Windows\Temp\vmware-tools.tar"
@@ -68,8 +68,8 @@ if ("$env:PACKER_BUILDER_TYPE" -eq "virtualbox-iso") {
         }
     }
 
-    cmd /c ""C:\Program Files\7-Zip\7z.exe" x C:\Windows\Temp\VBoxGuestAdditions.iso -oC:\Windows\Temp\virtualbox"
-    cmd /c for %%i in (C:\Windows\Temp\virtualbox\cert\vbox*.cer) do C:\Windows\Temp\virtualbox\cert\VBoxCertUtil add-trusted-publisher %%i --root %%i
+    cmd /c ""C:\PROGRA~1\7-Zip\7z.exe" x C:\Windows\Temp\VBoxGuestAdditions.iso -oC:\Windows\Temp\virtualbox"
+    Get-ChildItem "C:\Windows\Temp\virtualbox\cert\" -Filter vbox*.cer | Foreach-Object { C:\Windows\Temp\virtualbox\cert\VBoxCertUtil add-trusted-publisher $_.FullName --root $_.FullName }
     cmd /c C:\Windows\Temp\virtualbox\VBoxWindowsAdditions.exe /S
     cmd /c rd /S /Q "C:\Windows\Temp\virtualbox"
 }
