@@ -62,7 +62,7 @@
   become: yes
   shell: |
       echo "[$(date +%H:%M:%S)]: Running apt-fast install..."
-      apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip htop yq
+      apt-fast -qq install -y jq whois build-essential git mysql-server redis-server python-pip unzip htop yq
   register: apt_install_prerequisites
   failed_when: "'error' in apt_install_prerequisites.stderr"
 
@@ -88,7 +88,7 @@
     executable: /bin/bash
   become: yes
   shell: |
-    for package in jq whois build-essential git docker docker-compose unzip yq; do
+    for package in jq whois build-essential git unzip yq mysql-server redis-server python-pip; do
       echo "[$(date +%H:%M:%S)]: [TEST] Validating that $package is correctly installed..."
       # Loop through each package using dpkg
       if ! dpkg -S $package >/dev/null; then
@@ -281,22 +281,51 @@
     executable: /bin/bash
   become: yes
   shell: |
-    # Install Fleet
-    if [ -f "/opt/kolide-quickstart" ]; then
+    if [ -f "/opt/fleet" ]; then
       echo "[$(date +%H:%M:%S)]: Fleet is already installed"
     else
+      cd /opt || exit 1
+
       echo "[$(date +%H:%M:%S)]: Installing Fleet..."
       echo -e "\n127.0.0.1       kolide" >>/etc/hosts
       echo -e "\n127.0.0.1       logger" >>/etc/hosts
-      cd /opt && git clone https://github.com/kolide/kolide-quickstart.git
-      cd /opt/kolide-quickstart || echo "Something went wrong while trying to clone the kolide-quickstart repository"
-      cp /vagrant/resources/fleet/server.* .
-      sed -i 's/ -it//g' demo.sh
-      ./demo.sh up simple
+
+      # Set MySQL username and password, create kolide database
+      mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'kolide';"
+      mysql -uroot -pkolide -e "create database kolide;"
+
+      # Always download the latest release of Fleet
+      curl -s https://api.github.com/repos/kolide/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
+      unzip fleet.zip -d fleet
+      cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
+      cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
+
+      # Prepare the DB
+      fleet prepare db --mysql_address=127.0.0.1:3306 --mysql_database=kolide --mysql_username=root --mysql_password=kolide
+
+      # Copy over the certs and service file
+      cp /vagrant/resources/fleet/server.* /opt/fleet/
+      cp /vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service
+
+      mkdir /var/log/fleet
+
+      /bin/systemctl enable fleet.service
+      /bin/systemctl start fleet.service
+
+      echo "[$(date +%H:%M:%S)]: Waiting for fleet service to start..."
+      while true; do
+        result=$(curl --silent -k https://192.168.38.105:8412)
+        if echo "$result" | grep -q setup; then break; fi
+        sleep 1
+      done
+
+      fleetctl config set --address https://192.168.38.105:8412
+      fleetctl config set --tls-skip-verify true
+      fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
+      fleetctl login --email admin@detectionlab.network --password 'admin123#'
+
       # Set the enrollment secret to match what we deploy to Windows hosts
-      docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u kolide --password=kolide -e 'update app_configs set osquery_enroll_secret = "enrollmentsecret" where id=1;' --batch kolide
-      # Set snapshot events to be split into multiple events
-      docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u kolide --password=kolide -e 'insert into options (name, type, value) values ("logger_snapshot_event_type", 2, "true");' --batch kolide
+      mysql -uroot --password=kolide -e 'use kolide; update enroll_secrets set secret = "enrollmentsecret" where active=1;'
       echo "Updated enrollment secret"
     fi
   register: install_fleet
@@ -324,13 +353,6 @@
   become: yes
   shell: |
     cd /opt
-    wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.4.0/fleet.zip
-    unzip fleet.zip -d fleet
-    cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
-    fleetctl config set --address https://192.168.38.105:8412
-    fleetctl config set --tls-skip-verify true
-    fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
-    fleetctl login --email admin@detectionlab.network --password 'admin123#'
 
     # Change the query invervals to reflect a lab environment
     # Every hour -> Every 3 minutes
@@ -343,8 +365,10 @@
     # Dont log osquery INFO messages
     # Fix snapshot event formatting
     fleetctl get options > /tmp/options.yaml
-    /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_min_status' '1'
-    /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' '2'
+    /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
+    /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
+    # Fleet 3.0 requires the "kind" to be "options" instead of "option"
+    sed -i 's/kind: option/kind: options/g' /tmp/options.yaml
     fleetctl apply -f /tmp/options.yaml
 
     # Use fleetctl to import YAML files
@@ -355,11 +379,33 @@
     done
 
     # Add Splunk monitors for Fleet
-    /opt/splunk/bin/splunk add monitor "/opt/kolide-quickstart/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
-    /opt/splunk/bin/splunk add monitor "/opt/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'  
+    # Files must exist before splunk will add a monitor
+    touch /var/log/fleet/osquery_result
+    touch /var/log/fleet/osquery_status
+    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
   register: fleet_osquery_config
   failed_when: "'error' in fleet_osquery_config.stderr"
   changed_when: "'Fleet login successful and context configured!' in fleet_osquery_config.stdout"
+
+- name: Install Velociraptor
+  args:
+    executable: /bin/bash
+  become: yes
+  shell: |
+    echo "[$(date +%H:%M:%S)]: Installing Velociraptor..."
+    mkdir /opt/install_velociraptor
+    echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
+    LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
+    echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
+    echo "[$(date +%H:%M:%S)]: Attempting to download..."
+    wget -P --progress=bar:force /opt/velociraptor "$LATEST_VELOCIRAPTOR_LINUX_URL"
+    if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
+      echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
+    else
+      echo "[$(date +%H:%M:%S)]: Failed to download the latest version of Velociraptor. Please open a DetectionLab issue on Github."
+      return
+    fi
 
 - name: Install Suricata
   args: 
@@ -375,6 +421,7 @@
     cd /opt || exit 1
     git clone https://github.com/OISF/suricata-update.git
     cd /opt/suricata-update || exit 1
+    pip install pyyaml
     python setup.py install
 
     cp /vagrant/resources/suricata/suricata.yaml /etc/suricata/suricata.yaml
