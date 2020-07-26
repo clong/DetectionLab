@@ -36,7 +36,7 @@ apt_install_prerequisites() {
   apt-get -qq update
   apt-get -qq install -y apt-fast
   echo "[$(date +%H:%M:%S)]: Running apt-fast install..."
-  apt-fast -qq install -y jq whois build-essential git docker docker-compose unzip htop yq
+  apt-fast -qq install -y jq whois build-essential git unzip htop yq mysql-server redis-server python-pip
 }
 
 modify_motd() {
@@ -52,7 +52,7 @@ modify_motd() {
 }
 
 test_prerequisites() {
-  for package in jq whois build-essential git docker docker-compose unzip yq; do
+  for package in jq whois build-essential git unzip yq mysql-server redis-server python-pip; do
     echo "[$(date +%H:%M:%S)]: [TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
     if ! dpkg -S $package >/dev/null; then
@@ -241,33 +241,32 @@ install_fleet_import_osquery_config() {
     echo -e "\n127.0.0.1       kolide" >>/etc/hosts
     echo -e "\n127.0.0.1       logger" >>/etc/hosts
 
-    apt-get -q -y install mysql-server
-
+    # Set MySQL username and password, create kolide database
     mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'kolide';"
     mysql -uroot -pkolide -e "create database kolide;"
 
-    sudo apt-get install redis-server -y
-    sudo apt install unzip -y
-
-    wget --progress=bar:force https://github.com/kolide/fleet/releases/download/3.0.0/fleet.zip
+    # Always download the latest release of Fleet
+    curl -s https://api.github.com/repos/kolide/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
     unzip fleet.zip -d fleet
     cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
     cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
 
+    # Prepare the DB
     fleet prepare db --mysql_address=127.0.0.1:3306 --mysql_database=kolide --mysql_username=root --mysql_password=kolide
 
+    # Copy over the certs and service file
     cp /vagrant/resources/fleet/server.* /opt/fleet/
     cp /vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service
 
-    mkdir /var/log/kolide
+    mkdir /var/log/fleet
 
     /bin/systemctl enable fleet.service
     /bin/systemctl start fleet.service
 
-    echo "[$(date +%H:%M:%S)]: Waiting for fleet service..."
+    echo "[$(date +%H:%M:%S)]: Waiting for fleet service to start..."
     while true; do
       result=$(curl --silent -k https://192.168.38.105:8412)
-      if echo $result | grep -q setup; then break; fi
+      if echo "$result" | grep -q setup; then break; fi
       sleep 1
     done
 
@@ -290,10 +289,12 @@ install_fleet_import_osquery_config() {
 
     # Don't log osquery INFO messages
     # Fix snapshot event formatting
-    #fleetctl get options > /tmp/options.yaml
-    #/usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
-    #/usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
-    #fleetctl apply -f /tmp/options.yaml
+    fleetctl get options > /tmp/options.yaml
+    /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
+    /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
+    # Fleet 3.0 requires the "kind" to be "options" instead of "option"
+    sed -i 's/kind: option/kind: options/g' /tmp/options.yaml
+    fleetctl apply -f /tmp/options.yaml
 
     # Use fleetctl to import YAML files
     fleetctl apply -f osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
@@ -303,8 +304,11 @@ install_fleet_import_osquery_config() {
     done
 
     # Add Splunk monitors for Fleet
-    /opt/splunk/bin/splunk add monitor "/var/log/kolide/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
-    /opt/splunk/bin/splunk add monitor "/var/log/kolide/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
+    # Files must exist before splunk will add a monitor
+    touch /var/log/fleet/osquery_result
+    touch /var/log/fleet/osquery_status
+    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
   fi
 }
 
@@ -318,7 +322,7 @@ install_zeek() {
   # Update APT repositories
   apt-get -qq -ym update
   # Install tools to build and configure Zeek
-  apt-get -qq -ym install zeek crudini python-pip
+  apt-get -qq -ym install zeek crudini
   export PATH=$PATH:/opt/zeek/bin
   pip install zkg==2.1.1
   zkg refresh
@@ -391,7 +395,7 @@ install_velociraptor() {
   LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
   echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
   echo "[$(date +%H:%M:%S)]: Attempting to download..."
-  wget -P /opt/velociraptor "$LATEST_VELOCIRAPTOR_LINUX_URL"
+  wget -P --progress=bar:force /opt/velociraptor "$LATEST_VELOCIRAPTOR_LINUX_URL"
   if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
     echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
   else
@@ -425,6 +429,7 @@ install_suricata() {
   cd /opt || exit 1
   git clone https://github.com/OISF/suricata-update.git
   cd /opt/suricata-update || exit 1
+  pip install pyyaml
   python setup.py install
 
   cp /vagrant/resources/suricata/suricata.yaml /etc/suricata/suricata.yaml
