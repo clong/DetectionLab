@@ -2,7 +2,7 @@
 
 # Override existing DNS Settings using netplan, but don't do it for Terraform builds
 if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then
-  echo -e "    eth1:\n      dhcp4: true\n      nameservers:\n        addresses: [8.8.8.8,8.8.4.4]" >> /etc/netplan/01-netcfg.yaml
+  echo -e "    eth1:\n      dhcp4: true\n      nameservers:\n        addresses: [8.8.8.8,8.8.4.4]" >>/etc/netplan/01-netcfg.yaml
   netplan apply
 fi
 sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr +i /etc/resolv.conf
@@ -136,11 +136,11 @@ install_splunk() {
       # Download Hardcoded Splunk
       wget --progress=bar:force -O /opt/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb 'https://download.splunk.com/products/splunk/releases/8.0.2/linux/splunk-8.0.2-a7f645ddaf91-linux-2.6-amd64.deb&wget=true'
     fi
-    if ! ls /opt/splunk*.deb 1> /dev/null 2>&1; then
+    if ! ls /opt/splunk*.deb 1>/dev/null 2>&1; then
       echo "Something went wrong while trying to download Splunk. This script cannot continue. Exiting."
       exit 1
     fi
-    if ! dpkg -i /opt/splunk*.deb > /dev/null; then
+    if ! dpkg -i /opt/splunk*.deb >/dev/null; then
       echo "Something went wrong while trying to install Splunk. This script cannot continue. Exiting."
       exit 1
     fi
@@ -171,7 +171,7 @@ install_splunk() {
 
     # Install the Maxmind license key for the ASNgen App
     if [ -n "$MAXMIND_LICENSE" ]; then
-      mkdir /opt/splunk/etc/apps/TA-asngen/local 
+      mkdir /opt/splunk/etc/apps/TA-asngen/local
       cp /opt/splunk/etc/apps/TA-asngen/default/asngen.conf /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
       sed -i "s/license_key =/license_key = $MAXMIND_LICENSE/g" /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
     fi
@@ -207,7 +207,7 @@ install_splunk() {
 render_version_messages = 1
 dismissedInstrumentationOptInVersion = 4
 notification_python_3_impact = false
-display.page.home.dashboardId = /servicesNS/nobody/search/data/ui/views/logger_dashboard' > /opt/splunk/etc/users/admin/user-prefs/local/user-prefs.conf
+display.page.home.dashboardId = /servicesNS/nobody/search/data/ui/views/logger_dashboard' >/opt/splunk/etc/users/admin/user-prefs/local/user-prefs.conf
     # Enable SSL Login for Splunk
     echo -e "[settings]\nenableSplunkWebSSL = true" >/opt/splunk/etc/system/local/web.conf
     # Copy over the Logger Dashboard
@@ -221,27 +221,6 @@ display.page.home.dashboardId = /servicesNS/nobody/search/data/ui/views/logger_d
   fi
 }
 
-install_fleet() {
-  # Install Fleet
-  if [ -f "/opt/kolide-quickstart" ]; then
-    echo "[$(date +%H:%M:%S)]: Fleet is already installed"
-  else
-    echo "[$(date +%H:%M:%S)]: Installing Fleet..."
-    echo -e "\n127.0.0.1       kolide" >>/etc/hosts
-    echo -e "\n127.0.0.1       logger" >>/etc/hosts
-    cd /opt && git clone https://github.com/kolide/kolide-quickstart.git
-    cd /opt/kolide-quickstart || echo "Something went wrong while trying to clone the kolide-quickstart repository"
-    cp /vagrant/resources/fleet/server.* .
-    sed -i 's/ -it//g' demo.sh
-    ./demo.sh up simple
-    # Set the enrollment secret to match what we deploy to Windows hosts
-    docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u kolide --password=kolide -e 'update app_configs set osquery_enroll_secret = "enrollmentsecret" where id=1;' --batch kolide
-    # Set snapshot events to be split into multiple events
-    docker run --rm --network=kolidequickstart_default mysql:5.7 mysql -h mysql -u kolide --password=kolide -e 'insert into options (name, type, value) values ("logger_snapshot_event_type", 2, "true");' --batch kolide
-    echo "Updated enrollment secret"
-  fi
-}
-
 download_palantir_osquery_config() {
   if [ -f /opt/osquery-configuration ]; then
     echo "[$(date +%H:%M:%S)]: osquery configs have already been downloaded"
@@ -252,41 +231,81 @@ download_palantir_osquery_config() {
   fi
 }
 
-import_osquery_config_into_fleet() {
-  cd /opt || exit 1
-  wget --progress=bar:force https://github.com/kolide/fleet/releases/download/2.4.0/fleet.zip
-  unzip fleet.zip -d fleet
-  cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
-  fleetctl config set --address https://192.168.38.105:8412
-  fleetctl config set --tls-skip-verify true
-  fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
-  fleetctl login --email admin@detectionlab.network --password 'admin123#'
+install_fleet_import_osquery_config() {
+  if [ -f "/opt/fleet" ]; then
+    echo "[$(date +%H:%M:%S)]: Fleet is already installed"
+  else
+    cd /opt || exit 1
 
-  # Change the query invervals to reflect a lab environment
-  # Every hour -> Every 3 minutes
-  # Every 24 hours -> Every 15 minutes
-  sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
-  sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
-  sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
-  sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
+    echo "[$(date +%H:%M:%S)]: Installing Fleet..."
+    echo -e "\n127.0.0.1       kolide" >>/etc/hosts
+    echo -e "\n127.0.0.1       logger" >>/etc/hosts
 
-  # Don't log osquery INFO messages
-  # Fix snapshot event formatting
-  fleetctl get options > /tmp/options.yaml
-  /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_min_status' '1'
-  /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' '2'
-  fleetctl apply -f /tmp/options.yaml
+    apt-get -q -y install mysql-server
 
-  # Use fleetctl to import YAML files
-  fleetctl apply -f osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
-  fleetctl apply -f osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
-  for pack in osquery-configuration/Fleet/Endpoints/packs/*.yaml; do
-    fleetctl apply -f "$pack"
-  done
+    mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'kolide';"
+    mysql -uroot -pkolide -e "create database kolide;"
 
-  # Add Splunk monitors for Fleet
-  /opt/splunk/bin/splunk add monitor "/opt/kolide-quickstart/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
-  /opt/splunk/bin/splunk add monitor "/opt/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
+    sudo apt-get install redis-server -y
+    sudo apt install unzip -y
+
+    wget --progress=bar:force https://github.com/kolide/fleet/releases/download/3.0.0/fleet.zip
+    unzip fleet.zip -d fleet
+    cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
+    cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
+
+    fleet prepare db --mysql_address=127.0.0.1:3306 --mysql_database=kolide --mysql_username=root --mysql_password=kolide
+
+    cp /vagrant/resources/fleet/server.* /opt/fleet/
+    cp /vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service
+
+    mkdir /var/log/kolide
+
+    /bin/systemctl enable fleet.service
+    /bin/systemctl start fleet.service
+
+    echo "[$(date +%H:%M:%S)]: Waiting for fleet service..."
+    while true; do
+      result=$(curl --silent -k https://192.168.38.105:8412)
+      if echo $result | grep -q setup; then break; fi
+      sleep 1
+    done
+
+    fleetctl config set --address https://192.168.38.105:8412
+    fleetctl config set --tls-skip-verify true
+    fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
+    fleetctl login --email admin@detectionlab.network --password 'admin123#'
+
+    # Set the enrollment secret to match what we deploy to Windows hosts
+    mysql -uroot --password=kolide -e 'use kolide; update enroll_secrets set secret = "enrollmentsecret" where active=1;'
+    echo "Updated enrollment secret"
+
+    # Change the query invervals to reflect a lab environment
+    # Every hour -> Every 3 minutes
+    # Every 24 hours -> Every 15 minutes
+    sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
+    sed -i 's/interval: 3600/interval: 180/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
+    sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
+    sed -i 's/interval: 28800/interval: 900/g' osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
+
+    # Don't log osquery INFO messages
+    # Fix snapshot event formatting
+    #fleetctl get options > /tmp/options.yaml
+    #/usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
+    #/usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
+    #fleetctl apply -f /tmp/options.yaml
+
+    # Use fleetctl to import YAML files
+    fleetctl apply -f osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
+    fleetctl apply -f osquery-configuration/Fleet/Endpoints/Windows/osquery.yaml
+    for pack in osquery-configuration/Fleet/Endpoints/packs/*.yaml; do
+      fleetctl apply -f "$pack"
+    done
+
+    # Add Splunk monitors for Fleet
+    /opt/splunk/bin/splunk add monitor "/var/log/kolide/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add monitor "/var/log/kolide/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
+  fi
 }
 
 install_zeek() {
@@ -346,7 +365,7 @@ install_zeek() {
   systemctl enable zeek
   systemctl start zeek
 
-  # Configure the Splunk inputs 
+  # Configure the Splunk inputs
   mkdir -p /opt/splunk/etc/apps/Splunk_TA_bro/local && touch /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf
   crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager index zeek
   crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager sourcetype bro:json
@@ -379,7 +398,7 @@ install_velociraptor() {
     echo "[$(date +%H:%M:%S)]: Failed to download the latest version of Velociraptor. Please open a DetectionLab issue on Github."
     return
   fi
-  
+
   cd /opt/velociraptor || exit 1
   mv velociraptor-*-linux-amd64 velociraptor
   chmod +x velociraptor
@@ -387,7 +406,7 @@ install_velociraptor() {
   echo "[$(date +%H:%M:%S)]: Creating Velociraptor dpkg..."
   ./velociraptor --config /opt/velociraptor/server.config.yaml debian server
   echo "[$(date +%H:%M:%S)]: Installing the dpkg..."
-  if dpkg -i velociraptor_*_server.deb > /dev/null; then
+  if dpkg -i velociraptor_*_server.deb >/dev/null; then
     echo "[$(date +%H:%M:%S)]: Installation complete!"
   else
     echo "[$(date +%H:%M:%S)]: Failed to install the dpkg"
@@ -495,9 +514,8 @@ main() {
   test_prerequisites
   fix_eth1_static_ip
   install_splunk
-  install_fleet
   download_palantir_osquery_config
-  import_osquery_config_into_fleet
+  install_fleet_import_osquery_config
   install_velociraptor
   install_suricata
   install_zeek
