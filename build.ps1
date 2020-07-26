@@ -304,7 +304,7 @@ function vagrant_up_host {
   Write-Host "Attempting to bring up the $VagrantHost host using Vagrant" -ForegroundColor green
   $CurrentDir = Get-Location
   Set-Location "$DL_DIR\Vagrant"
-  set VAGRANT_LOG=info
+  Set-Variable VAGRANT_LOG=info
   &vagrant.exe @('up', $VagrantHost, '--provider', "$ProviderName") 2>&1 | Out-File -FilePath ".\vagrant_up_$VagrantHost.log"
   Set-Location $CurrentDir
   Write-Host "[vagrant_up_host] Finished for $VagrantHost. Got exit code: $LASTEXITCODE" -ForegroundColor green
