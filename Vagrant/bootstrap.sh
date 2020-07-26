@@ -303,8 +303,8 @@ install_fleet_import_osquery_config() {
     done
 
     # Add Splunk monitors for Fleet
-    /opt/splunk/bin/splunk add monitor "/opt/kolide-quickstart/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
-    /opt/splunk/bin/splunk add monitor "/opt/kolide-quickstart/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add monitor "/var/log/kolide/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add monitor "/var/log/kolide/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
   fi
 }
 
