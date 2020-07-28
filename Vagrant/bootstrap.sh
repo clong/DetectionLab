@@ -266,7 +266,7 @@ install_fleet_import_osquery_config() {
 
     echo "[$(date +%H:%M:%S)]: Waiting for fleet service to start..."
     while true; do
-      result=$(curl --silent -k https://192.168.38.105:8412)
+      result=$(curl --silent -k https://127.0.0.1:8412)
       if echo "$result" | grep -q setup; then break; fi
       sleep 1
     done
@@ -391,12 +391,14 @@ install_zeek() {
 
 install_velociraptor() {
   echo "[$(date +%H:%M:%S)]: Installing Velociraptor..."
-  mkdir /opt/install_velociraptor
+  if [ ! -d "/opt/velociraptor" ]; then
+    mkdir /opt/velociraptor
+  fi
   echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
   LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
   echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
   echo "[$(date +%H:%M:%S)]: Attempting to download..."
-  wget -P --progress=bar:force /opt/velociraptor "$LATEST_VELOCIRAPTOR_LINUX_URL"
+  wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
   if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
     echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
   else
