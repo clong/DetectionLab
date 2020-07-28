@@ -266,7 +266,7 @@ install_fleet_import_osquery_config() {
 
     echo "[$(date +%H:%M:%S)]: Waiting for fleet service to start..."
     while true; do
-      result=$(curl --silent -k https://192.168.38.105:8412)
+      result=$(curl --silent -k https://127.0.0.1:8412)
       if echo "$result" | grep -q setup; then break; fi
       sleep 1
     done
