@@ -57,5 +57,15 @@
 - name: Clear Event Logs
   win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
 
+- name: Install classic-shell with chocolatey
+  win_chocolatey:
+    name:
+      - classic-shell
+    state: present
+    install_args: "ADDLOCAL=ClassicStartMenu"
+
+- name: DetectionLab Menu
+  win_shell: "\"C:\\Program Files\\Classic Shell\\ClassicStartMenu.exe -xml c:\\vagrant\\resources\\windows\\MenuSettings.xml\""
+
 
 

@@ -217,7 +217,12 @@
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
-      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_141.tgz -auth 'admin:changeme'
+      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_143.tgz -auth 'admin:changeme'
+
+      ## Fix a bug with the ThreatHunting App (https://github.com/olafhartong/ThreatHunting/pull/57)
+      mv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmonevencodes.csv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmoneventcodes.csv
+      sed -i 's/= sysmoneventcode /= sysmoneventcodes.csv /g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
+      sed -i 's/sysmoneventcode.csv/sysmoneventcodes.csv/g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
 
       # Install the Maxmind license key for the ASNgen App
       if [ ! -z $MAXMIND_LICENSE ]; then
@@ -314,12 +319,12 @@
 
       echo "[$(date +%H:%M:%S)]: Waiting for fleet service to start..."
       while true; do
-        result=$(curl --silent -k https://192.168.38.105:8412)
+        result=$(curl --silent -k https://127.0.0.1:8412)
         if echo "$result" | grep -q setup; then break; fi
         sleep 1
       done
 
-      fleetctl config set --address https://192.168.38.105:8412
+      fleetctl config set --address https://0.0.0.0:8412
       fleetctl config set --tls-skip-verify true
       fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
       fleetctl login --email admin@detectionlab.network --password 'admin123#'
@@ -394,19 +399,30 @@
   become: yes
   shell: |
     echo "[$(date +%H:%M:%S)]: Installing Velociraptor..."
-    mkdir /opt/install_velociraptor
+    mkdir /opt/velociraptor
     echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
     LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
     echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
     echo "[$(date +%H:%M:%S)]: Attempting to download..."
-    wget -P --progress=bar:force /opt/velociraptor "$LATEST_VELOCIRAPTOR_LINUX_URL"
+    wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
     if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
       echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
     else
       echo "[$(date +%H:%M:%S)]: Failed to download the latest version of Velociraptor. Please open a DetectionLab issue on Github."
-      return
     fi
 
+    cd /opt/velociraptor || exit 1
+    mv velociraptor-*-linux-amd64 velociraptor
+    chmod +x velociraptor
+    cp /vagrant/resources/velociraptor/server.config.yaml /opt/velociraptor
+    echo "[$(date +%H:%M:%S)]: Creating Velociraptor dpkg..."
+    ./velociraptor --config /opt/velociraptor/server.config.yaml debian server
+    echo "[$(date +%H:%M:%S)]: Installing the dpkg..."
+    if dpkg -i velociraptor_*_server.deb >/dev/null; then
+      echo "[$(date +%H:%M:%S)]: Installation complete!"
+    else
+      echo "[$(date +%H:%M:%S)]: Failed to install the dpkg"
+    fi
 - name: Install Suricata
   args: 
     executable: /bin/bash

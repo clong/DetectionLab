@@ -63,16 +63,7 @@
     - wireshark
     - winpcap
     state: present
-
-- name: Install classic-shell with chocolatey
-  win_chocolatey:
-    name:
-      - classic-shell
-    state: present
-    install_args: "ADDLOCAL=ClassicStartMenu"
-
-- name: DetectionLab Menu
-  win_shell: "\"C:\\Program Files\\Classic Shell\\ClassicStartMenu.exe -xml c:\\vagrant\\resources\\windows\\MenuSettings.xml\""
+    ignore_checksums: yes
 
 
 
