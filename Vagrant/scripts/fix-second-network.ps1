@@ -1,6 +1,8 @@
 # Source: https://github.com/StefanScherer/adfs2
 param ([String] $ip, [String] $dns, [String] $gateway)
 
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Running fix-second-network.ps1..."
+
 if ( (Get-NetAdapter | Select-Object -First 1 | Select-Object -ExpandProperty InterfaceDescription).Contains('Red Hat VirtIO')) {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting Network Configuration for LibVirt interface"
   $subnet = $ip -replace "\.\d+$", ""
@@ -18,10 +20,12 @@ if ( (Get-NetAdapter | Select-Object -First 1 | Select-Object -ExpandProperty In
     Write-Error "Could not find a interface with subnet $subnet.xx"
   }
   exit 0
+} Else {
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) No VirtIO adapters, moving on..."
 }
 
 if (! (Test-Path 'C:\Program Files\VMware\VMware Tools') ) {
-  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Nothing to do for other providers than VMware."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) VMware Tools not found, no need to continue. Exiting."
   exit 0
 }
 
