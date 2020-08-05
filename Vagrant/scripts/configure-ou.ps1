@@ -10,7 +10,7 @@ while ($servers_ou_created -ne 1) {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Server OU..."
   try {
     Get-ADOrganizationalUnit -Identity 'OU=Servers,DC=windomain,DC=local' | Out-Null
-    Write-Host "Servers OU already exists. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Servers OU already exists. Moving On."
     $servers_ou_created = 1
   }
   catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
@@ -19,11 +19,11 @@ while ($servers_ou_created -ne 1) {
     $servers_ou_created = 1
   }
   catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
-    Write-Host "Unable to reach Active Directory. Sleeping for 5 and trying again..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Unable to reach Active Directory. Sleeping for 5 and trying again..."
     Start-Sleep 5
   }
   catch {
-    Write-Host "Something went wrong attempting to reach AD or create the OU."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong attempting to reach AD or create the OU."
   }
 }
 
@@ -33,7 +33,7 @@ while ($workstations_ou_created -ne 1) {
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Workstations OU..."
   try {
     Get-ADOrganizationalUnit -Identity 'OU=Workstations,DC=windomain,DC=local' | Out-Null
-    Write-Host "Workstations OU already exists. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Workstations OU already exists. Moving On."
     $workstations_ou_created = 1
   }
   catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
@@ -42,11 +42,11 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Creating Workstations OU..."
     $workstations_ou_created = 1
   }
   catch [Microsoft.ActiveDirectory.Management.ADServerDownException] {
-    Write-Host "Unable to reach Active Directory. Sleeping for 5 and trying again..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Unable to reach Active Directory. Sleeping for 5 and trying again..."
     Start-Sleep 5
   }
   catch {
-    Write-Host "Something went wrong attempting to reach AD or create the OU."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong attempting to reach AD or create the OU."
   }
 }
 

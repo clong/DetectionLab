@@ -13,6 +13,6 @@ If (-not (Test-Path $wefRepoPath))
 }
 else
 {
-    Write-Host "$wefRepoPath already exists. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) $wefRepoPath already exists. Moving On."
 }
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Palantir WEF download complete!"

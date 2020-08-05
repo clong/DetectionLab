@@ -1,6 +1,6 @@
-# Purpose: Configures the inputs.conf for the Splunk forwarders on the Windows hosts
+# Purpose: Configures the inputs.conf for the Splunk forwarder on WEF to send events from the WEF channels
 
-Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting up Splunk Inputs for Sysmon & osquery"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting up Splunk Inputs for Sysmon"
 
 $inputsPath = "C:\Program Files\SplunkUniversalForwarder\etc\apps\SplunkUniversalForwarder\local\inputs.conf"
 $currentContent = get-content $inputsPath
@@ -28,7 +28,7 @@ if ($currentContent -ne $targetContent)
 }
 else
 {
-  Write-Host "Splunk forwarder already configured. Moving on."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Splunk forwarder already configured. Moving on."
 }
 If ((Get-Service -name splunkforwarder).Status -ne "Running")
 {

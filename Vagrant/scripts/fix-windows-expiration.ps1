@@ -20,7 +20,7 @@ Elseif ($regex.Matches.Value -eq "0xC004FC07") {
   Try {
     cscript c:\windows\system32\slmgr.vbs /rearm
   } Catch {
-    Write-Host "Something went wrong trying to re-arm the image..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong trying to re-arm the image..."
   }
 }
 
@@ -48,7 +48,7 @@ If ($days_left -as [int] -lt 30) {
     Try {
       cscript c:\windows\system32\slmgr.vbs /rearm
     } Catch {
-      Write-Host "Something went wrong trying to re-arm the image..."
+      Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong trying to re-arm the image..."
     }
   }
 } 

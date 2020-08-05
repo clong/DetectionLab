@@ -12,7 +12,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-  Write-Host "Allow Domain Users RDP GPO was already linked at $OU. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Allow Domain Users RDP GPO was already linked at $OU. Moving On."
 }
 $OU = "ou=Servers,dc=windomain,dc=local"
 $gPLinks = $null
@@ -24,6 +24,6 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-  Write-Host "Allow Domain Users RDP GPO was already linked at $OU. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Allow Domain Users RDP GPO was already linked at $OU. Moving On."
 }
 gpupdate /force

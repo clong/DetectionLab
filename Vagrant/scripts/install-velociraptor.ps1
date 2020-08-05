@@ -27,7 +27,7 @@ If (-not (Test-Path $velociraptorLogFile)) {
   Restart-Service Velociraptor
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Velociraptor successfully installed!"
 } Else {
-  Write-Host "Velociraptor was already installed. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Velociraptor was already installed. Moving On."
 }
 If ((Get-Service -name Velociraptor).Status -ne "Running")
 {

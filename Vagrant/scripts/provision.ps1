@@ -13,7 +13,7 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Checking if Windows evaluation is exp
 # Ping DetectionLab server for usage statistics
 curl -userAgent "DetectionLab-$box" "https://detectionlab.network/$box" -UseBasicParsing | out-null
 
-Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disable IPv6 on all network adatpers..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disabling IPv6 on all network adatpers..."
 Get-NetAdapterBinding -ComponentID ms_tcpip6 | ForEach-Object {Disable-NetAdapterBinding -Name $_.Name -ComponentID ms_tcpip6}
 Get-NetAdapterBinding -ComponentID ms_tcpip6 
 # https://support.microsoft.com/en-gb/help/929852/guidance-for-configuring-ipv6-in-windows-for-advanced-users
@@ -26,14 +26,12 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing bginfo..."
   . c:\vagrant\scripts\install-bginfo.ps1
 
-  Write-Host -fore red 'Hint: vagrant reload' $box '--provision'
-
 } elseif ((gwmi win32_computersystem).partofdomain -eq $false) {
 
-  Write-Host -fore red "$('[{0:HH:mm}]' -f (Get-Date)) Current domain is set to 'workgroup'. Time to join the domain!"
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Current domain is set to 'workgroup'. Time to join the domain!"
 
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
-    Write-Host 'Install bginfo'
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing bginfo..."
     . c:\vagrant\scripts\install-bginfo.ps1
     # Set background to be "fitted" instead of "tiled"
     Set-ItemProperty 'HKCU:\Control Panel\Desktop' -Name TileWallpaper -Value '0'
@@ -48,13 +46,10 @@ if ($env:COMPUTERNAME -imatch 'vagrant') {
     . c:\vagrant\scripts\join-domain.ps1
   }
 } else {
-
   Write-Host -fore green "$('[{0:HH:mm}]' -f (Get-Date)) I am domain joined!"
-
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
-    Write-Host 'Installing bginfo...'
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing bginfo..."
     . c:\vagrant\scripts\install-bginfo.ps1
   }
-
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Provisioning after joining domain..."
 }

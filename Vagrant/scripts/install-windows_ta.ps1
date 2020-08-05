@@ -4,7 +4,7 @@
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing the Windows TA for Splunk"
 
 If (test-path "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_windows\default") {
-  Write-Host "Windows TA is already installed. Moving on."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Windows TA is already installed. Moving on."
   Exit
 }
 
@@ -24,6 +24,6 @@ start-sleep -s 15
 If (test-path "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_windows\default") {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Windows TA installed successfully."
 } Else {
-  Write-Host "Something went wrong during installation."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong during installation."
   exit 1
 }
