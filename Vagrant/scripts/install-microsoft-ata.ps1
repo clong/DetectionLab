@@ -61,7 +61,7 @@ If (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center
     }
     $Mount = Mount-DiskImage -ImagePath "$env:temp\$title.iso" -StorageType ISO -Access ReadOnly -PassThru
     $Volume = $Mount | Get-Volume
-    Write-Host "Installing $title"
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing $title"
     $Install = Start-Process -Wait -FilePath ($Volume.DriveLetter + ":\Microsoft ATA Center Setup.exe") -ArgumentList "/q --LicenseAccepted NetFrameworkCommandLineArguments=`"/q`" --EnableMicrosoftUpdate" -PassThru
     $Install
     $Mount | Dismount-DiskImage -Confirm:$false

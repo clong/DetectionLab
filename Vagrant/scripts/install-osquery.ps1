@@ -5,7 +5,7 @@ $flagfile = "c:\Program Files\osquery\osquery.flags"
 choco install -y --limit-output --no-progress osquery | Out-String  # Apparently Out-String makes the process wait
 $service = Get-WmiObject -Class Win32_Service -Filter "Name='osqueryd'"
 If (-not ($service)) {
-  Write-Host "Setting osquery to run as a service"
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting osquery to run as a service"
   New-Service -Name "osqueryd" -BinaryPathName "C:\Program Files\osquery\osqueryd\osqueryd.exe --flagfile=`"C:\Program Files\osquery\osquery.flags`""
 
   # Download the flags file from the Palantir osquery-configuration Github
@@ -38,7 +38,7 @@ If (-not ($service)) {
   Start-Service osqueryd
 }
 else {
-  Write-Host "osquery is already installed. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) osquery is already installed. Moving On."
 }
 If ((Get-Service -name osqueryd).Status -ne "Running")
 {

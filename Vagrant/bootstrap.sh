@@ -163,7 +163,7 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_143.tgz -auth 'admin:changeme'
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_144.tgz -auth 'admin:changeme'
 
     ## Fix a bug with the ThreatHunting App (https://github.com/olafhartong/ThreatHunting/pull/57)
     mv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmonevencodes.csv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmoneventcodes.csv
