@@ -11,7 +11,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-    Write-Host "Powershell Logging was already linked at $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Powershell Logging was already linked at $OU. Moving On."
 }
 $OU = "ou=Servers,dc=windomain,dc=local"
 $gPLinks = $null
@@ -23,7 +23,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-    Write-Host "Powershell Logging was already linked at $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Powershell Logging was already linked at $OU. Moving On."
 }
 $OU = "ou=Domain Controllers,dc=windomain,dc=local"
 $gPLinks = $null
@@ -34,6 +34,6 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-    Write-Host "Powershell Logging was already linked at $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Powershell Logging was already linked at $OU. Moving On."
 }
 gpupdate /force

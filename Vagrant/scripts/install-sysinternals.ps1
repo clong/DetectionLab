@@ -1,4 +1,5 @@
 # Purpose: Installs a handful of SysInternals tools on the host into c:\Tools\Sysinternals
+# Also installs Sysmon and Olaf Harton's Sysmon config
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing SysInternals Tooling..."
 $sysinternalsDir = "C:\Tools\Sysinternals"
@@ -6,14 +7,14 @@ $sysmonDir = "C:\ProgramData\Sysmon"
 If(!(test-path $sysinternalsDir)) {
   New-Item -ItemType Directory -Force -Path $sysinternalsDir
 } Else {
-  Write-Host "Tools directory exists. Exiting."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Tools directory exists, no need to re-install. Exiting."
   exit
 }
 
 If(!(test-path $sysmonDir)) {
   New-Item -ItemType Directory -Force -Path $sysmonDir
 } Else {
-  Write-Host "Sysmon directory exists. Exiting."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Sysmon directory exists, no need to re-install. Exiting."
   exit
 }
 

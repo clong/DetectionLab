@@ -11,7 +11,7 @@ if (-not (Test-Path "$env:windir\system32\CustomEventChannels.dll"))
 
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Custom Event Channels Manifest..."
     wevtutil im "c:\windows\system32\CustomEventChannels.man"
-    Write-Host "Resizing Channels to 4GB..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Resizing Channels to 4GB..."
     $xml = wevtutil el | select-string -pattern "WEC"
     foreach ($subscription in $xml) { wevtutil sl $subscription /ms:4294967296 }
 
@@ -30,7 +30,7 @@ if (-not (Test-Path "$env:windir\system32\CustomEventChannels.dll"))
 }
 else
 {
-  Write-Host "WEF Subscriptions are already installed, moving on..."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) WEF Subscriptions are already installed, moving on..."
   if ((Get-Service -Name wecsvc).Status -ne "Running")
   {
     net start wecsvc
