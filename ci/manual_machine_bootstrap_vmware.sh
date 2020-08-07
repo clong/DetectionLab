@@ -10,7 +10,7 @@ sed -i 's#http://archive.ubuntu.com#http://us.archive.ubuntu.com#g' /etc/apt/sou
 
 # Install VMWare Workstation 15
 apt-get update
-apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apache2 python-pip ubuntu-desktop python-pip
+apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apache2 python-pip ubuntu-desktop python-pip libxtst6
 pip install awscli --upgrade --user
 cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
 

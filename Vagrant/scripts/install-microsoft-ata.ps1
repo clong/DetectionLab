@@ -61,7 +61,7 @@ If (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center
     }
     $Mount = Mount-DiskImage -ImagePath "$env:temp\$title.iso" -StorageType ISO -Access ReadOnly -PassThru
     $Volume = $Mount | Get-Volume
-    Write-Host "Installing $title"
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing $title"
     $Install = Start-Process -Wait -FilePath ($Volume.DriveLetter + ":\Microsoft ATA Center Setup.exe") -ArgumentList "/q --LicenseAccepted NetFrameworkCommandLineArguments=`"/q`" --EnableMicrosoftUpdate" -PassThru
     $Install
     $Mount | Dismount-DiskImage -Confirm:$false
@@ -110,7 +110,7 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = [SSLValidator]::GetDelegate()
 
     If (-not (Test-Path "$env:temp\gatewaysetup.zip")) {
-        Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [$env:computername] Downloading Microsoft ATA now..."
+        Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [$env:computername] Downloading ATA Lightweight Gateway from WEF now..."
         Invoke-WebRequest -uri https://wef/api/management/softwareUpdates/gateways/deploymentPackage -UseBasicParsing -OutFile "$env:temp\gatewaysetup.zip" -Credential (new-object pscredential("wef\vagrant", (convertto-securestring -AsPlainText -Force -String "vagrant")))
         Expand-Archive -Path "$env:temp\gatewaysetup.zip" -DestinationPath "$env:temp\gatewaysetup" -Force
     }

@@ -11,13 +11,22 @@ If ($hostname -eq "win10") {
   Set-MpPreference -DisableRealtimeMonitoring $true
 }
 
-# Windows Defender should be disabled already by the GPO, sometimes it doesnt work
+# Windows Defender should be disabled by the GPO or uninstalled already, but we'll keep this just in case
 If ($hostname -ne "win10" -And (Get-Service -Name WinDefend -ErrorAction SilentlyContinue).status -eq 'Running') {
   # Uninstalling Windows Defender (https://github.com/StefanScherer/packer-windows/issues/201)
-  Uninstall-WindowsFeature Windows-Defender
-  Uninstall-WindowsFeature Windows-Defender-Features
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Uninstalling Windows Defender..."
+  Try {
+    Uninstall-WindowsFeature Windows-Defender -ErrorAction Stop
+    Uninstall-WindowsFeature Windows-Defender-Features -ErrorAction Stop
+  }
+  Catch {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Windows Defender did not uninstall successfully..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) We'll try again during install-red-team.ps1"
+  }
 }
-
+Else  {
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Windows Defender has already been disabled or uninstalled."
+}
 # Purpose: Downloads and unzips a copy of the latest Mimikatz trunk
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Mimikatz..."
 # GitHub requires TLS 1.2 as of 2/27
@@ -30,7 +39,7 @@ if (-not (Test-Path $mimikatzRepoPath)) {
   Expand-Archive -path "$mimikatzRepoPath" -destinationpath 'c:\Tools\Mimikatz' -Force
 }
 else {
-  Write-Host "Mimikatz was already installed. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Mimikatz was already installed. Moving On."
 }
 
 # Download and unzip a copy of PowerSploit
@@ -45,7 +54,7 @@ if (-not (Test-Path $powersploitRepoPath)) {
   Copy-Item "c:\Tools\PowerSploit\PowerSploit-dev\*" "$Env:windir\System32\WindowsPowerShell\v1.0\Modules" -Recurse -Force
 }
 else {
-  Write-Host "PowerSploit was already installed. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) PowerSploit was already installed. Moving On."
 }
 
 # Download and unzip a copy of Atomic Red Team
@@ -59,7 +68,7 @@ if (-not (Test-Path $atomicRedTeamRepoPath)) {
   Expand-Archive -path "$atomicRedTeamRepoPath" -destinationpath 'c:\Tools\Atomic Red Team' -Force
 }
 else {
-  Write-Host "Atomic Red Team was already installed. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Atomic Red Team was already installed. Moving On."
 }
 
 # Download and unzip a copy of BadBlood
@@ -76,7 +85,7 @@ if (-not (Test-Path $badbloodRepoPath)) {
   ((Get-Content -path $invokeBadBloodPath -Raw) -replace '1000..5000','500..1500') | Set-Content -Path $invokeBadBloodPath
 }
 else {
-  Write-Host "BadBlood was already installed. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) BadBlood was already installed. Moving On."
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Red Team tooling installation complete!"

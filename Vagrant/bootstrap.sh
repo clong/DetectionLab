@@ -163,12 +163,7 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
-    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_143.tgz -auth 'admin:changeme'
-
-    ## Fix a bug with the ThreatHunting App (https://github.com/olafhartong/ThreatHunting/pull/57)
-    mv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmonevencodes.csv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmoneventcodes.csv
-    sed -i 's/= sysmoneventcode /= sysmoneventcodes.csv /g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
-    sed -i 's/sysmoneventcode.csv/sysmoneventcodes.csv/g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
+    /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_144.tgz -auth 'admin:changeme'
 
     # Install the Maxmind license key for the ASNgen App
     if [ -n "$MAXMIND_LICENSE" ]; then
@@ -177,8 +172,17 @@ install_splunk() {
       sed -i "s/license_key =/license_key = $MAXMIND_LICENSE/g" /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
     fi
 
+    # Replace the props.conf for Sysmon TA and Windows TA
+    # Removed all the 'rename = xmlwineventlog' directives
+    # I know youre not supposed to modify files in "default",
+    # but for some reason adding them to "local" wasnt working
+    cp /vagrant/resources/splunk_server/windows_ta_props.conf /opt/splunk/etc/apps/Splunk_TA_windows/default/props.conf
+    cp /vagrant/resources/splunk_server/sysmon_ta_props.conf /opt/splunk/etc/apps/TA-microsoft-sysmon/default/props.conf
+
     # Add custom Macro definitions for ThreatHunting App
     cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
+    # Fix props.conf in ThreatHunting App
+    sed -i 's/EVAL-host_fqdn = Computer/EVAL-host_fqdn = ComputerName/g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
     # Fix Windows TA macros
     mkdir /opt/splunk/etc/apps/Splunk_TA_windows/local
     cp /opt/splunk/etc/apps/Splunk_TA_windows/default/macros.conf /opt/splunk/etc/apps/Splunk_TA_windows/local
@@ -398,7 +402,9 @@ install_velociraptor() {
   LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
   echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
   echo "[$(date +%H:%M:%S)]: Attempting to download..."
-  wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
+  #wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
+  # Harcoding until the release after v0.4.7
+  wget -P /opt/velociraptor --progress=bar:force "https://github.com/Velocidex/velociraptor/releases/download/v0.4.7/velociraptor-v0.4.7-1-linux-amd64"
   if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
     echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
   else

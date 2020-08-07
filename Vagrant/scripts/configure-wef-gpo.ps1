@@ -11,7 +11,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 {
     New-GPLink -Name $GPOName -Target $OU -Enforced yes
 } else {
-    Write-Host "GpLink $GPOName already linked on $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) GpLink $GPOName already linked on $OU. Moving On."
 }
 $OU = "ou=Domain Controllers,dc=windomain,dc=local"
 $gpLinks = $null
@@ -21,7 +21,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 {
     New-GPLink -Name $GPOName -Target $OU -Enforced yes
 } else {
-    Write-Host "GpLink $GPOName already linked on $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) GpLink $GPOName already linked on $OU. Moving On."
 }
 $OU = "ou=Workstations,dc=windomain,dc=local"
 $gpLinks = $null
@@ -31,7 +31,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 {
     New-GPLink -Name $GPOName -Target $OU -Enforced yes
 } else {
-    Write-Host "GpLink $GPOName already linked on $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) GpLink $GPOName already linked on $OU. Moving On."
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Importing the GPO to modify ACLs on Custom Event Channels"
@@ -48,7 +48,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-    Write-Host "GpLink $GPOName already linked on $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) GpLink $GPOName already linked on $OU. Moving On."
 }
 $OU = "ou=Domain Controllers,dc=windomain,dc=local"
 $gPLinks = Get-ADOrganizationalUnit -Server "dc.windomain.local" -Identity $OU -Properties name,distinguishedName, gPLink, gPOptions
@@ -59,7 +59,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-    Write-Host "GpLink $GPOName already linked on $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) GpLink $GPOName already linked on $OU. Moving On."
 }
 $OU = "ou=Workstations,dc=windomain,dc=local"
 $gPLinks = Get-ADOrganizationalUnit -Server "dc.windomain.local" -Identity $OU -Properties name,distinguishedName, gPLink, gPOptions
@@ -70,7 +70,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-    Write-Host "GpLink $GPOName already linked on $OU. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) GpLink $GPOName already linked on $OU. Moving On."
 }
 
 gpupdate /force
