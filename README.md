@@ -111,3 +111,30 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team)
 * [Hunting for Beacons](http://findingbad.blogspot.com/2020/05/hunting-for-beacons-part-2.html)
 * [BadBlood](https://github.com/davidprowe/BadBlood)
+
+# DetectionLab Sponsors
+#### Lated updated: 8/8/2020
+I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
+
+### Diamond Sponsors:
+* [Veramine](https://github.com/veramine)
+* [Thinkst](https://github.com/ThinkstAppliedResearch)
+
+### Premium Sponsors:
+* [CyDefUnicorn](https://github.com/CyDefUnicorn)
+* [dlee35](https://github.com/dlee35)
+* [chrissanders](https://github.com/chrissanders)
+* [punchdrunktux](https://github.com/punchdrunktux)
+* [jaredhaight](https://github.com/jaredhaight)
+* [iamfuntime](https://github.com/iamfuntime)
+* +1 private sponsor
+
+### Standard Sponsors:
+* [dtonomy](https://github.com/dtonomy)
+* [braimee](https://github.com/braimee)
+* [iLoC0dez](https://github.com/iLoC0dez)
+* [defensivedepth](https://github.com/defensivedepth)
+* [elreydetoda](https://github.com/elreydetoda)
+* [kafkaesqu3](https://github.com/kafkaesqu3)
+* [anthonysecurity](https://github.com/anthonysecurity)
+* +2 private sponsors
