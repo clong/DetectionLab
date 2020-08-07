@@ -30,8 +30,8 @@ resource "esxi_guest" "logger" {
 
     provisioner "remote-exec" {
     inline = [
-      "sudo ifconfig up eth1 || echo 'eth1 up'",
-      "sudo ifconfig up eth2 || echo 'eth2 up'",
+      "sudo ifconfig eth1 up || echo 'eth1 up'",
+      "sudo ifconfig eth2 up || echo 'eth2 up'",
       "sudo route add default gw 192.168.76.1 || echo 'route exists'"
     ]
 
