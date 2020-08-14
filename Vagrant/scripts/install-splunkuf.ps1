@@ -2,7 +2,7 @@
 
 If (-not (Test-Path "C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe")) {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Splunk Universal Forwarder..."
-$msiFile = $env:Temp + "\splunkforwarder-7.1.0-2e75b3406c5b-x64-release.msi"
+  $msiFile = $env:Temp + "\splunkforwarder-7.1.0-2e75b3406c5b-x64-release.msi"
 
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing & Starting Splunk"
   [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
