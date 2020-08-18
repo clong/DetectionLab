@@ -34,7 +34,8 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * osquery comes installed on each host and is pre-configured to connect to a [Fleet](https://kolide.co/fleet) server via TLS. Fleet is preconfigured with the configuration from [Palantir's osquery Configuration](https://github.com/palantir/osquery-configuration)
 * Sysmon is installed and configured using [Olaf Hartong's open-sourced Sysmon configuration](https://github.com/olafhartong/sysmon-modular)
 * All autostart items are logged to Windows Event Logs via [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog)
-* SMBv1 Auditing is enabled
+* Zeek and Suricata are pre-configured to monitor and alert on network traffic
+* Apache Guacamole is installed to easily access all hosts from your local browser
 
 ## Requirements for VMware or Virtualbox
 * 55GB+ of free disk space

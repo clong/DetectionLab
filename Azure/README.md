@@ -1,7 +1,5 @@
 # Building DetectionLab on Azure
 
-NOTE: This is an early release and it's possible that certain features may not work perfectly for everyone yet
-
 ## Prereqs (~30-60 minutes)
 0. Have an active [Azure account](https://azure.microsoft.com/en-us/free/). If you don't have one yet, they give you $200 worth of credit to use within the first 30 days!
 1. [Install Terraform](https://www.terraform.io/downloads.html) and move it to a directory included in your system's PATH.
