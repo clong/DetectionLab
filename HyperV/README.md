@@ -1,6 +1,6 @@
 # Detection Lab for Hyper-V 
 
-This hypervisor does not undergo the same level of weekly testing as what is found in the main part of Detectionlab.  
+This build does not undergo the same level of weekly testing as what is found in the main part of Detectionlab.  
 Hyper-V support is only in beta and needs more testing by more users to ensure its stability and usability.  
 
 ## Requirements 
