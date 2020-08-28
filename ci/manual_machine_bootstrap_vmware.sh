@@ -28,8 +28,8 @@ git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab
 # Install Vagrant
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
-dpkg -i vagrant_2.2.9_x86_64.deb
+wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.deb
+dpkg -i vagrant_2.2.10_x86_64.deb
 # Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
 echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf > /dev/null
@@ -37,8 +37,8 @@ vagrant plugin install vagrant-reload
 vagrant plugin install vagrant-vmware-desktop
 echo $LICENSEFILE | base64 -d > /tmp/license.lic
 vagrant plugin license vagrant-vmware-desktop /tmp/license.lic
-wget --progress=bar:force "https://releases.hashicorp.com/vagrant-vmware-utility/1.0.9/vagrant-vmware-utility_1.0.9_x86_64.deb"
-dpkg -i vagrant-vmware-utility_1.0.9_x86_64.deb
+wget --progress=bar:force "https://releases.hashicorp.com/vagrant-vmware-utility/1.0.11/vagrant-vmware-utility_1.0.11_x86_64.deb"
+dpkg -i vagrant-vmware-utility_1.0.11_x86_64.deb
 
 # Make the Vagrant instances headless
 cd /opt/DetectionLab/Vagrant || exit 1
@@ -56,7 +56,3 @@ cd /opt/DetectionLab/Packer || exit 1
 for file in *.json; do
   sed -i 's/"headless": false,/"headless": true,/g' "$file";
 done
-
-# Ensure the script is executable
-chmod +x /opt/DetectionLab/build.sh
-cd /opt/DetectionLab || exit 1

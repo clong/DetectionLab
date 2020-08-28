@@ -45,6 +45,8 @@ If (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center
     If ($download -eq $true)
     {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading $title..."
+        # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
+        $ProgressPreference = 'SilentlyContinue'
         Invoke-WebRequest -Uri $downloadUrl -OutFile "$env:temp\$title.iso"
         $actualHash = (Get-FileHash -Algorithm SHA256 -Path "$env:temp\$title.iso").Hash
         If (-not ($actualHash -eq $fileHash))
@@ -111,6 +113,8 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
 
     If (-not (Test-Path "$env:temp\gatewaysetup.zip")) {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [$env:computername] Downloading ATA Lightweight Gateway from WEF now..."
+        # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
+        $ProgressPreference = 'SilentlyContinue'
         Invoke-WebRequest -uri https://wef/api/management/softwareUpdates/gateways/deploymentPackage -UseBasicParsing -OutFile "$env:temp\gatewaysetup.zip" -Credential (new-object pscredential("wef\vagrant", (convertto-securestring -AsPlainText -Force -String "vagrant")))
         Expand-Archive -Path "$env:temp\gatewaysetup.zip" -DestinationPath "$env:temp\gatewaysetup" -Force
     }

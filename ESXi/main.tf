@@ -43,15 +43,11 @@ resource "esxi_guest" "logger" {
     }
   }
   # This is the network that bridges your host machine with the ESXi VM
+  # If this interface doesn't provide connectivity, you will have to uncomment
+  # the interface below and add a virtual network that does
   network_interfaces {
     virtual_network = var.vm_network
     mac_address     = "00:50:56:a3:b1:c2"
-    nic_type        = "e1000"
-  }
-  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
-  network_interfaces {
-    virtual_network = var.nat_network
-    mac_address     = "00:50:56:a3:b1:c3"
     nic_type        = "e1000"
   }
   # This is the local network that will be used for 192.168.38.x addressing
@@ -60,6 +56,13 @@ resource "esxi_guest" "logger" {
     mac_address     = "00:50:56:a3:b1:c4"
     nic_type        = "e1000"
   }
+  # OPTIONAL: Uncomment out this interface stanza if your vm_network doesn't 
+  # provide internet access
+  # network_interfaces {
+  #  virtual_network = var.nat_network
+  #  mac_address     = "00:50:56:a3:b1:c3"
+  #  nic_type        = "e1000"
+  # }
   guest_startup_timeout  = 45
   guest_shutdown_timeout = 30
 }

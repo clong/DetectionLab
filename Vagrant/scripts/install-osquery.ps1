@@ -11,6 +11,8 @@ If (-not ($service)) {
   # Download the flags file from the Palantir osquery-configuration Github
   # GitHub requires TLS 1.2 as of 2/1/2018
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+  # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
+  $ProgressPreference = 'SilentlyContinue'
   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/palantir/osquery-configuration/master/Classic/Endpoints/Windows/osquery.flags" -OutFile $flagfile
 
   ## Use the TLS config

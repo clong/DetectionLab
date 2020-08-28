@@ -12,6 +12,8 @@ If (Select-String -Path "c:\windows\system32\drivers\etc\hosts" -Pattern "logger
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Velociraptor..."
 # GitHub requires TLS 1.2 as of 2/27
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+# Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
+$ProgressPreference = 'SilentlyContinue'
 $tag = (Invoke-WebRequest "https://api.github.com/repos/Velocidex/velociraptor/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 # Workaround hardcoded URL until this issue gets fixed: https://github.com/Velocidex/velociraptor/issues/528
 $velociraptorDownloadUrl = "https://github.com/Velocidex/velociraptor/releases/download/v0.4.7/velociraptor-v0.4.7-1-windows-amd64.msi"
