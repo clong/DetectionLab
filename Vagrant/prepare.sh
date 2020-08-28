@@ -153,6 +153,12 @@ list_providers() {
     (echo >&2 "${ERROR} You need to install a provider such as VirtualBox or VMware Fusion/Workstation to build DetectionLab.")
     exit 1
   fi
+  if [[ $VBOX_PRESENT -eq 1 ]] && [[ $VMWARE_FUSION_PRESENT -eq 1 || $VMWARE_WORKSTATION_PRESENT -eq 1 ]]; then
+    (echo >&2  "${INFO} Both VMware Workstation/Fusion and Virtualbox appear to be installed on this system.")
+    (echo >&2  "${INFO} Please consider setting the VAGRANT_DEFAULT_PROVIDER environment variable to prevent confusion." )
+    (echo >&2  "${INFO} More details can be found here: https://www.vagrantup.com/docs/providers/default" )
+    (echo >&2  "${INFO} Additionally, please ensure only one providers' network adapters are active at any given time." )
+  fi
 }
 
 # Check to see if boxes exist in the "Boxes" directory already
