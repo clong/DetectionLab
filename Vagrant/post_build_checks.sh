@@ -28,7 +28,7 @@ post_build_checks() {
   if [ "$SPLUNK_CHECK" -lt 1 ]; then
     (echo >&2 "${ERROR} Warning: Splunk was unreachable and may not have installed correctly.")
   else
-    (echo >&2 "${GOODTOGO} Fleet is running and reachable.")
+    (echo >&2 "${GOODTOGO} Splunk is running and reachable.")
   fi
 
   echo ""
