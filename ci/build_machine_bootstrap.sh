@@ -113,4 +113,4 @@ fi
 # Start the build in a tmux session
 sn=tmuxsession
 tmux new-session -s "$sn" -d
-tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab/Vagrant && vagrant up && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter
+tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab/Vagrant && vagrant up | tee -a vagrant_up_all.log && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter

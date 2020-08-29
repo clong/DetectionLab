@@ -37,43 +37,31 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * Zeek and Suricata are pre-configured to monitor and alert on network traffic
 * Apache Guacamole is installed to easily access all hosts from your local browser
 
-## Requirements for VMware or Virtualbox
-* 55GB+ of free disk space
-* 16GB+ of RAM
-* Packer 1.6.0 or newer
-* Vagrant 2.2.9 or newer
-* Virtualbox or VMWare Fusion/Workstation
-
 ---
 
 ## Building Detection Lab
 
 Please view the quickstart guides based on the operating system you are using. The AWS and Azure deployment options for DetectionLab can be launched from any operating system.
 
-* [AWS via Terraform](https://github.com/clong/DetectionLab/wiki/Quickstart---AWS-(Terraform))
-* [Azure via Terraform & Ansible](https://github.com/clong/DetectionLab/tree/master/Azure)
-* [MacOS](https://github.com/clong/DetectionLab/wiki/Quickstart---MacOS)
-* [Windows](https://github.com/clong/DetectionLab/wiki/Quickstart---Windows)
-* [Linux](https://github.com/clong/DetectionLab/wiki/Quickstart-Linux)
-* [ESXi](https://github.com/clong/DetectionLab/tree/master/ESXi)
+* [Prerequisites](https://www.detectionlab.network/introduction/prerequisites/)
+* [MacOS](https://www.detectionlab.network/deployment/macosvm/)
+* [Windows](https://www.detectionlab.network/deployment/windowsvm/)
+* [Linux](https://www.detectionlab.network/deployment/linuxvm/)
+* [AWS via Terraform](https://www.detectionlab.network/deployment/aws/)
+* [Azure via Terraform & Ansible](https://www.detectionlab.network/deployment/azure/)
+* [ESXi](https://www.detectionlab.network/deployment/esxi/)
+* [HyperV](https://www.detectionlab.network/deployment/hyperv/)
+* [LibVirt](https://www.detectionlab.network/deployment/libvirt/)
 
 ---
 
-## Basic Vagrant Usage
+## DetectionLab Documentation
 
-Moved to the wiki: [Basic Vagrant Usage](https://github.com/clong/DetectionLab/wiki/Vagrant-Usage)
+The primary documentation site is located at https://detectionlab.network
 
----
-
-## Lab Information
-
-Moved to the wiki: [Lab Information & Credentials](https://github.com/clong/DetectionLab/wiki/Lab-Information-&-Credentials)
-
----
-
-## Known Issues and Workarounds
-
-Moved to the wiki: [Known Issues and Workarounds](https://github.com/clong/DetectionLab/wiki/Known-Issues-and-Workarounds)
+* [Basic Vagrant Usage](https://www.detectionlab.network/introduction/basicvagrant/)
+* [Lab Information & Credentials](https://www.detectionlab.network/introduction/infoandcreds/)
+* [Troubleshooting and Known Issues](https://www.detectionlab.network/deployment/troubleshooting/)
 
 ---
 
