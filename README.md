@@ -114,7 +114,7 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [BadBlood](https://github.com/davidprowe/BadBlood)
 
 # DetectionLab Sponsors
-#### Lated updated: 8/8/2020
+#### Lated updated: 8/28/2020
 I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
 
 ### Diamond Sponsors:
@@ -122,6 +122,7 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [Thinkst](https://github.com/ThinkstAppliedResearch)
 
 ### Premium Sponsors:
+* [mikeesparza](https://github.com/mikeesparza)
 * [CyDefUnicorn](https://github.com/CyDefUnicorn)
 * [dlee35](https://github.com/dlee35)
 * [chrissanders](https://github.com/chrissanders)
