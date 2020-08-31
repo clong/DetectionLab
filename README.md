@@ -41,15 +41,13 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 
 ## Building Detection Lab
 
-Please view the quickstart guides based on the operating system you are using. The AWS and Azure deployment options for DetectionLab can be launched from any operating system.
-
 * [Prerequisites](https://www.detectionlab.network/introduction/prerequisites/)
-* [MacOS](https://www.detectionlab.network/deployment/macosvm/)
-* [Windows](https://www.detectionlab.network/deployment/windowsvm/)
-* [Linux](https://www.detectionlab.network/deployment/linuxvm/)
+* [MacOS - Virtualbox or VMware Fusion](https://www.detectionlab.network/deployment/macosvm/)
+* [Windows - Virtualbox or VMware Workstation](https://www.detectionlab.network/deployment/windowsvm/)
+* [Linux - Virtualbox or VMware Workstation](https://www.detectionlab.network/deployment/linuxvm/)
 * [AWS via Terraform](https://www.detectionlab.network/deployment/aws/)
 * [Azure via Terraform & Ansible](https://www.detectionlab.network/deployment/azure/)
-* [ESXi](https://www.detectionlab.network/deployment/esxi/)
+* [ESXi via Terraform & Ansible](https://www.detectionlab.network/deployment/esxi/)
 * [HyperV](https://www.detectionlab.network/deployment/hyperv/)
 * [LibVirt](https://www.detectionlab.network/deployment/libvirt/)
 
@@ -99,7 +97,9 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [sysmon-modular](https://github.com/olafhartong/sysmon-modular)
 * [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team)
 * [Hunting for Beacons](http://findingbad.blogspot.com/2020/05/hunting-for-beacons-part-2.html)
+* [Velociraptor](https://github.com/Velocidex/velociraptor)
 * [BadBlood](https://github.com/davidprowe/BadBlood)
+* [PurpleSharp](https://github.com/mvelazc0/PurpleSharp)
 
 # DetectionLab Sponsors
 #### Lated updated: 8/28/2020
