@@ -404,9 +404,7 @@
     LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
     echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
     echo "[$(date +%H:%M:%S)]: Attempting to download..."
-    #wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
-    # Harcoding until the release after v0.4.7
-    wget -P /opt/velociraptor --progress=bar:force "https://github.com/Velocidex/velociraptor/releases/download/v0.4.7/velociraptor-v0.4.7-1-linux-amd64"
+    wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
     if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
       echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
     else
