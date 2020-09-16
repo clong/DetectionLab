@@ -102,22 +102,23 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [PurpleSharp](https://github.com/mvelazc0/PurpleSharp)
 
 # DetectionLab Sponsors
-#### Lated updated: 8/28/2020
+#### Lated updated: 9/16/2020
 I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
 
 ### Diamond Sponsors:
 * [Veramine](https://github.com/veramine)
 * [Thinkst](https://github.com/ThinkstAppliedResearch)
+* [csterner82](https://github.com/csterner82)
+* [swizzlez](https://github.com/swizzlez)
+* [CyDefUnicorn](https://github.com/CyDefUnicorn)
 
 ### Premium Sponsors:
 * [mikeesparza](https://github.com/mikeesparza)
-* [CyDefUnicorn](https://github.com/CyDefUnicorn)
 * [dlee35](https://github.com/dlee35)
 * [chrissanders](https://github.com/chrissanders)
 * [punchdrunktux](https://github.com/punchdrunktux)
 * [jaredhaight](https://github.com/jaredhaight)
 * [iamfuntime](https://github.com/iamfuntime)
-* +1 private sponsor
 
 ### Standard Sponsors:
 * [dtonomy](https://github.com/dtonomy)
