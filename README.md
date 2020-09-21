@@ -119,6 +119,7 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [punchdrunktux](https://github.com/punchdrunktux)
 * [jaredhaight](https://github.com/jaredhaight)
 * [iamfuntime](https://github.com/iamfuntime)
+* [Luct0r](https://github.com/Luct0r)
 
 ### Standard Sponsors:
 * [dtonomy](https://github.com/dtonomy)
