@@ -294,7 +294,7 @@ install_fleet_import_osquery_config() {
 
     # Don't log osquery INFO messages
     # Fix snapshot event formatting
-    fleetctl get options > /tmp/options.yaml
+    fleetctl get options >/tmp/options.yaml
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
     # Fleet 3.0 requires the "kind" to be "options" instead of "option"
@@ -468,6 +468,22 @@ install_suricata() {
     echo "Suricata attempted to start but is not running. Exiting"
     exit 1
   fi
+
+  cat >/etc/logrotate.d/suricata <<EOF
+/var/log/suricata/*.log /var/log/suricata/*.json
+{
+    hourly
+    rotate 0
+    missingok
+    nocompress
+    size=500M
+    sharedscripts
+    postrotate
+            /bin/kill -HUP \`cat /var/run/suricata.pid 2>/dev/null\` 2>/dev/null || true
+    endscript
+}
+EOF
+
 }
 
 test_suricata_prerequisites() {
