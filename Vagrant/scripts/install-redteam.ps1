@@ -83,7 +83,13 @@ $PSDefaultParameterValues = @{"Invoke-AtomicTest:PathToAtomicsFolder"="C:\Tools\
 }
 
 # Purpose: Downloads the latest release of PurpleSharpNewtonsoft.Json.dll
-New-Item -Path "c:\Tools\" -Name "PurpleSharp" -ItemType "directory"
+If (-not (Test-Path "c:\Tools\PurpleSharp")) {
+  New-Item -Path "c:\Tools\" -Name "PurpleSharp" -ItemType "directory"
+}
+Else {
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) PurpleSharp folder is already existing. Moving On."
+}
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Purplesharp..."
 $tag = (Invoke-WebRequest "https://api.github.com/repos/mvelazc0/PurpleSharp/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $purplesharpDownloadUrl = "https://github.com/mvelazc0/PurpleSharp/releases/download/$tag/PurpleSharp.exe"
@@ -97,4 +103,3 @@ Else {
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Red Team tooling installation complete!"
-
