@@ -85,9 +85,8 @@ $PSDefaultParameterValues = @{"Invoke-AtomicTest:PathToAtomicsFolder"="C:\Tools\
 # Purpose: Downloads the latest release of PurpleSharpNewtonsoft.Json.dll
 If (-not (Test-Path "c:\Tools\PurpleSharp")) {
   New-Item -Path "c:\Tools\" -Name "PurpleSharp" -ItemType "directory"
-}
-Else {
-  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) PurpleSharp folder is already existing. Moving On."
+} Else {
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) PurpleSharp folder already exists. Moving On."
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Purplesharp..."
@@ -97,8 +96,7 @@ $purplesharpDllDownloadURL = "https://github.com/mvelazc0/PurpleSharp/releases/d
 If (-not (Test-Path "c:\Tools\PurpleSharp\PurpleSharp.exe")) {
   Invoke-WebRequest -Uri $purplesharpDownloadUrl -OutFile "c:\Tools\PurpleSharp\PurpleSharp.exe"
   Invoke-WebRequest -Uri $purplesharpDllDownloadUrl -OutFile "c:\Tools\PurpleSharp\Newtonsoft.Json.dll"
-}
-Else {
+} Else {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) PurpleSharp was already installed. Moving On."
 }
 
