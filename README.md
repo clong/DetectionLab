@@ -111,6 +111,7 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [csterner82](https://github.com/csterner82)
 * [swizzlez](https://github.com/swizzlez)
 * [CyDefUnicorn](https://github.com/CyDefUnicorn)
+* [olliencc](https://github.com/olliencc)
 
 ### Premium Sponsors:
 * [mikeesparza](https://github.com/mikeesparza)
