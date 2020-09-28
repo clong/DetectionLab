@@ -2,7 +2,7 @@
 
 # Override existing DNS Settings using netplan, but don't do it for Terraform builds
 if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then
-  echo -e "    eth1:\n      dhcp4: true\n      nameservers:\n        addresses: [8.8.8.8,8.8.4.4]" >>/etc/netplan/01-netcfg.yaml
+  echo -e "    eth0:\n      dhcp4: true\n      nameservers:\n        addresses: [8.8.8.8,8.8.4.4]" >>/etc/netplan/01-netcfg.yaml
   netplan apply
 fi
 sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr +i /etc/resolv.conf
@@ -67,48 +67,6 @@ test_prerequisites() {
     else
       echo "[+] $package was successfully installed!"
     fi
-  done
-}
-
-fix_eth1_static_ip() {
-  USING_KVM=$(sudo lsmod | grep kvm)
-  if [ -n "$USING_KVM" ]; then
-    echo "[*] Using KVM, no need to fix DHCP for eth1 iface"
-    return 0
-  fi
-  if [ -f /sys/class/net/eth2/address ]; then
-    if [ "$(cat /sys/class/net/eth2/address)" == "00:50:56:a3:b1:c4" ]; then
-      echo "[*] Using ESXi, no need to change anything"
-      return 0
-    fi
-  fi
-  # There's a fun issue where dhclient keeps messing with eth1 despite the fact
-  # that eth1 has a static IP set. We workaround this by setting a static DHCP lease.
-  echo -e 'interface "eth1" {
-    send host-name = gethostname();
-    send dhcp-requested-address 192.168.38.105;
-  }' >>/etc/dhcp/dhclient.conf
-  netplan apply
-  # Fix eth1 if the IP isn't set correctly
-  ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
-  if [ "$ETH1_IP" != "192.168.38.105" ]; then
-    echo "Incorrect IP Address settings detected. Attempting to fix."
-    ifdown eth1
-    ip addr flush dev eth1
-    ifup eth1
-    ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
-    if [ "$ETH1_IP" == "192.168.38.105" ]; then
-      echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.38.105"
-    else
-      echo "[$(date +%H:%M:%S)]: Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
-      exit 1
-    fi
-  fi
-
-  # Make sure we do have a DNS resolution
-  while true; do
-    if [ "$(dig +short @8.8.8.8 github.com)" ]; then break; fi
-    sleep 1
   done
 }
 
@@ -294,7 +252,7 @@ install_fleet_import_osquery_config() {
 
     # Don't log osquery INFO messages
     # Fix snapshot event formatting
-    fleetctl get options >/tmp/options.yaml
+    fleetctl get options > /tmp/options.yaml
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
     # Fleet 3.0 requires the "kind" to be "options" instead of "option"
@@ -363,11 +321,11 @@ install_zeek() {
   crudini --set $NODECFG proxy host localhost
 
   # Setup $CPUS numbers of Zeek workers
-  crudini --set $NODECFG worker-eth1 type worker
-  crudini --set $NODECFG worker-eth1 host localhost
-  crudini --set $NODECFG worker-eth1 interface eth1
-  crudini --set $NODECFG worker-eth1 lb_method pf_ring
-  crudini --set $NODECFG worker-eth1 lb_procs "$(nproc)"
+  crudini --set $NODECFG worker-eth0 type worker
+  crudini --set $NODECFG worker-eth0 host localhost
+  crudini --set $NODECFG worker-eth0 interface eth0
+  crudini --set $NODECFG worker-eth0 lb_method pf_ring
+  crudini --set $NODECFG worker-eth0 lb_procs "$(nproc)"
 
   # Setup Zeek to run at boot
   cp /vagrant/resources/zeek/zeek.service /lib/systemd/system/zeek.service
@@ -399,10 +357,12 @@ install_velociraptor() {
     mkdir /opt/velociraptor
   fi
   echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
-  LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
+  LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
   echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
   echo "[$(date +%H:%M:%S)]: Attempting to download..."
-  wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
+  #wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
+  # Harcoding until the release after v0.4.7
+  wget -P /opt/velociraptor --progress=bar:force "https://github.com/Velocidex/velociraptor/releases/download/v0.4.7/velociraptor-v0.4.7-1-linux-amd64"
   if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
     echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
   else
@@ -440,7 +400,7 @@ install_suricata() {
   python setup.py install
 
   cp /vagrant/resources/suricata/suricata.yaml /etc/suricata/suricata.yaml
-  crudini --set --format=sh /etc/default/suricata '' iface eth1
+  crudini --set --format=sh /etc/default/suricata '' iface eth0
   # update suricata signature sources
   suricata-update update-sources
   # disable protocol decode as it is duplicative of Zeek
@@ -468,22 +428,6 @@ install_suricata() {
     echo "Suricata attempted to start but is not running. Exiting"
     exit 1
   fi
-
-  cat >/etc/logrotate.d/suricata <<EOF
-/var/log/suricata/*.log /var/log/suricata/*.json
-{
-    hourly
-    rotate 0
-    missingok
-    nocompress
-    size=500M
-    sharedscripts
-    postrotate
-            /bin/kill -HUP \`cat /var/run/suricata.pid 2>/dev/null\` 2>/dev/null || true
-    endscript
-}
-EOF
-
 }
 
 test_suricata_prerequisites() {
@@ -533,14 +477,13 @@ postinstall_tasks() {
   echo export PATH="$PATH:/opt/splunk/bin:/opt/zeek/bin" >>~/.bashrc
   echo "export SPLUNK_HOME=/opt/splunk" >>~/.bashrc
   # Ping DetectionLab server for usage statistics
-  curl -s -A "DetectionLab-logger" "https:/ping.detectionlab.network/logger" || echo "Unable to connect to ping.detectionlab.network"
+  curl -s -A "DetectionLab-logger" "https:/ping.detectionlab.network/logger"
 }
 
 main() {
   apt_install_prerequisites
   modify_motd
   test_prerequisites
-  fix_eth1_static_ip
   install_splunk
   download_palantir_osquery_config
   install_fleet_import_osquery_config

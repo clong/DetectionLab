@@ -79,8 +79,8 @@ ufw --force enable
 echo "[$(date +%H:%M:%S)]: Installing Vagrant..."
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
-dpkg -i vagrant_2.2.9_x86_64.deb
+wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.deb
+dpkg -i vagrant_2.2.10_x86_64.deb
 echo "[$(date +%H:%M:%S)]: Installing vagrant-reload plugin..."
 vagrant plugin install vagrant-reload
 
@@ -110,11 +110,7 @@ if [ $BOXES_PRESENT -eq 1 ]; then
   sed -i 's#"detectionlab/win10"#"/mnt/windows_10_virtualbox.box"#g' /opt/DetectionLab/Vagrant/Vagrantfile
 fi
 
-# Make the build script is executable
-chmod +x /opt/DetectionLab/build.sh
-cd /opt/DetectionLab || exit 1
-
 # Start the build in a tmux session
 sn=tmuxsession
 tmux new-session -s "$sn" -d
-tmux send-keys -t "$sn:0" './build.sh virtualbox --vagrant-only && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter
+tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab/Vagrant && vagrant up | tee -a vagrant_up_all.log && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter

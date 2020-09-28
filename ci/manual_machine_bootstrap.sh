@@ -25,8 +25,8 @@ git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab
 # Install Vagrant
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
-dpkg -i vagrant_2.2.9_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.deb
+dpkg -i vagrant_2.2.10_x86_64.deb
 
 # Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
 echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
@@ -50,6 +50,3 @@ for file in *.json; do
   sed -i 's/"headless": false,/"headless": true,/g' "$file";
 done
 
-# Ensure the script is executable
-chmod +x /opt/DetectionLab/build.sh
-cd /opt/DetectionLab || exit 1

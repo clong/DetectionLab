@@ -8,6 +8,8 @@ If (-not (Test-Path $wefRepoPath))
 {
     # GitHub requires TLS 1.2 as of 2/1/2018
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
+    $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest -Uri "https://github.com/palantir/windows-event-forwarding/archive/master.zip" -OutFile $wefRepoPath
     Expand-Archive -path "$wefRepoPath" -destinationpath 'c:\Users\vagrant\AppData\Local\Temp' -Force
 }
