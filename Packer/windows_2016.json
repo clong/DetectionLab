@@ -143,7 +143,8 @@
       "type": "powershell",
       "scripts": [
         "./scripts/vm-guest-tools.ps1",
-        "./scripts/debloat-windows.ps1"
+        "./scripts/debloat-windows.ps1",
+        "./scripts/download-microsoft-ata.ps1"
       ]
     },
     {
