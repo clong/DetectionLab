@@ -100,6 +100,7 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [Velociraptor](https://github.com/Velocidex/velociraptor)
 * [BadBlood](https://github.com/davidprowe/BadBlood)
 * [PurpleSharp](https://github.com/mvelazc0/PurpleSharp)
+* [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES)
 
 # DetectionLab Sponsors
 #### Lated updated: 9/16/2020
