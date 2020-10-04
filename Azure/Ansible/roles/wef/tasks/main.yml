@@ -92,6 +92,15 @@
 
 - debug: msg="{{ pstranscriptshare.stdout_lines }}"
 
+- name: Installing the EVTX Event Samples
+  win_shell: ".\\install-evtx-attack-samples.ps1"
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: evtxeventsamples
+  failed_when: "'Exception' in evtxeventsamples.stdout"
+
+- debug: msg="{{ evtxeventsamples.stdout_lines }}"
+
 - name: Installing Microsoft Advanced Threat Analytics
   win_shell: ".\\install-microsoft-ata.ps1"
   args:
