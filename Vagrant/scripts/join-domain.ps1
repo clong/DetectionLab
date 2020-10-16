@@ -9,12 +9,8 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) First, set DNS to DC to join the doma
 $newDNSServers = "192.168.38.102"
 $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPAddress -match "192.168.38."}
 # Don't do this in Azure. If the network adatper description contains "Hyper-V", this won't apply changes.
-$adapters | ForEach-Object {if (!($_.Description).Contains("Hyper-V")) {$_.SetDNSServerSearchOrder($newDNSServers)}}
-
-# Hardcoding DNS domain name in hosts file to sidestep any DNS issues
-If (!(Select-String -Path $hostsFile -Pattern "192.168.38.102")) {
-  Add-Content $hostsFile "        192.168.38.102    windomain.local"
-}
+# Specify the DC as a WINS server to help with connectivity as well
+$adapters | ForEach-Object {if (!($_.Description).Contains("Hyper-V")) {$_.SetDNSServerSearchOrder($newDNSServers); $_.SetWINSServer($newDNSServers, "")}}
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Now join the domain..."
 $hostname = $(hostname)
