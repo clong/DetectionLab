@@ -113,4 +113,25 @@ fi
 # Start the build in a tmux session
 sn=tmuxsession
 tmux new-session -s "$sn" -d
-tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab/Vagrant && vagrant up | tee -a vagrant_up_all.log && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter
+tmux send-keys -t "$sn:0" 'for host in logger dc wef win10; do vagrant up $host | tee -a vagrant_up_$host.log; COMPLETE="$(grep -ci "$host Provisioning Complete" vagrant_up_$host.log)"; echo "Complete is $COMPLETE for $host" ; if [ "$COMPLETE" -lt 1 ]; then echo "failed" > /var/www/html/index.html; break; fi; done; ALL_SUCCESS="$(grep -ci "Provisioning Complete" vagrant_up_*.log | cut -d : -f 2 | awk '"'"'{ sum += $1 } END { print sum }'"'"')"; echo "All success is $ALL_SUCCESS"; if [ "$ALL_SUCCESS" -eq 4 ]; then echo "success" > /var/www/html/index.html; else  echo "failed" > /var/www/html/index.html; fi' Enter
+
+
+#  Expanding the send-keys command
+#  Vagrant isn't great about return codes, so we'll hack this up for now
+#  for host in logger dc wef win10;
+#  do
+#    vagrant up $host | tee -a vagrant_up_$host.log
+#    COMPLETE="$(grep -ci "$host Provisioning Complete" vagrant_up_$host.log)"
+#    echo "Complete is $COMPLETE for $host"
+#    if [ "$COMPLETE" -lt 1 ]; then
+#      echo "failed" > /var/www/html/index.html
+#      break
+#    fi
+#  done
+#  ALL_SUCCESS="$(grep -ci "Provisioning Complete" vagrant_up_*.log | cut -d : -f 2 | awk '"'"'{ sum += $1 } END { print sum }'"'"')"
+#  echo "All success is $ALL_SUCCESS"
+#  if [ "$ALL_SUCCESS" -eq 4 ]; then
+#    echo "success" > /var/www/html/index.html
+#  else
+#    echo "failed" > /var/www/html/index.html
+#  fi

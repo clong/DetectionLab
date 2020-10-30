@@ -550,6 +550,7 @@ main() {
   install_zeek
   install_guacamole
   postinstall_tasks
+  echo "Logger Provisioning Complete!"
 }
 
 main
