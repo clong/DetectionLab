@@ -111,7 +111,7 @@ if [ $BOXES_PRESENT -eq 1 ]; then
 fi
 
 # Recreate a barebones version of the build script so we have some sense of return codes
-cat << EOF > /opt/DetectionLab/Vagrant/build.sh
+cat << EOF > /opt/DetectionLab/build.sh
 #! /bin/bash
 
 # Brings up a single host using Vagrant
@@ -201,6 +201,7 @@ main() {
 main
 exit 0
 EOF
+chmod +x /opt/DetectionLab/build.sh
 
 # Start the build in a tmux session
 sn=tmuxsession
