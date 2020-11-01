@@ -111,7 +111,7 @@ if [ $BOXES_PRESENT -eq 1 ]; then
 fi
 
 # Recreate a barebones version of the build script so we have some sense of return codes
-cat << EOF > /opt/DetectionLab/build.sh
+cat << 'EOF' > /opt/DetectionLab/build.sh
 #! /bin/bash
 
 # Brings up a single host using Vagrant
@@ -194,6 +194,7 @@ main() {
   DL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
   # Build and Test Vagrant hosts 
+  cd Vagrant
   build_vagrant_hosts
   post_build_checks
 }
@@ -206,4 +207,4 @@ chmod +x /opt/DetectionLab/build.sh
 # Start the build in a tmux session
 sn=tmuxsession
 tmux new-session -s "$sn" -d
-tmux send-keys -t "$sn:0" './build.sh && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter
+tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab && ./build.sh && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter
