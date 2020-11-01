@@ -119,7 +119,7 @@ vagrant_up_host() {
   HOST="$1"
   (echo >&2 "Attempting to bring up the $HOST host using Vagrant")
   cd "$DL_DIR"/Vagrant || exit 1
-  $(which vagrant) up "$HOST" --provider="$PROVIDER" &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log"
+  $(which vagrant) up "$HOST" &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log"
   echo "$?"
 }
 
