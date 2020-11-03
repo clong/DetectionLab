@@ -50,7 +50,7 @@ These commands can be run in parallel from three separate terminal sessions.
 8. **(3 Minute)s** Edit `DetectionLab/ESXi/resources/01-netcfg.yaml`. These are the IP addresses that will be applied to the logger network interfaces. These should be be able to be found in your ESXi console or from the Terraform outputs.
 9. **(3 Minute)** Before running any Ansible playbooks, I highly recommend taking snapshots of all your VMs! If anything goes wrong with provisioning, you can simply restore the snapshot and easily debug the issue.
 10. Change your directory to `DetectionLab/ESXi/Ansible`
-11. **(30 Minutes)** Run `ansible-playbook -vvv detectionlab.yml` 
+11. **(30 Minutes)** Run `ansible-playbook -vvv detectionlab.yml` - If running Ansible causes a `fork()` related error message, set the following environment variable before running Ansible: `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`. More on this [here](https://github.com/clong/DetectionLab/issues/543).
 12. If all goes well, you should see the following and your lab is complete!
 ![Ansible](https://github.com/clong/DetectionLab/blob/master/img/esxi_ansible.png?raw=true)
 
