@@ -219,11 +219,6 @@
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_144.tgz -auth 'admin:changeme'
 
-      ## Fix a bug with the ThreatHunting App (https://github.com/olafhartong/ThreatHunting/pull/57)
-      mv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmonevencodes.csv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmoneventcodes.csv
-      sed -i 's/= sysmoneventcode /= sysmoneventcodes.csv /g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
-      sed -i 's/sysmoneventcode.csv/sysmoneventcodes.csv/g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
-
       # Install the Maxmind license key for the ASNgen App
       if [ ! -z $MAXMIND_LICENSE ]; then
         mkdir /opt/splunk/etc/apps/TA-asngen/local 
@@ -272,8 +267,6 @@
       dismissedInstrumentationOptInVersion = 4
       notification_python_3_impact = false
       display.page.home.dashboardId = /servicesNS/nobody/search/data/ui/views/logger_dashboard' > /opt/splunk/etc/users/admin/user-prefs/local/user-prefs.conf
-      # Disable the instrumentation popup
-      echo -e "showOptInModal = 0\noptInVersionAcknowledged = 4" >>/opt/splunk/etc/apps/splunk_instrumentation/local/telemetry.conf
       # Enable SSL Login for Splunk
       echo -e "[settings]\nenableSplunkWebSSL = true" >/opt/splunk/etc/system/local/web.conf
       # Copy over the Logger Dashboard
@@ -284,8 +277,6 @@
       # Reboot Splunk to make changes take effect
         /opt/splunk/bin/splunk restart
         /opt/splunk/bin/splunk enable boot-start
-        # Generate the ASN lookup table
-        /opt/splunk/bin/splunk search "|asngen | outputlookup asn" -auth 'admin:changeme'
       fi
   register: install_splunk
   changed_when: "'The Splunk web interface is at https://logger:8000' in install_splunk.stdout"
