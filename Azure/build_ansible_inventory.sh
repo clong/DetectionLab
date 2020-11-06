@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # This script is used to populate the Azure Ansible inventory.yml with 
 # the results of "terraform output"

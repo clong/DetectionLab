@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # This script is run on the Packet.net baremetal server for CI tests.
 # While building, the server will start a webserver on Port 80 that contains
@@ -112,7 +112,7 @@ fi
 
 # Recreate a barebones version of the build script so we have some sense of return codes
 cat << 'EOF' > /opt/DetectionLab/build.sh
-#! /bin/bash
+#! /usr/bin/env bash
 
 # Brings up a single host using Vagrant
 vagrant_up_host() {

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # Override existing DNS Settings using netplan, but don't do it for Terraform builds
 if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then

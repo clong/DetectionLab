@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # This script is used to manually prepare an Ubuntu 16.04 server for DetectionLab building
 export DEBIAN_FRONTEND=noninteractive
