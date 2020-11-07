@@ -17,6 +17,7 @@ NOTE: This is an early release and it's possible that certain features may not w
     2. Enable the "Guest IP Hack" 
     3. Open VNC ports on the firewall
     * Instructions for those steps are here: https://nickcharlton.net/posts/using-packer-esxi-6.html
+    * Alternatively, you can install the VIB file from https://github.com/sukster/ESXi-Packer-VNC which will automatically open the VNC ports on the ESXi firewall.
 6. [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Steps
