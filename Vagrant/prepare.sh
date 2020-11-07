@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # This script is meant to verify that your system is configured to 
 # build DetectionLab successfully.

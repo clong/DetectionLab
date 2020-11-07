@@ -38,7 +38,16 @@ if ("$env:PACKER_BUILDER_TYPE" -eq "vmware-iso") {
     }
 
     cmd /c "C:\PROGRA~1\7-Zip\7z.exe" x "C:\Windows\Temp\windows.iso" -oC:\Windows\Temp\VMWare
-    cmd /c C:\Windows\Temp\VMWare\setup.exe /S /v"/qn REBOOT=R\"
+    cmd /c C:\Windows\Temp\VMWare\setup.exe /S /v "/qn REBOOT=R"
+    $software = "VMware Tools";
+    $installed = (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where { $_.DisplayName -eq $software }) -ne $null
+
+    If (-Not $installed) {
+        Write-Host "'$software' did not install successfully. Quitting.";
+        exit 1
+    } Else {
+        Write-Host "'$software' was installed successfully."
+    }
 
     Remove-Item -Force "C:\Windows\Temp\vmware-tools.tar"
     Remove-Item -Force "C:\Windows\Temp\windows.iso"

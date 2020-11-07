@@ -28,14 +28,14 @@ public static class SSLValidator {
 If (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center"))
 {
     $download = $false
-    If (-not (Test-Path "$env:temp\$title.iso"))
+    If (-not (Test-Path "c:\$title.iso"))
     {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) $title.iso doesn't exist yet, downloading..."
         $download = $true
     }
     Else
     {
-        $actualHash = (Get-FileHash -Algorithm SHA256 -Path "$env:temp\$title.iso").Hash
+        $actualHash = (Get-FileHash -Algorithm SHA256 -Path "c:\$title.iso").Hash
         If (-not ($actualHash -eq $fileHash))
         {
             Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) $title.iso exists, but the hash did not validate successfully. Downloading a new copy..."
@@ -47,21 +47,21 @@ If (-not (Test-Path "C:\Program Files\Microsoft Advanced Threat Analytics\Center
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading $title..."
         # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
         $ProgressPreference = 'SilentlyContinue'
-        Invoke-WebRequest -Uri $downloadUrl -OutFile "$env:temp\$title.iso"
-        $actualHash = (Get-FileHash -Algorithm SHA256 -Path "$env:temp\$title.iso").Hash
+        Invoke-WebRequest -Uri $downloadUrl -OutFile "c:\$title.iso"
+        $actualHash = (Get-FileHash -Algorithm SHA256 -Path "c:\$title.iso").Hash
         If (-not ($actualHash -eq $fileHash))
         {
             Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) $title.iso was not downloaded correctly: hash from downloaded file: $actualHash, should've been: $fileHash. Re-trying using BitsAdmin now..."
-            Remove-Item -Path "$env:temp\$title.iso" -Force
-            bitsadmin /Transfer ATA $downloadUrl "$env:temp\$title.iso"
-            $actualHash = (Get-FileHash -Algorithm SHA256 -Path "$env:temp\$title.iso").Hash
+            Remove-Item -Path "c:\$title.iso" -Force
+            bitsadmin /Transfer ATA $downloadUrl "c:\$title.iso"
+            $actualHash = (Get-FileHash -Algorithm SHA256 -Path "c:\$title.iso").Hash
             If (-not ($actualHash -eq $fileHash))
             {
                 Throw "$title.iso was not downloaded correctly after a retry: hash from downloaded file: $actualHash, should've been: $fileHash - Giving up."
             }
         }
     }
-    $Mount = Mount-DiskImage -ImagePath "$env:temp\$title.iso" -StorageType ISO -Access ReadOnly -PassThru
+    $Mount = Mount-DiskImage -ImagePath "c:\$title.iso" -StorageType ISO -Access ReadOnly -PassThru
     $Volume = $Mount | Get-Volume
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing $title"
     $Install = Start-Process -Wait -FilePath ($Volume.DriveLetter + ":\Microsoft ATA Center Setup.exe") -ArgumentList "/q --LicenseAccepted NetFrameworkCommandLineArguments=`"/q`" --EnableMicrosoftUpdate" -PassThru

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # This script is meant to verify that DetectionLab was built successfully.
 # Only MacOS and Linux are supported. Use post_build_checks.ps1 for Windows.

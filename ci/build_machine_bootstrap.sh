@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # This script is run on the Packet.net baremetal server for CI tests.
 # While building, the server will start a webserver on Port 80 that contains
@@ -110,7 +110,101 @@ if [ $BOXES_PRESENT -eq 1 ]; then
   sed -i 's#"detectionlab/win10"#"/mnt/windows_10_virtualbox.box"#g' /opt/DetectionLab/Vagrant/Vagrantfile
 fi
 
+# Recreate a barebones version of the build script so we have some sense of return codes
+cat << 'EOF' > /opt/DetectionLab/build.sh
+#! /usr/bin/env bash
+
+# Brings up a single host using Vagrant
+vagrant_up_host() {
+  HOST="$1"
+  (echo >&2 "Attempting to bring up the $HOST host using Vagrant")
+  cd "$DL_DIR"/Vagrant || exit 1
+  $(which vagrant) up "$HOST" &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log"
+  echo "$?"
+}
+
+# Attempts to reload and re-provision a host if the intial "vagrant up" fails
+vagrant_reload_host() {
+  HOST="$1"
+  cd "$DL_DIR"/Vagrant || exit 1
+  # Attempt to reload the host if the vagrant up command didn't exit cleanly
+  $(which vagrant) reload "$HOST" --provision >>"$DL_DIR/Vagrant/vagrant_up_$HOST.log" 2>&1
+  echo "$?"
+}
+
+# A series of checks to ensure important services are responsive after the build completes.
+post_build_checks() {
+  # If the curl operation fails, we'll just leave the variable equal to 0
+  # This is needed to prevent the script from exiting if the curl operation fails
+  SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk' || echo "")
+  FLEET_CHECK=$(curl -ks -m 2 https://192.168.38.105:8412 | grep -c 'Kolide Fleet' || echo "")
+  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.38.103 -m 2)
+  [[ $ATA_CHECK == 401 ]] && ATA_CHECK=1
+
+  BASH_MAJOR_VERSION=$(/bin/bash --version | grep 'GNU bash' | grep -oi version\.\.. | cut -d ' ' -f 2 | cut -d '.' -f 1)
+  # Associative arrays are only supported in bash 4 and up
+  if [ "$BASH_MAJOR_VERSION" -ge 4 ]; then
+    declare -A SERVICES
+    SERVICES=(["splunk"]="$SPLUNK_CHECK" ["fleet"]="$FLEET_CHECK" ["ms_ata"]="$ATA_CHECK")
+    for SERVICE in "${!SERVICES[@]}"; do
+      if [ "${SERVICES[$SERVICE]}" -lt 1 ]; then
+        (echo >&2 "Warning: $SERVICE failed post-build tests and may not be functioning correctly.")
+      fi
+    done
+  else
+    if [ "$SPLUNK_CHECK" -lt 1 ]; then
+      (echo >&2 "Warning: Splunk failed post-build tests and may not be functioning correctly.")
+    fi
+    if [ "$FLEET_CHECK" -lt 1 ]; then
+      (echo >&2 "Warning: Fleet failed post-build tests and may not be functioning correctly.")
+    fi
+    if [ "$ATA_CHECK" -lt 1 ]; then
+      (echo >&2 "Warning: MS ATA failed post-build tests and may not be functioning correctly.")
+    fi
+  fi
+}
+
+build_vagrant_hosts() {
+  LAB_HOSTS=("logger" "dc" "wef" "win10")
+
+  # Vagrant up each box and attempt to reload one time if it fails
+  for VAGRANT_HOST in "${LAB_HOSTS[@]}"; do
+    RET=$(vagrant_up_host "$VAGRANT_HOST")
+    if [ "$RET" -eq 0 ]; then
+      (echo >&2 "Good news! $VAGRANT_HOST was built successfully!")
+    fi
+    # Attempt to recover if the intial "vagrant up" fails
+    if [ "$RET" -ne 0 ]; then
+      (echo >&2 "Something went wrong while attempting to build the $VAGRANT_HOST box.")
+      (echo >&2 "Attempting to reload and reprovision the host...")
+      RETRY_STATUS=$(vagrant_reload_host "$VAGRANT_HOST")
+      if [ "$RETRY_STATUS" -eq 0 ]; then
+        (echo >&2 "Good news! $VAGRANT_HOST was built successfully after a reload!")
+      else
+        (echo >&2 "Failed to bring up $VAGRANT_HOST after a reload. Exiting.")
+        exit 1
+      fi
+    fi
+  done
+}
+
+main() {
+  # Get location of build.sh
+  # https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
+  DL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  # Build and Test Vagrant hosts 
+  cd Vagrant
+  build_vagrant_hosts
+  post_build_checks
+}
+
+main
+exit 0
+EOF
+chmod +x /opt/DetectionLab/build.sh
+
 # Start the build in a tmux session
 sn=tmuxsession
 tmux new-session -s "$sn" -d
-tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab/Vagrant && vagrant up | tee -a vagrant_up_all.log && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter
+tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab && ./build.sh && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter

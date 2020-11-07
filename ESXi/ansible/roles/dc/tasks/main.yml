@@ -10,10 +10,10 @@
   when: res.reboot_required
 
 - name: Set HostOnly IP Address
-  win_shell: "New-NetIPAddress –InterfaceAlias Ethernet2 –AddressFamily IPv4 -IPAddress 192.168.38.102 –PrefixLength 24 -DefaultGateway 192.168.38.1"
+  win_shell: "New-NetIPAddress –InterfaceAlias Ethernet1 –AddressFamily IPv4 -IPAddress 192.168.38.102 –PrefixLength 24 -DefaultGateway 192.168.38.1"
 
 - name: Set DNS Address
-  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet2 -ServerAddresses 127.0.0.1,8.8.8.8"
+  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet1 -ServerAddresses 127.0.0.1,8.8.8.8"
 
 - name: Install git
   win_chocolatey:

@@ -23,6 +23,15 @@ NOTE: This is an early release and it's possible that certain features may not w
 
 1. **(5 Minutes)** Edit the variables in `DetectionLab/ESXi/Packer/variables.json` to match your ESXi configuration. The `esxi_network_with_dhcp_and_internet` variable refers to any ESXi network that will be able to provide DHCP and internet access to the VM while it's being built in Packer.
 
+Note: As per ESXI 7.x, built-in VNC server has been removed from distribution (https://docs.vmware.com/en/VMware-vSphere/7.0/rn/vsphere-esxi-vcenter-server-70-release-notes.html). If you are using ESXI 7.x, you need to:
+* Upgrade Packer to 1.6.3+, we need to use `vnc_over_websocket` instead of old vnc configuration : [see packer issue](https://github.com/hashicorp/packer/issues/8984), [changelog](https://github.com/hashicorp/packer/blob/master/CHANGELOG.md)
+* Add two config to windows_10_esxi.json, windows_2016_esxi.json, ubuntu1804_esxi.json like this:
+```
+"vnc_over_websocket": true,
+"insecure_connection": true,
+```
+Ref: https://www.virtuallyghetto.com/2020/10/quick-tip-vmware-iso-builder-for-packer-now-supported-with-esxi-7-0.html
+
 2. **(45 Minutes)** From the `DetectionLab/ESXi/Packer` directory, run:
 * `PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_10_esxi.json`
 * `PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_2016_esxi.json`
@@ -41,7 +50,7 @@ These commands can be run in parallel from three separate terminal sessions.
 8. **(3 Minute)s** Edit `DetectionLab/ESXi/resources/01-netcfg.yaml`. These are the IP addresses that will be applied to the logger network interfaces. These should be be able to be found in your ESXi console or from the Terraform outputs.
 9. **(3 Minute)** Before running any Ansible playbooks, I highly recommend taking snapshots of all your VMs! If anything goes wrong with provisioning, you can simply restore the snapshot and easily debug the issue.
 10. Change your directory to `DetectionLab/ESXi/Ansible`
-11. **(30 Minutes)** Run `ansible-playbook -vvv detectionlab.yml` 
+11. **(30 Minutes)** Run `ansible-playbook -vvv detectionlab.yml` - If running Ansible causes a `fork()` related error message, set the following environment variable before running Ansible: `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`. More on this [here](https://github.com/clong/DetectionLab/issues/543).
 12. If all goes well, you should see the following and your lab is complete!
 ![Ansible](https://github.com/clong/DetectionLab/blob/master/img/esxi_ansible.png?raw=true)
 

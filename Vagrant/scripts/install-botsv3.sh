@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #Thanks to @MHaggis for this addition!
 #More information on BOTSv3 can be found at https://github.com/splunk/botsv3
