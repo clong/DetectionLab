@@ -20,19 +20,27 @@
 
 - name: Copy scripts to c:\vagrant
   win_shell: Copy-Item -Recurse c:\DetectionLab\Vagrant c:\vagrant
+  args:
+    creates: c:\vagrant\Vagrantfile
 
 - name: Making Windows10 Great Again
   win_shell:  .\\MakeWindows10GreatAgain.ps1
   args:
     chdir: 'c:\vagrant\scripts'
+  register: win10_great
+  changed_when: "' was already installed. Moving On.' not in win10_great.stdout"
 
 - name: Join the Domain
   win_shell: .\\provision.ps1
   args:
     chdir: 'c:\vagrant\scripts'
+  register: win10_join_domain
+  changed_when: "'HasSucceeded : True' in win10_join_domain.stdout"
+  failed_when: '"failed to join domain" in win10_join_domain.stderr'
 
 - name: Update group policy
   win_shell: "gpupdate /force"
+  when: win10_join_domain.changed
 
 - name: Reboot Server
   win_reboot:
@@ -40,6 +48,7 @@
     pre_reboot_delay: 15
     reboot_timeout: 600
     post_reboot_delay: 60
+  when: win10_join_domain.changed
 
 - name: Clear Event Logs
   win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
