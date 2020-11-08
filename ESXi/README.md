@@ -5,20 +5,17 @@ NOTE: This is an early release and it's possible that certain features may not w
 
 ## Prereqs (~30-60 minutes)
 0. Have an ESXi instance version 6 or higher. VSphere is **NOT** required.
-1. Install the [requirements from the ESXi Terraform Provider](https://github.com/josenk/terraform-provider-esxi#requirements)
-    * If building on MacOS, don't forget to change the GOOS from linux to darwin!
-        * `GOOS=linux` -> `GOOS=darwin`
-2. Build and install the [terraform-provider-esxi](https://github.com/josenk/terraform-provider-esxi#building-the-provider) provider
-3. Your ESXi must have at least two separate networks - one that is accessible from your current machine (VM Network) and a HostOnly network to allow the VMs to have internet access (HostOnly). 
-4. [OVFTool](https://my.vmware.com/web/vmware/details?downloadGroup=OVFTOOL420&productId=618) must be installed and in your path. 
+1. The ESXi Terraform Provider built by https://github.com/josenk/terraform-provider-esxi will be installed automatically from the Terraform Registry, if you are using Terraform 0.13.x or higher. If needed, the lastest provider package can be downloaded manually from https://github.com/josenk/terraform-provider-esxi/releases.
+2. Your ESXi must have at least two separate networks - one that is accessible from your current machine (VM Network) and a HostOnly network to allow the VMs to have internet access (HostOnly). 
+3. [OVFTool](https://my.vmware.com/web/vmware/details?downloadGroup=OVFTOOL420&productId=618) must be installed and in your path. 
     * On MacOS, I solved this by creating a symbolic link to the ovftool included in VMWare Fusion: `sudo ln -s "/Applications/VMware Fusion.app/Contents/Library/VMware OVF Tool/ovftool" "/usr/local/bin/ovftool"`
-5. On your ESXI, you must:
+4. On your ESXI, you must:
    1. Enable SSH
     2. Enable the "Guest IP Hack" 
     3. Open VNC ports on the firewall
     * Instructions for those steps are here: https://nickcharlton.net/posts/using-packer-esxi-6.html
     * Alternatively, you can install the VIB file from https://github.com/sukster/ESXi-Packer-VNC which will automatically open the VNC ports on the ESXi firewall.
-6. [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+5. [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Steps
 
