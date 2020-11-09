@@ -244,7 +244,7 @@ install_fleet_import_osquery_config() {
     cd /opt || exit 1
 
     echo "[$(date +%H:%M:%S)]: Installing Fleet..."
-    echo -e "\n127.0.0.1       kolide" >>/etc/hosts
+    echo -e "\n127.0.0.1       fleet" >>/etc/hosts
     echo -e "\n127.0.0.1       logger" >>/etc/hosts
 
     # Set MySQL username and password, create kolide database
@@ -252,7 +252,7 @@ install_fleet_import_osquery_config() {
     mysql -uroot -pkolide -e "create database kolide;"
 
     # Always download the latest release of Fleet
-    curl -s https://api.github.com/repos/kolide/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
+    curl -s https://api.github.com/repos/fleetdm/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
     unzip fleet.zip -d fleet
     cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
     cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
