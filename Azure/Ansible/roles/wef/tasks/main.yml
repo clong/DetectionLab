@@ -21,6 +21,8 @@
 
 - name: Copy scripts to c:\vagrant
   win_shell: Copy-Item -Recurse c:\DetectionLab\Vagrant c:\vagrant
+  args:
+    creates: c:\vagrant\Vagrantfile
 
 - name: Join the Domain
   win_shell: .\\provision.ps1
@@ -28,6 +30,7 @@
     chdir: 'c:\vagrant\scripts'
   register: wef_join_domain
   changed_when: "'HasSucceeded : True' in wef_join_domain.stdout"
+  failed_when: '"failed to join domain" in wef_join_domain.stderr'
 
 - debug: msg="{{ wef_join_domain.stdout_lines }}"
 
@@ -37,6 +40,7 @@
     pre_reboot_delay: 15
     reboot_timeout: 600
     post_reboot_delay: 60
+  when: wef_join_domain.changed
 
 - name: Download Microsoft ATA
   win_get_url:
@@ -53,6 +57,7 @@
     chdir: 'c:\vagrant\scripts'
   register: palantir_wef
   failed_when: "'Exception' in palantir_wef.stdout"
+  changed_when: "' already exists. Moving On.' not in palantir_wef.stdout"
 
 - debug: msg="{{ palantir_wef.stdout_lines }}"
 
@@ -62,6 +67,7 @@
     chdir: 'c:\vagrant\scripts'
   register: wef_subscriptions
   failed_when: "'Exception' in wef_subscriptions.stdout"
+  changed_when: "'already installed, moving on...' not in wef_subscriptions.stdout"
 
 - debug: msg="{{ wef_subscriptions.stdout_lines }}"
 
@@ -71,6 +77,7 @@
     chdir: 'c:\vagrant\scripts'
   register: splunkuf
   failed_when: "'Exception' in splunkuf.stdout"
+  changed_when: "' already installed. Moving on.' not in splunkuf.stdout"
 
 - debug: msg="{{ splunkuf.stdout_lines }}"
 
@@ -80,6 +87,7 @@
     chdir: 'c:\vagrant\scripts'
   register: windowsta
   failed_when: "'Exception' in windowsta.stdout"
+  changed_when: "' already installed. Moving on.' not in windowsta.stdout"
 
 - debug: msg="{{ windowsta.stdout_lines }}"
 
@@ -98,6 +106,7 @@
     chdir: 'c:\vagrant\scripts'
   register: evtxeventsamples
   failed_when: "'Exception' in evtxeventsamples.stdout"
+  changed_when: "' were already installed. Moving On.' not in evtxeventsamples.stdout"
 
 - debug: msg="{{ evtxeventsamples.stdout_lines }}"
 
@@ -107,6 +116,7 @@
     chdir: 'c:\vagrant\scripts'
   register: windowsata
   failed_when: "'Exception' in windowsata.stdout"
+  changed_when: "' was already installed. Moving On.' not in windowsata.stdout"
 
 - debug: msg="{{ windowsata.stdout_lines }}"
 

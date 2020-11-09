@@ -21,6 +21,8 @@
 
 - name: Copy scripts to c:\vagrant
   win_shell: Copy-Item -Recurse c:\DetectionLab\Vagrant c:\vagrant
+  args:
+    creates: c:\vagrant\Vagrantfile
 
 - name: Create an Administrator user
   win_user:
@@ -28,7 +30,8 @@
     password: Vagrant123
     state: present
     groups:
-      - Users,Administrators
+      - Users
+      - Administrators
     password_never_expires: yes
   
 - name: Create the Domain
