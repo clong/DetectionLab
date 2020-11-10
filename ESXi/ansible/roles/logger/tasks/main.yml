@@ -208,6 +208,7 @@
       /opt/splunk/bin/splunk add index zeek -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index threathunting -auth 'admin:changeme'
+      /opt/splunk/bin/splunk add index evtx_attack_samples -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_700.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-sysmon_1062.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_110.tgz -auth 'admin:changeme'
@@ -292,7 +293,7 @@
       cd /opt || exit 1
 
       echo "[$(date +%H:%M:%S)]: Installing Fleet..."
-      echo -e "\n127.0.0.1       kolide" >>/etc/hosts
+      echo -e "\n127.0.0.1       fleet" >>/etc/hosts
       echo -e "\n127.0.0.1       logger" >>/etc/hosts
 
       # Set MySQL username and password, create kolide database
@@ -300,7 +301,7 @@
       mysql -uroot -pkolide -e "create database kolide;"
 
       # Always download the latest release of Fleet
-      curl -s https://api.github.com/repos/kolide/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
+      curl -s https://api.github.com/repos/fleetdm/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
       unzip fleet.zip -d fleet
       cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
       cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
@@ -401,7 +402,7 @@
     echo "[$(date +%H:%M:%S)]: Installing Velociraptor..."
     mkdir /opt/velociraptor
     echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
-    LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
+    LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
     echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
     echo "[$(date +%H:%M:%S)]: Attempting to download..."
     wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
@@ -608,6 +609,6 @@
     # Include Splunk and Zeek in the PATH
     echo export PATH="$PATH:/opt/splunk/bin:/opt/zeek/bin" >>~/.bashrc
     # Ping DetectionLab server for usage statistics
-    curl -s -A "DetectionLab-logger" "https://detectionlab.network/logger"
+    curl -s -A "DetectionLab-logger" "https:/ping.detectionlab.network/logger" || echo "Unable to connect to ping.detectionlab.network"
 
 
