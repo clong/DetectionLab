@@ -31,8 +31,8 @@ function install_checker {
   param(
     [string]$Name
   )
-  $results = Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | Select-Object DisplayName
-  $results += Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | Select-Object DisplayName
+  $results = Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | where { ($_.Publisher -eq 'VMware, Inc.') -OR ($_.Publisher -eq 'Oracle Corporation') -OR ($_.Publisher -eq 'HashiCorp')} | Select-Object DisplayName
+  $results += Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | where { ($_.Publisher -eq 'VMware, Inc.') -OR ($_.Publisher -eq 'Oracle Corporation') -OR ($_.Publisher -eq 'HashiCorp') } | Select-Object DisplayName
 
   forEach ($result in $results) {
     if ($result -like "*$Name*") {
@@ -158,8 +158,8 @@ function list_providers {
     Write-Host "  [-] Additionally, please ensure only one providers' network adapters are active at any given time." -ForegroundColor Yellow
   }
   if (($vboxInstalled -eq 0) -and ($vmwareInstalled -eq 0)) {
-    Write-Error '  [!] You need to install a provider such as VirtualBox or VMware Workstation to continue.' -ForegroundColor red
-    Write-Error '  [!] Virtualbox is free, the VMware Vagrant Plugin costs $80.' -ForegroundColor red
+    Write-Host '  [!] You need to install a provider such as VirtualBox or VMware Workstation to continue.' -ForegroundColor Red
+    Write-Host '  [!] Virtualbox is free, the VMware Vagrant Plugin costs $80.' -ForegroundColor Red
     break
   }
   Write-Host ''
@@ -177,9 +177,12 @@ function preflight_checks {
   Write-Host ''
   Write-Host '[+] Checking if CredentialGuard is enabled...'
   # Verify CredentialGuard isn't enabled
-  if (('CredentialGuard' -match ((Get-ComputerInfo).DeviceGuardSecurityServicesConfigured) -eq "True")) {
+  if ((Get-ComputerInfo).DeviceGuardSecurityServicesConfigured -match 'CredentialGuard|Credential Guard') {
     Write-Host '  [!] CredentialGuard appears to be enabled on this system which can cause issues with Virtualbox.' -ForegroundColor red
     Write-Host '  [!] See this thread for more info: https://forums.virtualbox.org/viewtopic.php?f=25&t=82106' -ForegroundColor red
+  }
+  else {
+    Write-Host '  ['$($checkmark)'] CredentialGuard is not enabled on this system and there will not cause conflicts with VirtualBox.' -ForegroundColor green
   }
 
   Write-Host ''
