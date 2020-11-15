@@ -31,9 +31,14 @@ function install_checker {
   param(
     [string]$Name
   )
-  $results = Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | where { ($_.Publisher -eq 'VMware, Inc.') -OR ($_.Publisher -eq 'Oracle Corporation') -OR ($_.Publisher -eq 'HashiCorp')} | Select-Object DisplayName
-  $results += Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | where { ($_.Publisher -eq 'VMware, Inc.') -OR ($_.Publisher -eq 'Oracle Corporation') -OR ($_.Publisher -eq 'HashiCorp') } | Select-Object DisplayName
-
+  $results = @()
+Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall, HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall |
+  ForEach-Object {
+    $obj = New-Object psobject
+      Add-Member -InputObject $obj -MemberType NoteProperty -Name GUID -Value $_.pschildname
+      Add-Member -InputObject $obj -MemberType NoteProperty -Name DisplayName -Value $_.GetValue("DisplayName")
+      $results += $obj
+  }
   forEach ($result in $results) {
     if ($result -like "*$Name*") {
       return $true
