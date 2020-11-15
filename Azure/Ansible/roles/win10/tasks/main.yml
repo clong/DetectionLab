@@ -1,6 +1,11 @@
 ---
 - name: Set HostOnly DNS Address
-  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet -ServerAddresses 192.168.38.102,8.8.8.8"
+  win_dns_client:
+    adapter_names: '*'
+    ipv4_addresses:
+      - 192.168.38.102
+      - 8.8.8.8
+    log_path: C:\dns_log.txt
 
 - name: Install git
   win_chocolatey:
@@ -50,8 +55,20 @@
     post_reboot_delay: 60
   when: win10_join_domain.changed
 
-- name: Clear Event Logs
-  win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
+- name: Check if DetectionLab Clear Event Logs has been done
+  win_stat:
+    path: 'c:\Windows\.detectionlab_clear_done'
+  register: clearevt
+
+- block:
+    - name: Clear Event Logs
+      win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
+
+    - name: Add marker for DetectionLab Clear Event
+      win_file:
+        path: 'c:\Windows\.detectionlab_clear_done'
+        state: touch
+  when: not clearevt.stat.exists
 
 - name: Install Classic Shell with Chocolatey
   win_chocolatey:
@@ -60,12 +77,19 @@
     state: present
     install_args: "ADDLOCAL=ClassicStartMenu"
 
-- name: Import ClassicShell config
-  win_shell: |
-      "C:\Program Files\Classic Shell\ClassicStartMenu.exe -xml c:\vagrant\resources\windows\MenuSettings.xml"
-      regedit /s c:\vagrant\resources\windows\MenuStyle_Default_Win7.reg
+- name: Check if DetectionLab Menu Install has been done
+  win_stat:
+    path: 'c:\Program Files\Classic Shell\.menu_install_done'
+  register: menu_install
 
+- block:
+    - name: Import ClassicShell config
+      win_shell: |
+        "C:\Program Files\Classic Shell\ClassicStartMenu.exe -xml c:\vagrant\resources\windows\MenuSettings.xml"
+        regedit /s c:\vagrant\resources\windows\MenuStyle_Default_Win7.reg
 
-
-
-
+    - name: Add marker for DetectionLab Menu install
+      win_file:
+        path: 'c:\Program Files\Classic Shell\.menu_install_done'
+        state: touch
+  when: not menu_install.stat.exists
