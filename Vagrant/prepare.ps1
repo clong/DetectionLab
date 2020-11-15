@@ -182,7 +182,7 @@ function preflight_checks {
     Write-Host '  [!] See this thread for more info: https://forums.virtualbox.org/viewtopic.php?f=25&t=82106' -ForegroundColor red
   }
   else {
-    Write-Host '  ['$($checkmark)'] CredentialGuard is not enabled on this system and there will not cause conflicts with VirtualBox.' -ForegroundColor green
+    Write-Host '  ['$($checkmark)'] CredentialGuard is not enabled on this system and will not cause conflicts with VirtualBox.' -ForegroundColor green
   }
 
   Write-Host ''
