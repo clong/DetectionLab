@@ -62,7 +62,13 @@ index = evtx_attack_samples
 sourcetype = preprocess-winevt'
         # Restart the forwarder to pick up changes
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Restarting the Splunk Forwarder..."
-        Restart-Service SplunkForwarder
+        Try { 
+          Restart-Service -Name SplunkForwarder -Force -ErrorAction Stop 
+        } Catch {
+          Start-Sleep 10
+          Stop-Service -Name SplunkForwarder -Force
+          Start-Service -Name SplunkForwarder -Force
+        }
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Done! Look in 'index=EVTX-ATTACK-SAMPLES' in Splunk to query these samples."
     }
 } Else {
