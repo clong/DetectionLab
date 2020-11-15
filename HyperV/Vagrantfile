@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision :shell, path: "fix-eth0-static-ip.sh"
     cfg.vm.provision "reload"
     cfg.vm.provision :shell, path: "check-eth0-ip.sh"
-    cfg.vm.provision :shell, path: "../Vagrant/bootstrap.sh"
+    cfg.vm.provision :shell, path: "../Vagrant/logger_bootstrap.sh"
     cfg.vm.provision :shell, path: "fix-motd.sh"
 
 
