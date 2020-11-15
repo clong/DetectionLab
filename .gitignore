@@ -13,3 +13,4 @@ inventory.yml.bak
 *.box
 manifest.xml
 HyperV/.vagrant/*
+logger_variables.sh

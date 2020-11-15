@@ -273,13 +273,13 @@ resource "azurerm_virtual_machine" "logger" {
       "sudo mkdir /home/vagrant/.ssh && sudo cp /home/ubuntu/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys && sudo chown -R vagrant:vagrant /home/vagrant/.ssh",
       "echo 'vagrant    ALL=(ALL:ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers",
       "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
-      "sudo sed -i 's/eth1/eth0/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
-      "sudo sed -i 's/ETH1/ETH0/g' /opt/DetectionLab/Vagrant/bootstrap.sh",
-      "sudo sed -i 's#/usr/local/go/bin/go get -u#GOPATH=/root/go /usr/local/go/bin/go get -u#g' /opt/DetectionLab/Vagrant/bootstrap.sh",
-      "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/bootstrap.sh",
-      "sudo chmod +x /opt/DetectionLab/Vagrant/bootstrap.sh",
+      "sudo sed -i 's/eth1/eth0/g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
+      "sudo sed -i 's/ETH1/ETH0/g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
+      "sudo sed -i 's#/usr/local/go/bin/go get -u#GOPATH=/root/go /usr/local/go/bin/go get -u#g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
+      "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
+      "sudo chmod +x /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
       "sudo apt-get -qq update",
-      "sudo /opt/DetectionLab/Vagrant/bootstrap.sh 2>&1 |sudo tee /opt/DetectionLab/Vagrant/bootstrap.log",
+      "sudo /opt/DetectionLab/Vagrant/logger_bootstrap.sh 2>&1 |sudo tee /opt/DetectionLab/Vagrant/bootstrap.log",
     ]
   }
 

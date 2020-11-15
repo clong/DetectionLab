@@ -20,7 +20,7 @@
 
 - name: Copy bootstrap file
   copy:
-    src: ../../Vagrant/bootstrap.sh
+    src: ../../Vagrant/logger_bootstrap.sh
     dest: /home/vagrant
     owner: vagrant
     group: vagrant
@@ -159,12 +159,15 @@
   args: 
     executable: /bin/bash
   become: yes
+  environment:
+    MAXMIND_LICENSE: ""
+    BASE64_ENCODED_SPLUNK_LICENSE: ""
   shell: |
     # Get a free Maxmind license here: https://www.maxmind.com/en/geolite2/signup
     # Required for the ASNgen app to work: https://splunkbase.splunk.com/app/3531/
     export MAXMIND_LICENSE=
     if [ -z $MAXMIND_LICENSE ]; then
-      echo "Note: You have not entered a MaxMind license key on line 5 of bootstrap.sh, so the ASNgen Splunk app may not work correctly."
+      echo "Note: You have not entered a MaxMind license key in the 'Install Splunk' Ansible task, so the ASNgen Splunk app may not work correctly."
       echo "However, it is not required and everything else should function correctly."
     fi
 
@@ -225,6 +228,13 @@
         mkdir /opt/splunk/etc/apps/TA-asngen/local 
         cp /opt/splunk/etc/apps/TA-asngen/default/asngen.conf /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
         sed -i "s/license_key =/license_key = $MAXMIND_LICENSE/g" /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
+      fi
+
+      # Install a Splunk license if it was provided
+      if [ -n $BASE64_ENCODED_SPLUNK_LICENSE ]; then
+        echo "$BASE64_ENCODED_SPLUNK_LICENSE" | base64 -d > /tmp/Splunk.License
+        /opt/splunk/bin/splunk add licenses /tmp/Splunk.License
+        rm /tmp/Splunk.License
       fi
 
       # Replace the props.conf for Sysmon TA and Windows TA
