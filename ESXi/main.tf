@@ -16,7 +16,7 @@ provider "esxi" {
 #########################################
 resource "esxi_guest" "logger" {
   guest_name = "logger"
-  disk_store = "datastore1"
+  disk_store = var.esxi_datastore
   guestos    = "ubuntu-64"
 
   boot_disk_type = "thin"

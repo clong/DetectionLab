@@ -18,6 +18,10 @@ variable "esxi_username" {
 variable "esxi_password" { # Unspecified will prompt
 }
 
+variable "esxi_datastore" {
+  default = "datastore1"
+}
+
 variable "vm_network" {
   default = "VM Network"
 }

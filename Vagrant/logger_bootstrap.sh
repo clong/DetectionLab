@@ -10,6 +10,7 @@ fi
 sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr +i /etc/resolv.conf
 
 # Source variables from logger_variables.sh
+# shellcheck disable=SC1091
 source ./logger_variables.sh
 
 if [ -z "$MAXMIND_LICENSE" ]; then
