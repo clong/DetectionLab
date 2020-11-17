@@ -176,7 +176,7 @@ install_splunk() {
     fi
 
     # Install a Splunk license if it was provided
-    if [ -n $BASE64_ENCODED_SPLUNK_LICENSE ]; then
+    if [ -n "$BASE64_ENCODED_SPLUNK_LICENSE" ]; then
       echo "$BASE64_ENCODED_SPLUNK_LICENSE" | base64 -d > /tmp/Splunk.License
       /opt/splunk/bin/splunk add licenses /tmp/Splunk.License -auth 'admin:changeme'
       rm /tmp/Splunk.License
