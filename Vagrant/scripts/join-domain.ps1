@@ -32,11 +32,6 @@ If ($hostname -eq "wef") {
   Add-Computer -DomainName "windomain.local" -credential $DomainCred -PassThru
 }
 
-# Set auto login
-Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name AutoAdminLogon -Value 1
-Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name DefaultUserName -Value "vagrant"
-Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name DefaultPassword -Value "vagrant"
-
 # Stop Windows Update
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disabling Windows Updates and Windows Module Services"
 Set-Service wuauserv -StartupType Disabled

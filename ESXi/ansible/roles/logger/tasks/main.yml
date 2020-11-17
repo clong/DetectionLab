@@ -383,8 +383,6 @@
     fleetctl get options > /tmp/options.yaml
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
-    # Fleet 3.0 requires the "kind" to be "options" instead of "option"
-    # sed -i 's/kind: option/kind: options/g' /tmp/options.yaml # Not needed with change to fleetdm/fleet
     fleetctl apply -f /tmp/options.yaml
 
     # Use fleetctl to import YAML files
