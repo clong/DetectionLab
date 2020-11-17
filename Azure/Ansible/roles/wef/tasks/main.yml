@@ -1,7 +1,12 @@
 ---
-# This needs to be made idempodent
+
 - name: Set HostOnly DNS Address
-  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet -ServerAddresses 192.168.38.102,8.8.8.8"
+  win_dns_client:
+    adapter_names: '*'
+    ipv4_addresses:
+      - 192.168.38.102
+      - 8.8.8.8
+    log_path: C:\dns_log.txt
 
 - name: Install git
   win_chocolatey:
@@ -48,8 +53,20 @@
     dest: "C:\\Users\\vagrant\\AppData\\Local\\Temp\\Microsoft ATA 1.9.iso"
     timeout: 3600
 
-- name: Clear Event Logs
-  win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
+- name: Check if DetectionLab Clear Event Logs has been done
+  win_stat:
+    path: 'c:\Windows\.detectionlab_clear_done'
+  register: clearevt
+
+- block:
+    - name: Clear Event Logs
+      win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
+
+    - name: Add marker for DetectionLab Clear Event
+      win_file:
+        path: 'c:\Windows\.detectionlab_clear_done'
+        state: touch
+  when: not clearevt.stat.exists
 
 - name: Downloading the Palantir WEF Configuration
   win_shell: ".\\download_palantir_wef.ps1"
@@ -95,10 +112,12 @@
   win_shell: ".\\configure-pslogstranscriptsshare.ps1"
   args:
     chdir: 'c:\vagrant\scripts'
+    creates: c:\pslogs
   register: pstranscriptshare
   failed_when: "'Exception' in pstranscriptshare.stdout"
 
 - debug: msg="{{ pstranscriptshare.stdout_lines }}"
+  when: pstranscriptshare.stdout_lines is defined
 
 - name: Installing the EVTX Event Samples
   win_shell: ".\\install-evtx-attack-samples.ps1"
