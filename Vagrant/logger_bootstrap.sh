@@ -168,6 +168,9 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_144.tgz -auth 'admin:changeme'
+    
+    # Fix ASNGen App - https://github.com/doksu/TA-asngen/issues/18#issuecomment-685691630
+    echo 'python.version = python2' >> /opt/splunk/etc/apps/TA-asngen/default/commands.conf
 
     # Install the Maxmind license key for the ASNgen App if it was provided
     if [ -n "$MAXMIND_LICENSE" ]; then
