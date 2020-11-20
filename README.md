@@ -34,45 +34,32 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 * osquery comes installed on each host and is pre-configured to connect to a [Fleet](https://kolide.co/fleet) server via TLS. Fleet is preconfigured with the configuration from [Palantir's osquery Configuration](https://github.com/palantir/osquery-configuration)
 * Sysmon is installed and configured using [Olaf Hartong's open-sourced Sysmon configuration](https://github.com/olafhartong/sysmon-modular)
 * All autostart items are logged to Windows Event Logs via [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog)
-* SMBv1 Auditing is enabled
-
-## Requirements for VMware or Virtualbox
-* 55GB+ of free disk space
-* 16GB+ of RAM
-* Packer 1.6.0 or newer
-* Vagrant 2.2.9 or newer
-* Virtualbox or VMWare Fusion/Workstation
+* Zeek and Suricata are pre-configured to monitor and alert on network traffic
+* Apache Guacamole is installed to easily access all hosts from your local browser
 
 ---
 
 ## Building Detection Lab
 
-Please view the quickstart guides based on the operating system you are using. The AWS and Azure deployment options for DetectionLab can be launched from any operating system.
-
-* [AWS via Terraform](https://github.com/clong/DetectionLab/wiki/Quickstart---AWS-(Terraform))
-* [Azure via Terraform & Ansible](https://github.com/clong/DetectionLab/tree/master/Azure)
-* [MacOS](https://github.com/clong/DetectionLab/wiki/Quickstart---MacOS)
-* [Windows](https://github.com/clong/DetectionLab/wiki/Quickstart---Windows)
-* [Linux](https://github.com/clong/DetectionLab/wiki/Quickstart-Linux)
-* [ESXi](https://github.com/clong/DetectionLab/tree/master/ESXi)
-
----
-
-## Basic Vagrant Usage
-
-Moved to the wiki: [Basic Vagrant Usage](https://github.com/clong/DetectionLab/wiki/Vagrant-Usage)
+* [Prerequisites](https://www.detectionlab.network/introduction/prerequisites/)
+* [MacOS - Virtualbox or VMware Fusion](https://www.detectionlab.network/deployment/macosvm/)
+* [Windows - Virtualbox or VMware Workstation](https://www.detectionlab.network/deployment/windowsvm/)
+* [Linux - Virtualbox or VMware Workstation](https://www.detectionlab.network/deployment/linuxvm/)
+* [AWS via Terraform](https://www.detectionlab.network/deployment/aws/)
+* [Azure via Terraform & Ansible](https://www.detectionlab.network/deployment/azure/)
+* [ESXi via Terraform & Ansible](https://www.detectionlab.network/deployment/esxi/)
+* [HyperV](https://www.detectionlab.network/deployment/hyperv/)
+* [LibVirt](https://www.detectionlab.network/deployment/libvirt/)
 
 ---
 
-## Lab Information
+## DetectionLab Documentation
 
-Moved to the wiki: [Lab Information & Credentials](https://github.com/clong/DetectionLab/wiki/Lab-Information-&-Credentials)
+The primary documentation site is located at https://detectionlab.network
 
----
-
-## Known Issues and Workarounds
-
-Moved to the wiki: [Known Issues and Workarounds](https://github.com/clong/DetectionLab/wiki/Known-Issues-and-Workarounds)
+* [Basic Vagrant Usage](https://www.detectionlab.network/introduction/basicvagrant/)
+* [Lab Information & Credentials](https://www.detectionlab.network/introduction/infoandcreds/)
+* [Troubleshooting and Known Issues](https://www.detectionlab.network/deployment/troubleshooting/)
 
 ---
 
@@ -110,4 +97,38 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [sysmon-modular](https://github.com/olafhartong/sysmon-modular)
 * [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team)
 * [Hunting for Beacons](http://findingbad.blogspot.com/2020/05/hunting-for-beacons-part-2.html)
+* [Velociraptor](https://github.com/Velocidex/velociraptor)
 * [BadBlood](https://github.com/davidprowe/BadBlood)
+* [PurpleSharp](https://github.com/mvelazc0/PurpleSharp)
+* [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES)
+
+# DetectionLab Sponsors
+#### Lated updated: 9/16/2020
+I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
+
+### Diamond Sponsors:
+* [Veramine](https://github.com/veramine)
+* [Thinkst](https://github.com/ThinkstAppliedResearch)
+* [csterner82](https://github.com/csterner82)
+* [swizzlez](https://github.com/swizzlez)
+* [CyDefUnicorn](https://github.com/CyDefUnicorn)
+* [olliencc](https://github.com/olliencc)
+
+### Premium Sponsors:
+* [mikeesparza](https://github.com/mikeesparza)
+* [dlee35](https://github.com/dlee35)
+* [chrissanders](https://github.com/chrissanders)
+* [punchdrunktux](https://github.com/punchdrunktux)
+* [jaredhaight](https://github.com/jaredhaight)
+* [iamfuntime](https://github.com/iamfuntime)
+* [Luct0r](https://github.com/Luct0r)
+
+### Standard Sponsors:
+* [dtonomy](https://github.com/dtonomy)
+* [braimee](https://github.com/braimee)
+* [iLoC0dez](https://github.com/iLoC0dez)
+* [defensivedepth](https://github.com/defensivedepth)
+* [elreydetoda](https://github.com/elreydetoda)
+* [kafkaesqu3](https://github.com/kafkaesqu3)
+* [anthonysecurity](https://github.com/anthonysecurity)
+* +2 private sponsors

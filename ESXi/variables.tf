@@ -18,12 +18,12 @@ variable "esxi_username" {
 variable "esxi_password" { # Unspecified will prompt
 }
 
-variable "vm_network" {
-  default = "VM Network"
+variable "esxi_datastore" {
+  default = "datastore1"
 }
 
-variable "nat_network" {
-  default = "NAT Network"
+variable "vm_network" {
+  default = "VM Network"
 }
 
 variable "hostonly_network" {

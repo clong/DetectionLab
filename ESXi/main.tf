@@ -16,7 +16,7 @@ provider "esxi" {
 #########################################
 resource "esxi_guest" "logger" {
   guest_name = "logger"
-  disk_store = "datastore1"
+  disk_store = var.esxi_datastore
   guestos    = "ubuntu-64"
 
   boot_disk_type = "thin"
@@ -30,8 +30,8 @@ resource "esxi_guest" "logger" {
 
     provisioner "remote-exec" {
     inline = [
-      "sudo ifconfig up eth1 || echo 'eth1 up'",
-      "sudo ifconfig up eth2 || echo 'eth2 up'",
+      "sudo ifconfig eth1 up || echo 'eth1 up'",
+      "sudo ifconfig eth2 up || echo 'eth2 up'",
       "sudo route add default gw 192.168.76.1 || echo 'route exists'"
     ]
 
@@ -43,15 +43,11 @@ resource "esxi_guest" "logger" {
     }
   }
   # This is the network that bridges your host machine with the ESXi VM
+  # If this interface doesn't provide connectivity, you will have to uncomment
+  # the interface below and add a virtual network that does
   network_interfaces {
     virtual_network = var.vm_network
     mac_address     = "00:50:56:a3:b1:c2"
-    nic_type        = "e1000"
-  }
-  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
-  network_interfaces {
-    virtual_network = var.nat_network
-    mac_address     = "00:50:56:a3:b1:c3"
     nic_type        = "e1000"
   }
   # This is the local network that will be used for 192.168.38.x addressing
@@ -60,6 +56,13 @@ resource "esxi_guest" "logger" {
     mac_address     = "00:50:56:a3:b1:c4"
     nic_type        = "e1000"
   }
+  # OPTIONAL: Uncomment out this interface stanza if your vm_network doesn't 
+  # provide internet access
+  # network_interfaces {
+  #  virtual_network = var.nat_network
+  #  mac_address     = "00:50:56:a3:b1:c3"
+  #  nic_type        = "e1000"
+  # }
   guest_startup_timeout  = 45
   guest_shutdown_timeout = 30
 }
@@ -81,12 +84,6 @@ resource "esxi_guest" "dc" {
   network_interfaces {
     virtual_network = var.vm_network
     mac_address     = "00:50:56:a1:b1:c2"
-    nic_type        = "e1000"
-  }
-  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
-  network_interfaces {
-    virtual_network = var.nat_network
-    mac_address     = "00:50:56:a1:b1:c3"
     nic_type        = "e1000"
   }
   # This is the local network that will be used for 192.168.38.x addressing
@@ -118,12 +115,6 @@ resource "esxi_guest" "wef" {
     mac_address     = "00:50:56:a1:b2:c2"
     nic_type        = "e1000"
   }
-  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
-  network_interfaces {
-    virtual_network = var.nat_network
-    mac_address     = "00:50:56:a1:b3:c3"
-    nic_type        = "e1000"
-  }
   # This is the local network that will be used for 192.168.38.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
@@ -151,12 +142,6 @@ resource "esxi_guest" "win10" {
   network_interfaces {
     virtual_network = var.vm_network
     mac_address     = "00:50:56:a2:b1:c2"
-    nic_type        = "e1000"
-  }
-  # OPTIONAL: You can comment out this interface stanza if your vm_network provides internet access
-  network_interfaces {
-    virtual_network = var.nat_network
-    mac_address     = "00:50:56:a2:b1:c3"
     nic_type        = "e1000"
   }
   # This is the local network that will be used for 192.168.38.x addressing

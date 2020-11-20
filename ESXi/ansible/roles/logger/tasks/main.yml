@@ -20,7 +20,7 @@
 
 - name: Copy bootstrap file
   copy:
-    src: ../../Vagrant/bootstrap.sh
+    src: ../../Vagrant/logger_bootstrap.sh
     dest: /home/vagrant
     owner: vagrant
     group: vagrant
@@ -159,12 +159,15 @@
   args: 
     executable: /bin/bash
   become: yes
+  environment:
+    MAXMIND_LICENSE: ""
+    BASE64_ENCODED_SPLUNK_LICENSE: ""
   shell: |
     # Get a free Maxmind license here: https://www.maxmind.com/en/geolite2/signup
     # Required for the ASNgen app to work: https://splunkbase.splunk.com/app/3531/
     export MAXMIND_LICENSE=
     if [ -z $MAXMIND_LICENSE ]; then
-      echo "Note: You have not entered a MaxMind license key on line 5 of bootstrap.sh, so the ASNgen Splunk app may not work correctly."
+      echo "Note: You have not entered a MaxMind license key in the 'Install Splunk' Ansible task, so the ASNgen Splunk app may not work correctly."
       echo "However, it is not required and everything else should function correctly."
     fi
 
@@ -208,6 +211,7 @@
       /opt/splunk/bin/splunk add index zeek -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index threathunting -auth 'admin:changeme'
+      /opt/splunk/bin/splunk add index evtx_attack_samples -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_700.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-sysmon_1062.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_110.tgz -auth 'admin:changeme'
@@ -217,12 +221,10 @@
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
-      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_143.tgz -auth 'admin:changeme'
-
-      ## Fix a bug with the ThreatHunting App (https://github.com/olafhartong/ThreatHunting/pull/57)
-      mv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmonevencodes.csv /opt/splunk/etc/apps/ThreatHunting/lookups/sysmoneventcodes.csv
-      sed -i 's/= sysmoneventcode /= sysmoneventcodes.csv /g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
-      sed -i 's/sysmoneventcode.csv/sysmoneventcodes.csv/g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
+      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_144.tgz -auth 'admin:changeme'
+      
+      # Fix ASNGen App - https://github.com/doksu/TA-asngen/issues/18#issuecomment-685691630
+      echo 'python.version = python2' >> /opt/splunk/etc/apps/TA-asngen/default/commands.conf
 
       # Install the Maxmind license key for the ASNgen App
       if [ ! -z $MAXMIND_LICENSE ]; then
@@ -231,8 +233,24 @@
         sed -i "s/license_key =/license_key = $MAXMIND_LICENSE/g" /opt/splunk/etc/apps/TA-asngen/local/asngen.conf
       fi
 
+      # Install a Splunk license if it was provided
+      if [ -n $BASE64_ENCODED_SPLUNK_LICENSE ]; then
+        echo "$BASE64_ENCODED_SPLUNK_LICENSE" | base64 -d > /tmp/Splunk.License
+        /opt/splunk/bin/splunk add licenses /tmp/Splunk.License
+        rm /tmp/Splunk.License
+      fi
+
+      # Replace the props.conf for Sysmon TA and Windows TA
+      # Removed all the 'rename = xmlwineventlog' directives
+      # I know youre not supposed to modify files in "default",
+      # but for some reason adding them to "local" wasnt working
+      cp /vagrant/resources/splunk_server/windows_ta_props.conf /opt/splunk/etc/apps/Splunk_TA_windows/default/props.conf
+      cp /vagrant/resources/splunk_server/sysmon_ta_props.conf /opt/splunk/etc/apps/TA-microsoft-sysmon/default/props.conf
+
       # Add custom Macro definitions for ThreatHunting App
       cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
+      # Fix props.conf in ThreatHunting App
+      sed -i 's/EVAL-host_fqdn = Computer/EVAL-host_fqdn = ComputerName/g' /opt/splunk/etc/apps/ThreatHunting/default/props.conf
       # Fix Windows TA macros
       mkdir /opt/splunk/etc/apps/Splunk_TA_windows/local
       cp /opt/splunk/etc/apps/Splunk_TA_windows/default/macros.conf /opt/splunk/etc/apps/Splunk_TA_windows/local
@@ -263,8 +281,6 @@
       dismissedInstrumentationOptInVersion = 4
       notification_python_3_impact = false
       display.page.home.dashboardId = /servicesNS/nobody/search/data/ui/views/logger_dashboard' > /opt/splunk/etc/users/admin/user-prefs/local/user-prefs.conf
-      # Disable the instrumentation popup
-      echo -e "showOptInModal = 0\noptInVersionAcknowledged = 4" >>/opt/splunk/etc/apps/splunk_instrumentation/local/telemetry.conf
       # Enable SSL Login for Splunk
       echo -e "[settings]\nenableSplunkWebSSL = true" >/opt/splunk/etc/system/local/web.conf
       # Copy over the Logger Dashboard
@@ -275,8 +291,6 @@
       # Reboot Splunk to make changes take effect
         /opt/splunk/bin/splunk restart
         /opt/splunk/bin/splunk enable boot-start
-        # Generate the ASN lookup table
-        /opt/splunk/bin/splunk search "|asngen | outputlookup asn" -auth 'admin:changeme'
       fi
   register: install_splunk
   changed_when: "'The Splunk web interface is at https://logger:8000' in install_splunk.stdout"
@@ -292,7 +306,7 @@
       cd /opt || exit 1
 
       echo "[$(date +%H:%M:%S)]: Installing Fleet..."
-      echo -e "\n127.0.0.1       kolide" >>/etc/hosts
+      echo -e "\n127.0.0.1       fleet" >>/etc/hosts
       echo -e "\n127.0.0.1       logger" >>/etc/hosts
 
       # Set MySQL username and password, create kolide database
@@ -300,7 +314,7 @@
       mysql -uroot -pkolide -e "create database kolide;"
 
       # Always download the latest release of Fleet
-      curl -s https://api.github.com/repos/kolide/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
+      curl -s https://api.github.com/repos/fleetdm/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
       unzip fleet.zip -d fleet
       cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
       cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
@@ -372,8 +386,6 @@
     fleetctl get options > /tmp/options.yaml
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
     /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
-    # Fleet 3.0 requires the "kind" to be "options" instead of "option"
-    sed -i 's/kind: option/kind: options/g' /tmp/options.yaml
     fleetctl apply -f /tmp/options.yaml
 
     # Use fleetctl to import YAML files
@@ -387,8 +399,8 @@
     # Files must exist before splunk will add a monitor
     touch /var/log/fleet/osquery_result
     touch /var/log/fleet/osquery_status
-    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme'
-    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme'
+    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
+    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
   register: fleet_osquery_config
   failed_when: "'error' in fleet_osquery_config.stderr"
   changed_when: "'Fleet login successful and context configured!' in fleet_osquery_config.stdout"
@@ -401,7 +413,7 @@
     echo "[$(date +%H:%M:%S)]: Installing Velociraptor..."
     mkdir /opt/velociraptor
     echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
-    LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep 'linux-amd64' | grep -Eo "/(?[^\"]+)" | grep amd | sed 's#^#https://github.com#g')
+    LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
     echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
     echo "[$(date +%H:%M:%S)]: Attempting to download..."
     wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
@@ -608,6 +620,6 @@
     # Include Splunk and Zeek in the PATH
     echo export PATH="$PATH:/opt/splunk/bin:/opt/zeek/bin" >>~/.bashrc
     # Ping DetectionLab server for usage statistics
-    curl -s -A "DetectionLab-logger" "https://detectionlab.network/logger"
+    curl -s -A "DetectionLab-logger" "https:/ping.detectionlab.network/logger" || echo "Unable to connect to ping.detectionlab.network"
 
 

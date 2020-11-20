@@ -15,6 +15,8 @@ if ("$env:PACKER_BUILDER_TYPE" -eq "vmware-iso") {
 
     if (!(Test-Path "C:\Windows\Temp\windows.iso")) {
         Try {
+            # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
+            $ProgressPreference = 'SilentlyContinue'
             $pageContentLinks = (Invoke-WebRequest('https://softwareupdate.vmware.com/cds/vmw-desktop/ws') -UseBasicParsing).Links | where-object {$_.href -Match "[0-9]"} | Select-Object href | % { $_.href.Trim('/') }
             $versionObject = $pageContentLinks | %{ new-object System.Version ($_) } | sort-object -Descending | select-object -First 1 -Property:Major,Minor,Build
             $newestVersion = $versionObject.Major.ToString()+"."+$versionObject.Minor.ToString()+"."+$versionObject.Build.ToString() | out-string
@@ -36,7 +38,16 @@ if ("$env:PACKER_BUILDER_TYPE" -eq "vmware-iso") {
     }
 
     cmd /c "C:\PROGRA~1\7-Zip\7z.exe" x "C:\Windows\Temp\windows.iso" -oC:\Windows\Temp\VMWare
-    cmd /c C:\Windows\Temp\VMWare\setup.exe /S /v"/qn REBOOT=R\"
+    cmd /c C:\Windows\Temp\VMWare\setup.exe /S /v "/qn REBOOT=R"
+    $software = "VMware Tools";
+    $installed = (Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where { $_.DisplayName -eq $software }) -ne $null
+
+    If (-Not $installed) {
+        Write-Host "'$software' did not install successfully. Quitting.";
+        exit 1
+    } Else {
+        Write-Host "'$software' was installed successfully."
+    }
 
     Remove-Item -Force "C:\Windows\Temp\vmware-tools.tar"
     Remove-Item -Force "C:\Windows\Temp\windows.iso"

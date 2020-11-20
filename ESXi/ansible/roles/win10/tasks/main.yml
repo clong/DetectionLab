@@ -10,10 +10,10 @@
   when: res.reboot_required
 
 - name: Set HostOnly IP Address
-  win_shell: "New-NetIPAddress –InterfaceAlias Ethernet2 –AddressFamily IPv4 -IPAddress 192.168.38.104 –PrefixLength 24 -DefaultGateway 192.168.38.1"
+  win_shell: "$adapter = (get-netadapter | where {$_.MacAddress -eq '00-50-56-A2-B1-C4'}).Name; New-NetIPAddress –InterfaceAlias $adapter –AddressFamily IPv4 -IPAddress 192.168.38.104 –PrefixLength 24 -DefaultGateway 192.168.38.1"
 
 - name: Set HostOnly DNS Address
-  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet2 -ServerAddresses 192.168.38.102,8.8.8.8"
+  win_shell: "$adapter = (get-netadapter | where {$_.MacAddress -eq '00-50-56-A2-B1-C4'}).Name; Set-DnsClientServerAddress -InterfaceAlias $adapter -ServerAddresses 192.168.38.102,8.8.8.8"
 
 - name: Install git
   win_chocolatey:

@@ -2,10 +2,10 @@
 
 If (-not (Test-Path "C:\ProgramData\chocolatey")) {
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-  Write-Host "Installing Chocolatey"
-  iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Chocolatey"
+  Invoke-Expression ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
 } else {
-  Write-Host "Chocolatey is already installed."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Chocolatey is already installed."
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing utilities..."
@@ -17,4 +17,4 @@ If ($(hostname) -eq "win10") {
 }
 choco install -y --limit-output --no-progress NotepadPlusPlus GoogleChrome WinRar 
 
-Write-Host "Utilties installation complete!"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Utilties installation complete!"

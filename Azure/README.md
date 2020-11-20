@@ -1,7 +1,5 @@
 # Building DetectionLab on Azure
 
-NOTE: This is an early release and it's possible that certain features may not work perfectly for everyone yet
-
 ## Prereqs (~30-60 minutes)
 0. Have an active [Azure account](https://azure.microsoft.com/en-us/free/). If you don't have one yet, they give you $200 worth of credit to use within the first 30 days!
 1. [Install Terraform](https://www.terraform.io/downloads.html) and move it to a directory included in your system's PATH.
@@ -87,9 +85,10 @@ If you run into any issues along the way, please open an issue on Github and I'l
 * If an Ansible playbook fails (and they sometimes do), you can pick up where it left off with `ansible-playbook -vvv detectionlab.yml --tags="hostname-goes-here" --start-at-task="taskname"`
 * "Installing Red Team Tooling" hangs if AV isn't disabled successfully
 * It seems like sometimes the logger provisioning "errors" somewhere and causes the box to become tained, despite the provision being successful. Work around this by untainting it: `terraform untaint azurerm_virtual_machine.dc`
+* If running Ansible causes a `fork()` related error message, set the following environment variable before running Ansible: `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`. More on this [here](https://github.com/clong/DetectionLab/issues/543).
 
 ## Future work required
-* It probably makes sense to abstract all of the logic in `bootstrap.sh` into individual Ansible tasks
+* It probably makes sense to abstract all of the logic in `logger_bootstrap.sh` into individual Ansible tasks
 * I imagine there's a streamlined way to get the results of `terraform output` into the `inventory.yml` for Ansible.
 * I'm guessing there's a way to parallelize some of this execution or make some of it asynchronous: https://medium.com/developer-space/parallel-playbook-execution-in-ansible-30799ccda4e0 and https://docs.ansible.com/ansible/latest/user_guide/playbooks_async.html
 

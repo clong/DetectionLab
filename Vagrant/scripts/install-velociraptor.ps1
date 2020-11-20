@@ -12,8 +12,12 @@ If (Select-String -Path "c:\windows\system32\drivers\etc\hosts" -Pattern "logger
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Velociraptor..."
 # GitHub requires TLS 1.2 as of 2/27
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+# Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
+$ProgressPreference = 'SilentlyContinue'
 $tag = (Invoke-WebRequest "https://api.github.com/repos/Velocidex/velociraptor/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
-$velociraptorDownloadUrl = "https://github.com/Velocidex/velociraptor/releases/download/$tag/velociraptor-$tag-windows-amd64.msi"
+# Workaround hardcoded URL until this issue gets fixed: https://github.com/Velocidex/velociraptor/issues/528
+$velociraptorDownloadUrl = "https://github.com/Velocidex/velociraptor/releases/download/v0.4.7/velociraptor-v0.4.7-1-windows-amd64.msi"
+#$velociraptorDownloadUrl = "https://github.com/Velocidex/velociraptor/releases/download/$tag/velociraptor-$tag-windows-amd64.msi"
 $velociraptorMSIPath = 'C:\Users\vagrant\AppData\Local\Temp\velociraptor.msi'
 $velociraptorLogFile = 'c:\Users\vagrant\AppData\Local\Temp\velociraptor_install.log'
 If (-not (Test-Path $velociraptorLogFile)) {
@@ -25,7 +29,7 @@ If (-not (Test-Path $velociraptorLogFile)) {
   Restart-Service Velociraptor
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Velociraptor successfully installed!"
 } Else {
-  Write-Host "Velociraptor was already installed. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Velociraptor was already installed. Moving On."
 }
 If ((Get-Service -name Velociraptor).Status -ne "Running")
 {

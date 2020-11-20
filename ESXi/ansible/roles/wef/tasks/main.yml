@@ -11,11 +11,11 @@
 
 # This needs to be made idempodent
 - name: Set HostOnly IP Address
-  win_shell: "New-NetIPAddress –InterfaceAlias Ethernet2 –AddressFamily IPv4 -IPAddress 192.168.38.103 –PrefixLength 24 -DefaultGateway 192.168.38.1"
+  win_shell: "$adapter = (get-netadapter | where {$_.MacAddress -eq '00-50-56-A1-B4-C4'}).Name; New-NetIPAddress –InterfaceAlias $adapter –AddressFamily IPv4 -IPAddress 192.168.38.103 –PrefixLength 24 -DefaultGateway 192.168.38.1"
 
 # This needs to be made idempodent
 - name: Set HostOnly DNS Address
-  win_shell: "Set-DnsClientServerAddress -InterfaceAlias Ethernet2 -ServerAddresses 192.168.38.102,8.8.8.8"
+  win_shell: "$adapter = (get-netadapter | where {$_.MacAddress -eq '00-50-56-A1-B4-C4'}).Name; Set-DnsClientServerAddress -InterfaceAlias $adapter -ServerAddresses 192.168.38.102,8.8.8.8"
 
 - name: Install git
   win_chocolatey:
@@ -105,6 +105,15 @@
   failed_when: "'Exception' in pstranscriptshare.stdout"
 
 - debug: msg="{{ pstranscriptshare.stdout_lines }}"
+
+- name: Installing the EVTX Event Samples
+  win_shell: ".\\install-evtx-attack-samples.ps1"
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: evtxeventsamples
+  failed_when: "'Exception' in evtxeventsamples.stdout"
+
+- debug: msg="{{ evtxeventsamples.stdout_lines }}"
 
 - name: Installing Microsoft Advanced Threat Analytics
   win_shell: ".\\install-microsoft-ata.ps1"

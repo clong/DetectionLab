@@ -12,7 +12,7 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-  Write-Host "Disable Windows Defender GPO was already linked at $OU. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disable Windows Defender GPO was already linked at $OU. Moving On."
 }
 $OU = "ou=Servers,dc=windomain,dc=local"
 $gPLinks = $null
@@ -24,6 +24,6 @@ If ($gPLinks.LinkedGroupPolicyObjects -notcontains $gpo.path)
 }
 else
 {
-  Write-Host "Disable Windows Defender GPO was already linked at $OU. Moving On."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disable Windows Defender GPO was already linked at $OU. Moving On."
 }
 gpupdate /force

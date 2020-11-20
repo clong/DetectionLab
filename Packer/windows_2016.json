@@ -93,7 +93,8 @@
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
       "winrm_timeout": "4h",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "shutdown_command": "a:/sysprep.bat",
+      "shutdown_timeout": "2h",
       "accelerator": "kvm",
       "disk_size": "{{user `disk_size`}}",
       "output_directory": "{{ user `packer_build_dir`}}",
@@ -142,7 +143,8 @@
       "type": "powershell",
       "scripts": [
         "./scripts/vm-guest-tools.ps1",
-        "./scripts/debloat-windows.ps1"
+        "./scripts/debloat-windows.ps1",
+        "./scripts/download-microsoft-ata.ps1"
       ]
     },
     {
