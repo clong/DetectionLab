@@ -80,7 +80,7 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [Microsoft Advanced Threat Analytics](https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics)
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)
-* [Fleet](https://kolide.co/fleet)
+* [Fleet](https://github.com/fleetdm/fleet)
 * [Windows Event Forwarding for Network Defense](https://medium.com/@palantir/windows-event-forwarding-for-network-defense-cb208d5ff86f)
 * [palantir/windows-event-forwarding](http://github.com/palantir/windows-event-forwarding)
 * [osquery Across the Enterprise](https://medium.com/@palantir/osquery-across-the-enterprise-3c3c9d13ec55)
