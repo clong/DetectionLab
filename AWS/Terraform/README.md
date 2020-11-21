@@ -1,5 +1,12 @@
 # DetectionLab Terraform
 
+## Cost
+```
+terraform state pull |  curl -s -X POST -H "Content-Type: application/json" -d @- https://cost.modules.tf/
+{"hourly": 0.17, "monthly": 123.26}
+```
+---
+
 ### Method 1 - Pre-built AMIs
 
 #### Estimated time to build: 30 minutes
