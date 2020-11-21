@@ -11,7 +11,9 @@ sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr
 
 # Source variables from logger_variables.sh
 # shellcheck disable=SC1091
-source ./logger_variables.sh
+source /vagrant/logger_variables.sh 2>/dev/null || \
+source /home/vagrant/logger_variables.sh 2>/dev/null || \
+echo "Unable to locate logger_variables.sh"
 
 if [ -z "$MAXMIND_LICENSE" ]; then
   echo "Note: You have not entered a MaxMind API key in logger_variables.sh, so the ASNgen Splunk app may not work correctly."

@@ -10,6 +10,7 @@ function download {
     $wc = New-Object System.Net.WebClient
     try {
       $result = $wc.DownloadString($URL)
+      
       if ($result -like "*$PatternToMatch*") {
         return $true
       } else {
@@ -40,7 +41,7 @@ function post_build_checks {
     Write-Host ''
 
     Write-Host '[*] Verifying that Fleet is reachable...'
-    $FLEET_CHECK = download -URL 'https://192.168.38.105:8412' -PatternToMatch 'Kolide Fleet'
+    $FLEET_CHECK = download -URL 'https://192.168.38.105:8412' -PatternToMatch 'Fleet for osquery'
     if ($FLEET_CHECK -eq $false) {
         Write-Host '[!] Fleet was unreachable and may not have installed correctly.' -ForegroundColor red
     }
@@ -60,7 +61,7 @@ function post_build_checks {
     Write-Host ''
 
     Write-Host '[*] Verifying that Velociraptor is reachable...'
-    $VELOCIRAPTOR_CHECK = download -URL 'https://192.168.38.105:9999' -PatternToMatch 'app.html'
+    $VELOCIRAPTOR_CHECK = download -URL 'https://192.168.38.105:9999' -SuccessOn401
     if ($VELOCIRAPTOR_CHECK -eq $false) {
         Write-Host '[!] Velociraptor was unreachable and may not have installed correctly.' -ForegroundColor red
     }
