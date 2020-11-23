@@ -2,8 +2,8 @@ reset_static_ip() {
   # The bootstrap script assumes that there are two adapters and attempts to set the ip address
   # to the eth1 adapter. This corrects the 01-netcfg.yaml file
 
-	MAC=$(ip a | grep "link/ether" | cut -d ' ' -f 6)
-    cat > /etc/netplan/01-netcfg.yaml << EOL
+  MAC=$(ip a | grep "link/ether" | cut -d ' ' -f 6)
+  cat > /etc/netplan/01-netcfg.yaml << EOL
 network:
   ethernets:
     eth0:
@@ -18,7 +18,6 @@ network:
   version: 2
   renderer: networkd
 EOL
-
 }
 
 reset_static_ip
