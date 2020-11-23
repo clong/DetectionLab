@@ -30,7 +30,7 @@ During the build you will also have to select the virtual switch you want to use
 
 A really hacky workaround is, if you are using the smb_username and smb_password options, would be to press the option number corresponding with the virtual switch you want to use then enter four times after `vagrant up`. So, if you know you want the virtual switch 1 `vagrant up` 1 enter 1 enter 1 enter 1 enter 
 
-Yes, I know hacky but it works.  
+Yes, I know hacky, but it works.  
 
 ## How this build works 
 
