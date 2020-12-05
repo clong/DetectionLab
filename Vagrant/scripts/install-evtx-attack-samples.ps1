@@ -67,7 +67,7 @@ sourcetype = preprocess-winevt'
         } Catch {
           Start-Sleep 10
           Stop-Service -Name SplunkForwarder -Force
-          Start-Service -Name SplunkForwarder -Force
+          Start-Service -Name SplunkForwarder
         }
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Done! Look in 'index=EVTX-ATTACK-SAMPLES' in Splunk to query these samples."
     }
