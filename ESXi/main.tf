@@ -20,7 +20,6 @@ resource "esxi_guest" "logger" {
   guestos    = "ubuntu-64"
 
   boot_disk_type = "thin"
-  boot_disk_size = "35"
 
   memsize            = "4096"
   numvcpus           = "2"
