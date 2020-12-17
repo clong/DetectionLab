@@ -31,50 +31,50 @@ $sysmonConfigPath = "$sysmonDir\sysmonConfig.xml"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Autoruns64.exe..."
 Try { 
-  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Autoruns64.exe', $autorunsPath) 
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Autoruns64.exe'), $autorunsPath) 
 } Catch { 
   Write-Host "HTTPS connection failed. Switching to HTTP :("
-  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Autoruns64.exe', $autorunsPath) 
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Autoruns64.exe'), $autorunsPath) 
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Procmon.exe..."
 Try { 
-  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Procmon.exe', $procmonPath)
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Procmon.exe'), $procmonPath)
 } Catch { 
   Write-Host "HTTPS connection failed. Switching to HTTP :("
-  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Procmon.exe', $procmonPath
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Procmon.exe'), $procmonPath
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading PsExec64.exe..."
 Try { 
-  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/PsExec64.exe', $psexecPath)
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/PsExec64.exe'), $psexecPath)
 } Catch { 
   Write-Host "HTTPS connection failed. Switching to HTTP :("
-  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/PsExec64.exe', $psexecPath)
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/PsExec64.exe'), $psexecPath)
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading procexp64.exe..."
 Try { 
-  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/procexp64.exe', $procexpPath)
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/procexp64.exe'), $procexpPath)
 } Catch { 
   Write-Host "HTTPS connection failed. Switching to HTTP :("
-  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/procexp64.exe', $procexpPath)
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/procexp64.exe'), $procexpPath)
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Sysmon64.exe..."
 Try { 
-  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Sysmon64.exe', $sysmonPath)
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Sysmon64.exe'), $sysmonPath)
 } Catch { 
   Write-Host "HTTPS connection failed. Switching to HTTP :("
-  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Sysmon64.exe', $sysmonPath)
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Sysmon64.exe'), $sysmonPath)
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Tcpview.exe..."
 Try { 
-  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Tcpview.exe', $tcpviewPath)
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Tcpview.exe'), $tcpviewPath)
 } Catch { 
   Write-Host "HTTPS connection failed. Switching to HTTP :("
-  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Tcpview.exe', $tcpviewPath)
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Tcpview.exe'), $tcpviewPath)
 }
 Copy-Item $sysmonPath $sysmonDir
 
