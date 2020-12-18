@@ -156,6 +156,21 @@
 - debug: msg="{{ rdp_gpo.stdout_lines }}"
   when: rdp_gpo.stdout_lines is defined
 
+- name: Configure Taskbar Layout GPO
+  win_shell: .\\configure-taskbar-layout-gpo.ps1
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: taskbar_gpo
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: windomain.local\vagrant
+    ansible_become_password: vagrant
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
+  failed_when: "'Exception' in taskbar_gpo.stderr"
+
+- debug: msg="{{ taskbar_gpo.stdout_lines }}"
+
 - name: Configure DC with raw Commands
   win_shell: "{{ item }}"
   with_items:

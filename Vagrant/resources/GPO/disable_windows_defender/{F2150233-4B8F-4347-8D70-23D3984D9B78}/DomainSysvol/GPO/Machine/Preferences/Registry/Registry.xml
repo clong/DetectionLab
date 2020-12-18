@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RegistrySettings clsid="{A3CCFC41-DFDB-43a5-8D26-0FE8B954DA51}"><Registry clsid="{9CD4B2F4-923D-47f5-A062-E897DD1DAD50}" name="EnableAmsi" status="EnableAmsi" image="10" changed="2020-12-02 21:13:55" uid="{7DF9C732-80E6-44B7-8803-5DFE6D7AAC8C}"><Properties action="C" displayDecimal="0" default="0" hive="HKEY_CURRENT_USER" key="SOFTWARE\Microsoft\Windows Script Host\Settings" name="EnableAmsi" type="REG_DWORD" value="00000000"/></Registry>
-</RegistrySettings>
