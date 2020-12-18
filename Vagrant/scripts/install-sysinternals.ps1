@@ -25,7 +25,9 @@ $procexpPath = "C:\Tools\Sysinternals\procexp64.exe"
 $sysmonPath = "C:\Tools\Sysinternals\Sysmon64.exe"
 $tcpviewPath = "C:\Tools\Sysinternals\Tcpview.exe"
 $sysmonConfigPath = "$sysmonDir\sysmonConfig.xml"
+$shortcutLocation = "$ENV:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs\"
 
+$WScriptShell = New-Object -ComObject WScript.Shell
 
 # Microsoft likes TLSv1.2 as well
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -36,6 +38,9 @@ Try {
   Write-Host "HTTPS connection failed. Switching to HTTP :("
   (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Autoruns64.exe', $autorunsPath) 
 }
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Autoruns.lnk")
+$Shortcut.TargetPath = $autorunsPath
+$Shortcut.Save()
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Procmon.exe..."
 Try { 
@@ -44,6 +49,9 @@ Try {
   Write-Host "HTTPS connection failed. Switching to HTTP :("
   (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Procmon.exe', $procmonPath)
 }
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Process Monitor.lnk")
+$Shortcut.TargetPath = $procmonPath
+$Shortcut.Save()
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading PsExec64.exe..."
 Try { 
@@ -60,6 +68,9 @@ Try {
   Write-Host "HTTPS connection failed. Switching to HTTP :("
   (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/procexp64.exe', $procexpPath)
 }
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Process Explorer.lnk")
+$Shortcut.TargetPath = $procexpPath
+$Shortcut.Save()
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Sysmon64.exe..."
 Try { 
@@ -68,6 +79,7 @@ Try {
   Write-Host "HTTPS connection failed. Switching to HTTP :("
   (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Sysmon64.exe', $sysmonPath)
 }
+Copy-Item $sysmonPath $sysmonDir
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Tcpview.exe..."
 Try { 
@@ -76,7 +88,12 @@ Try {
   Write-Host "HTTPS connection failed. Switching to HTTP :("
   (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Tcpview.exe', $tcpviewPath)
 }
-Copy-Item $sysmonPath $sysmonDir
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Tcpview.lnk")
+$Shortcut.TargetPath = $tcpviewPath
+$Shortcut.Save()
+
+# Restart Explorer so the taskbar shortcuts show up
+Stop-Process -ProcessName explorer -Force
 
 # Download Olaf Hartongs Sysmon config
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Olaf Hartong's Sysmon config..."
