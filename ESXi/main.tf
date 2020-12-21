@@ -68,7 +68,7 @@ resource "esxi_guest" "logger" {
 
 resource "esxi_guest" "dc" {
   guest_name = "dc"
-  disk_store = "datastore2"
+  disk_store = var.esxi_datastore
   guestos    = "windows9srv-64"
 
   boot_disk_type = "thin"
@@ -97,7 +97,7 @@ resource "esxi_guest" "dc" {
 
 resource "esxi_guest" "wef" {
   guest_name = "wef"
-  disk_store = "datastore2"
+  disk_store = var.esxi_datastore
   guestos    = "windows9srv-64"
 
   boot_disk_type = "thin"
@@ -126,7 +126,7 @@ resource "esxi_guest" "wef" {
 
 resource "esxi_guest" "win10" {
   guest_name = "win10"
-  disk_store = "datastore2"
+  disk_store = var.esxi_datastore
   guestos    = "windows9-64"
 
   boot_disk_type = "thin"
