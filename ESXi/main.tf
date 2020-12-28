@@ -18,6 +18,16 @@ resource "esxi_guest" "logger" {
   guest_name = "logger"
   disk_store = var.esxi_datastore
   guestos    = "ubuntu-64"
+  custom_vmx_settings = [
+    ['tools.syncTime', '0'], 
+    ['time.synchronize.continue', '0'], 
+    ['time.synchronize.restore', '0'], 
+    ['time.synchronize.resume.disk', '0'], 
+    ['time.synchronize.shrink', '0'],
+    ['time.synchronize.tools.startup', '0'],
+    ['time.synchronize.tools.enable', '0'],
+    ['time.synchronize.resume.host', '0']
+  ]
 
   boot_disk_type = "thin"
 
@@ -70,9 +80,18 @@ resource "esxi_guest" "dc" {
   guest_name = "dc"
   disk_store = var.esxi_datastore
   guestos    = "windows9srv-64"
+  custom_vmx_settings = [
+    ['tools.syncTime', '0'], 
+    ['time.synchronize.continue', '0'], 
+    ['time.synchronize.restore', '0'], 
+    ['time.synchronize.resume.disk', '0'], 
+    ['time.synchronize.shrink', '0'],
+    ['time.synchronize.tools.startup', '0'],
+    ['time.synchronize.tools.enable', '0'],
+    ['time.synchronize.resume.host', '0']
+  ]
 
   boot_disk_type = "thin"
-  boot_disk_size = "35"
 
   memsize            = "4096"
   numvcpus           = "2"
@@ -99,9 +118,18 @@ resource "esxi_guest" "wef" {
   guest_name = "wef"
   disk_store = var.esxi_datastore
   guestos    = "windows9srv-64"
+  custom_vmx_settings = [
+    ['tools.syncTime', '0'], 
+    ['time.synchronize.continue', '0'], 
+    ['time.synchronize.restore', '0'], 
+    ['time.synchronize.resume.disk', '0'], 
+    ['time.synchronize.shrink', '0'],
+    ['time.synchronize.tools.startup', '0'],
+    ['time.synchronize.tools.enable', '0'],
+    ['time.synchronize.resume.host', '0']
+  ]
 
   boot_disk_type = "thin"
-  boot_disk_size = "35"
 
   memsize            = "2048"
   numvcpus           = "2"
@@ -128,9 +156,18 @@ resource "esxi_guest" "win10" {
   guest_name = "win10"
   disk_store = var.esxi_datastore
   guestos    = "windows9-64"
+  custom_vmx_settings = [
+    ['tools.syncTime', '0'], 
+    ['time.synchronize.continue', '0'], 
+    ['time.synchronize.restore', '0'], 
+    ['time.synchronize.resume.disk', '0'], 
+    ['time.synchronize.shrink', '0'],
+    ['time.synchronize.tools.startup', '0'],
+    ['time.synchronize.tools.enable', '0'],
+    ['time.synchronize.resume.host', '0']
+  ]
 
   boot_disk_type = "thin"
-  boot_disk_size = "35"
 
   memsize            = "2048"
   numvcpus           = "2"
