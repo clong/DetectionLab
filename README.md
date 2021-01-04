@@ -9,7 +9,7 @@ DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to 
 ![Maintenance](https://img.shields.io/maintenance/yes/2021.svg?style=flat-square)
 [![GitHub last commit](https://img.shields.io/github/last-commit/clong/DetectionLab.svg?style=flat-square)](https://github.com/clong/DetectionLab/commit/master)
 [![Twitter](https://img.shields.io/twitter/follow/DetectionLab.svg?style=social)](https://twitter.com/DetectionLab)
-[![Slack][https://img.shields.io/badge/Slack-DetectionLab-blue](https://join.slack.com/t/cl0ng/shared_invite/zt-kjwgkldg-BqB1TyrUX0dSjDPe44tKRg)
+[![Slack](https://img.shields.io/badge/Slack-DetectionLab-blue)](https://join.slack.com/t/cl0ng/shared_invite/zt-kjwgkldg-BqB1TyrUX0dSjDPe44tKRg)
 
 #### Donate to the project:
 
