@@ -20,8 +20,7 @@ If ("$NATSwitchName" -in (Get-VMSwitch | Select-Object -ExpandProperty Name) -eq
 }
 
 # Check that our Hyper-V host has the proper gateway address for the NAT Network.
-# TODO make sure that this is set for the proper NATSwitch
-If ("$NATHostIP" -in (Get-NetIPAddress | Select-Object -ExpandProperty IPAddress) -eq $FALSE) {
+If (@(Get-NetIPAddress | Where-Object {$_.IPAddress -eq "$NATHostIP" -and $_.InterfaceAlias -eq "$NATSwitchNameAlias"}).Count -eq 1) {
     "Registering new IP address $NATHostIP on Windows Hyper-V host..."
 
     New-NetIPAddress -IPAddress $NATHostIP -PrefixLength $NATNetPrefixLength -InterfaceAlias $NATSwitchNameAlias
