@@ -69,13 +69,14 @@
       <title>Zeek Network Traffic by Type</title>
       <chart>
         <search>
-          <query>index=zeek | stats count by _time, tag::eventtype | timechart span=1h count by tag::eventtype</query>
+          <query>| tstats count where index=zeek by source, _time span=1h prestats=t | timechart span=1h count by source useother=f</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
         <option name="charting.chart">column</option>
         <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
       </chart>
     </panel>
   </row>
@@ -125,16 +126,18 @@
       <table>
         <title>http://findingbad.blogspot.com/2020/05/hunting-for-beacons-part-2.html</title>
         <search>
-          <query>index=zeek (dest_port=443 OR dest_port=80)  
-| rename orig_bytes as bytes_out resp_bytes as bytes_in 
-| stats count(bytes_out) as "beacon_count" values(bytes_in) as bytes_in by src_ip,dest_ip,bytes_out |eventstats sum(beacon_count) as total_count dc(bytes_out) as unique_count by src_ip,dest_ip 
-| eval beacon_avg=('beacon_count' / 'total_count') 
-| stats values(beacon_count) as beacon_count values(unique_count) as unique_count values(beacon_avg) as beacon_avg values(total_count) as total_count values(bytes_in) as bytes_in by src_ip,dest_ip,bytes_out 
-| head 100
-| eval incount=mvcount(bytes_in) 
-| eventstats avg(beacon_count) as overall_average 
-| eval beacon_percentage=('beacon_count' / 'overall_average') 
-| sort - beacon_percentage</query>
+          <query>index=zeek (dest_port=443 OR dest_port=80)  dest_ip!=192.168.0.0/16
+| rename orig_bytes as bytes_out resp_bytes as bytes_in
+| stats count(bytes_out) as "beacon_count" values(bytes_in) as bytes_in by src_ip,dest_ip,bytes_out |eventstats sum(beacon_count) as total_count dc(bytes_out) as unique_count by src_ip,dest_ip
+| eval beacon_avg=('beacon_count' / 'total_count')
+| stats values(beacon_count) as beacon_count values(unique_count) as unique_count values(beacon_avg) as beacon_avg values(total_count) as total_count values(bytes_in) as bytes_in by src_ip,dest_ip,bytes_out
+| eval beacon_avg=('beacon_count' / 'total_count')
+| stats values(beacon_count) as beacon_count values(unique_count) as unique_count values(beacon_avg) as beacon_avg values(total_count) as total_count values(bytes_in) as bytes_in by src_ip,dest_ip,bytes_out
+| eval incount=mvcount(bytes_in)
+| eventstats avg(beacon_count) as overall_average
+| eval beacon_percentage=('beacon_count' / 'overall_average')
+| sort - beacon_percentage
+| fields - incount,overall_average</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>

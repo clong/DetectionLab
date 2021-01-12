@@ -14,3 +14,4 @@ inventory.yml.bak
 manifest.xml
 HyperV/.vagrant/*
 logger_variables.sh
+ESXi/Packer/variables.json

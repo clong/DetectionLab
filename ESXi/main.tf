@@ -29,9 +29,8 @@ resource "esxi_guest" "logger" {
 
     provisioner "remote-exec" {
     inline = [
-      "sudo ifconfig eth1 up || echo 'eth1 up'",
-      "sudo ifconfig eth2 up || echo 'eth2 up'",
-      "sudo route add default gw 192.168.76.1 || echo 'route exists'"
+      "sudo ifconfig eth0 up && echo 'eth0 up' || echo 'unable to bring eth0 interface up",
+      "sudo ifconfig eth1 up && echo 'eth1 up' || echo 'unable to bring eth1 interface up"
     ]
 
     connection {
@@ -72,7 +71,6 @@ resource "esxi_guest" "dc" {
   guestos    = "windows9srv-64"
 
   boot_disk_type = "thin"
-  boot_disk_size = "35"
 
   memsize            = "4096"
   numvcpus           = "2"
@@ -101,7 +99,6 @@ resource "esxi_guest" "wef" {
   guestos    = "windows9srv-64"
 
   boot_disk_type = "thin"
-  boot_disk_size = "35"
 
   memsize            = "2048"
   numvcpus           = "2"
@@ -130,7 +127,6 @@ resource "esxi_guest" "win10" {
   guestos    = "windows9-64"
 
   boot_disk_type = "thin"
-  boot_disk_size = "35"
 
   memsize            = "2048"
   numvcpus           = "2"
