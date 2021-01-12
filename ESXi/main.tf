@@ -18,16 +18,6 @@ resource "esxi_guest" "logger" {
   guest_name = "logger"
   disk_store = var.esxi_datastore
   guestos    = "ubuntu-64"
-  custom_vmx_settings = [
-    ['tools.syncTime', '0'], 
-    ['time.synchronize.continue', '0'], 
-    ['time.synchronize.restore', '0'], 
-    ['time.synchronize.resume.disk', '0'], 
-    ['time.synchronize.shrink', '0'],
-    ['time.synchronize.tools.startup', '0'],
-    ['time.synchronize.tools.enable', '0'],
-    ['time.synchronize.resume.host', '0']
-  ]
 
   boot_disk_type = "thin"
 
@@ -39,9 +29,8 @@ resource "esxi_guest" "logger" {
 
     provisioner "remote-exec" {
     inline = [
-      "sudo ifconfig eth1 up || echo 'eth1 up'",
-      "sudo ifconfig eth2 up || echo 'eth2 up'",
-      "sudo route add default gw 192.168.76.1 || echo 'route exists'"
+      "sudo ifconfig eth0 up && echo 'eth0 up' || echo 'unable to bring eth0 interface up",
+      "sudo ifconfig eth1 up && echo 'eth1 up' || echo 'unable to bring eth1 interface up"
     ]
 
     connection {
@@ -80,16 +69,6 @@ resource "esxi_guest" "dc" {
   guest_name = "dc"
   disk_store = var.esxi_datastore
   guestos    = "windows9srv-64"
-  custom_vmx_settings = [
-    ['tools.syncTime', '0'], 
-    ['time.synchronize.continue', '0'], 
-    ['time.synchronize.restore', '0'], 
-    ['time.synchronize.resume.disk', '0'], 
-    ['time.synchronize.shrink', '0'],
-    ['time.synchronize.tools.startup', '0'],
-    ['time.synchronize.tools.enable', '0'],
-    ['time.synchronize.resume.host', '0']
-  ]
 
   boot_disk_type = "thin"
 
@@ -118,16 +97,6 @@ resource "esxi_guest" "wef" {
   guest_name = "wef"
   disk_store = var.esxi_datastore
   guestos    = "windows9srv-64"
-  custom_vmx_settings = [
-    ['tools.syncTime', '0'], 
-    ['time.synchronize.continue', '0'], 
-    ['time.synchronize.restore', '0'], 
-    ['time.synchronize.resume.disk', '0'], 
-    ['time.synchronize.shrink', '0'],
-    ['time.synchronize.tools.startup', '0'],
-    ['time.synchronize.tools.enable', '0'],
-    ['time.synchronize.resume.host', '0']
-  ]
 
   boot_disk_type = "thin"
 
@@ -156,16 +125,6 @@ resource "esxi_guest" "win10" {
   guest_name = "win10"
   disk_store = var.esxi_datastore
   guestos    = "windows9-64"
-  custom_vmx_settings = [
-    ['tools.syncTime', '0'], 
-    ['time.synchronize.continue', '0'], 
-    ['time.synchronize.restore', '0'], 
-    ['time.synchronize.resume.disk', '0'], 
-    ['time.synchronize.shrink', '0'],
-    ['time.synchronize.tools.startup', '0'],
-    ['time.synchronize.tools.enable', '0'],
-    ['time.synchronize.resume.host', '0']
-  ]
 
   boot_disk_type = "thin"
 

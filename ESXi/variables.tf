@@ -1,7 +1,8 @@
 #
 #  See https://www.terraform.io/intro/getting-started/variables.html for more details.
 #
-#  Change these defaults to fit your needs!
+#  Don't change the variables in this file! 
+#  Instead, create a terrform.tfvars file to override them.
 
 variable "esxi_hostname" {
   default = ""

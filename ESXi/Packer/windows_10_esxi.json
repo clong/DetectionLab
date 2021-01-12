@@ -1,31 +1,10 @@
 {
   "builders": [
     {
-      "vnc_disable_password": true,
-      "keep_registered": true,
-      "remote_datastore": "{{user `esxi_datastore`}}",
-      "remote_host": "{{user `esxi_host`}}",
-      "remote_username": "{{user `esxi_username`}}",
-      "remote_password": "{{user `esxi_password`}}",
-      "remote_type": "esx5",
-      "type": "vmware-iso",
-      "vm_name":"Windows10",
-      "communicator": "winrm",
-      "iso_url": "{{user `iso_url`}}",
-      "iso_checksum": "{{user `iso_checksum`}}",
-      "headless": false,
       "boot_wait": "6m",
       "boot_command": "",
-      "winrm_username": "vagrant",
-      "winrm_password": "vagrant",
-      "winrm_timeout": "4h",
-      "shutdown_timeout": "2h",
-      "shutdown_command": "a:/sysprep.bat",
-      "guest_os_type": "windows9-64",
-      "disk_size": "{{user `disk_size`}}",
-      "vnc_port_min": 5900,
-      "vnc_port_max": 5980,
-      "version": 11,
+      "communicator": "winrm",
+      "disk_size": 61440,
       "floppy_files": [
         "{{user `autounattend`}}",
         "../../Packer/floppy/WindowsPowershell.lnk",
@@ -40,12 +19,42 @@
         "../../Packer/scripts/unattend.xml",
         "../../Packer/scripts/sysprep.bat"
       ],
+      "guest_os_type": "windows9-64",
+      "keep_registered": true,
+      "headless": false,
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "shutdown_timeout": "2h",
+      "shutdown_command": "a:/sysprep.bat",
+      "skip_export": true,
+      "remote_datastore": "{{user `esxi_datastore`}}",
+      "remote_host": "{{user `esxi_host`}}",
+      "remote_username": "{{user `esxi_username`}}",
+      "remote_password": "{{user `esxi_password`}}",
+      "remote_type": "esx5",
+      "type": "vmware-iso",
+      "version": 11,
+      "vm_name": "Windows10",
+      "vnc_disable_password": true,
+      "vnc_port_min": 5900,
+      "vnc_port_max": 5980,
       "vmx_data": {
         "ethernet0.networkName": "{{user `esxi_network_with_dhcp_and_internet`}}",
         "memsize": "2048",
         "numvcpus": "2",
-        "scsi0.virtualDev": "lsisas1068"
-      }
+        "scsi0.virtualDev": "lsisas1068",
+        "tools.syncTime": "0",
+        "time.synchronize.continue": "0",
+        "time.synchronize.restore": "0",
+        "time.synchronize.resume.disk": "0",
+        "time.synchronize.shrink": "0",
+        "time.synchronize.tools.startup": "0",
+        "time.synchronize.tools.enable": "0",
+        "time.synchronize.resume.host": "0"
+      },
+    "winrm_username": "vagrant",
+    "winrm_password": "vagrant",
+    "winrm_timeout": "4h"
     }
   ],
   "provisioners": [
@@ -93,8 +102,7 @@
     "esxi_password": "",
     "iso_checksum": "sha256:ab4862ba7d1644c27f27516d24cb21e6b39234eb3301e5f1fb365a78b22f79b3",
     "iso_url": "https://software-download.microsoft.com/download/pr/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
-    "autounattend": "../../Packer/answer_files/10/Autounattend.xml",
-    "disk_size": "61440"
+    "autounattend": "../../Packer/answer_files/10/Autounattend.xml"
   }
 }
 
