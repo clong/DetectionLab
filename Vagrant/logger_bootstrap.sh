@@ -377,11 +377,17 @@ install_zeek() {
   crudini --set $NODECFG proxy host localhost
 
   # Setup $CPUS numbers of Zeek workers
-  crudini --set $NODECFG worker-eth0 type worker
-  crudini --set $NODECFG worker-eth0 host localhost
-  crudini --set $NODECFG worker-eth0 interface eth0
-  crudini --set $NODECFG worker-eth0 lb_method pf_ring
-  crudini --set $NODECFG worker-eth0 lb_procs "$(nproc)"
+  # AWS only has a single interface (eth1), so don't monitor eth0 if we're in AWS
+  if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then 
+  # TL;DR of ^^^: if you can't reach the AWS metadata service, you're not running in AWS
+  # Therefore, it's ok to add this.
+    crudini --set $NODECFG worker-eth0 type worker
+    crudini --set $NODECFG worker-eth0 host localhost
+    crudini --set $NODECFG worker-eth0 interface eth0
+    crudini --set $NODECFG worker-eth0 lb_method pf_ring
+    crudini --set $NODECFG worker-eth0 lb_procs "$(nproc)"
+  fi
+  
   crudini --set $NODECFG worker-eth1 type worker
   crudini --set $NODECFG worker-eth1 host localhost
   crudini --set $NODECFG worker-eth1 interface eth1
