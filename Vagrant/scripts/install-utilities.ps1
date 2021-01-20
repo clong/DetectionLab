@@ -15,6 +15,9 @@ If ($(hostname) -eq "win10") {
   & "C:\Program Files\Classic Shell\ClassicStartMenu.exe" "-xml" "c:\vagrant\resources\windows\MenuSettings.xml"
   regedit /s c:\vagrant\resources\windows\MenuStyle_Default_Win7.reg
 }
-choco install -y --limit-output --no-progress NotepadPlusPlus GoogleChrome WinRar 
+choco install -y --limit-output --no-progress NotepadPlusPlus WinRar 
+
+# The checksums for the GoogleChrome package are frequently out of date and cause the script to fail
+choco install -y --limit-output --no-progress GoogleChrome
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Utilties installation complete!"
