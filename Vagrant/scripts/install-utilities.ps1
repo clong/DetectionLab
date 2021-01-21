@@ -17,7 +17,8 @@ If ($(hostname) -eq "win10") {
 }
 choco install -y --limit-output --no-progress NotepadPlusPlus WinRar 
 
-# The checksums for the GoogleChrome package are frequently out of date and cause the script to fail
-choco install -y --limit-output --no-progress --ignore-checksums GoogleChrome 
+# The GoogleChrome choco repo is totally broken at the moment. 
+# Temporary workaround for https://github.com/clong/DetectionLab/issues/595
+# choco install -y --limit-output --no-progress --ignore-checksums GoogleChrome 
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Utilties installation complete!"
