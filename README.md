@@ -104,7 +104,7 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES)
 
 # DetectionLab Sponsors
-#### Lated updated: 12/31/2020
+#### Lated updated: 02/04/2020
 I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
 
 ### Diamond Sponsors:
@@ -129,7 +129,7 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [braimee](https://github.com/braimee)
 * [defensivedepth](https://github.com/defensivedepth)
 * [kafkaesqu3](https://github.com/kafkaesqu3)
-* [anthonysecurity](https://github.com/anthonysecurity)
+* [mdtro](https://github.com/mdtro)
 * [ealaney](https://github.com/ealaney)
 * [elreydetoda](https://github.com/elreydetoda)
 * [DevBits1702](https://github.com/DevBits1702)
