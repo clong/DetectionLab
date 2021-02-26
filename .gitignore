@@ -1,3 +1,4 @@
+Azure/Ansible/inventory.yml
 Vagrant/.vagrant/*
 Vagrant/vagrant*.log
 Packer/packer_cache/*
