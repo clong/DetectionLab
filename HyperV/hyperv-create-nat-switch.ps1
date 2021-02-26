@@ -1,32 +1,40 @@
 # See: https://www.petri.com/using-nat-virtual-switch-hyper-v
 
-If ("NATSwitch" -in (Get-VMSwitch | Select-Object -ExpandProperty Name) -eq $FALSE) {
-    'Creating Internal-only switch named "NATSwitch" on Windows Hyper-V host...'
+$NATHostIP = "192.168.38.1"
+$NATNetPrefixLength = 24
+$NATNet = "192.168.38.0/$NATNetPrefixLength"
+$NATNetName = "NATNetwork"
+$NATSwitchName = "NATSwitch"
+$NATSwitchNameAlias = "vEthernet ($NATSwitchName)"
 
-    New-VMSwitch -SwitchName "NATSwitch" -SwitchType Internal
+# Check our NAT switch exists, create it and configure it if it doesn't.
+If ("$NATSwitchName" -in (Get-VMSwitch | Select-Object -ExpandProperty Name) -eq $FALSE) {
+    "Creating Internal-only switch named ""$NatSwitchName"" on Windows Hyper-V host..."
 
-    New-NetIPAddress -IPAddress 192.168.38.1 -PrefixLength 24 -InterfaceAlias "vEthernet (NATSwitch)"
+    New-VMSwitch -SwitchName $NATSwitchName -SwitchType Internal
+    New-NetIPAddress -IPAddress $NATHostIP -PrefixLength $NATNetPrefixLength -InterfaceAlias $NATSwitchNameAlias
+    New-NetNAT -Name $NATNetName -InternalIPInterfaceAddressPrefix $NATNet
 
-    New-NetNAT -Name "NATNetwork" -InternalIPInterfaceAddressPrefix 192.168.38.0/24
-}
-else {
-    '"NATSwitch" for static IP configuration already exists; skipping'
-}
-
-If ("192.168.38.1" -in (Get-NetIPAddress | Select-Object -ExpandProperty IPAddress) -eq $FALSE) {
-    'Registering new IP address 192.168.38.1 on Windows Hyper-V host...'
-
-    New-NetIPAddress -IPAddress 192.168.38.1 -PrefixLength 24 -InterfaceAlias "vEthernet (NATSwitch)"
-}
-else {
-    '"192.168.38.1" for static IP configuration already registered; skipping'
+} else {
+    """$NATSwitchName"" VM Switch on Hyper-V host for guest static IP configuration already exists; skipping..."
 }
 
-If ("192.168.38.0/24" -in (Get-NetNAT | Select-Object -ExpandProperty InternalIPInterfaceAddressPrefix) -eq $FALSE) {
-    'Registering new NAT adapter for 192.168.38.0/24 on Windows Hyper-V host...'
+# Check that our Hyper-V host has the proper gateway address for the NAT Network.
+If (@(Get-NetIPAddress | Where-Object {$_.IPAddress -eq "$NATHostIP" -and $_.InterfaceAlias -eq "$NATSwitchNameAlias"}).Count -eq 1) {
+    "Registering new IP address $NATHostIP on Windows Hyper-V host..."
 
-    New-NetNAT -Name "NATNetwork" -InternalIPInterfaceAddressPrefix 192.168.38.0/24
+    New-NetIPAddress -IPAddress $NATHostIP -PrefixLength $NATNetPrefixLength -InterfaceAlias $NATSwitchNameAlias
+
+} else {
+    """$NATHostIP"" Hyper-V host gateway address for guest static IP configuration already registered; skipping..."
 }
-else {
-    '"192.168.38.0/24" for static IP configuration already registered; skipping'
+
+# Check that our Hyper-V host has the proper NAT Network setup
+If ("$NATNet" -in (Get-NetNAT | Select-Object -ExpandProperty InternalIPInterfaceAddressPrefix) -eq $FALSE) {
+    "Registering new NAT adapter for $NATNet on Windows Hyper-V host..."
+
+    New-NetNAT -Name $NATNetName -InternalIPInterfaceAddressPrefix $NATNet
+
+} else {
+    """$NATNet"" Hyper-V host NAT Network for guest static IP configuration already registered; skipping"
 }

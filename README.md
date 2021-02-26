@@ -6,9 +6,10 @@ DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to 
 [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.svg?style=shield)](https://circleci.com/gh/clong/DetectionLab/tree/master)
 ![Lint Code Base](https://github.com/clong/DetectionLab/workflows/Lint%20Code%20Base/badge.svg)
 [![license](https://img.shields.io/github/license/clong/DetectionLab.svg?style=flat-square)](https://github.com/clong/DetectionLab/blob/master/license.md)
-![Maintenance](https://img.shields.io/maintenance/yes/2020.svg?style=flat-square)
+![Maintenance](https://img.shields.io/maintenance/yes/2021.svg?style=flat-square)
 [![GitHub last commit](https://img.shields.io/github/last-commit/clong/DetectionLab.svg?style=flat-square)](https://github.com/clong/DetectionLab/commit/master)
 [![Twitter](https://img.shields.io/twitter/follow/DetectionLab.svg?style=social)](https://twitter.com/DetectionLab)
+[![Slack](https://img.shields.io/badge/Slack-DetectionLab-blue)](https://join.slack.com/t/detectionlab/shared_invite/zt-mv1qnw9f-3qo2ZrB0IbIKhvinfsgYhg)
 
 #### Donate to the project:
 
@@ -103,13 +104,13 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES)
 
 # DetectionLab Sponsors
-#### Lated updated: 9/16/2020
+#### Lated updated: 02/04/2020
 I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
 
 ### Diamond Sponsors:
 * [Veramine](https://github.com/veramine)
 * [Thinkst](https://github.com/ThinkstAppliedResearch)
-* [csterner82](https://github.com/csterner82)
+* [kungskal](https://github.com/kungskal)
 * [swizzlez](https://github.com/swizzlez)
 * [CyDefUnicorn](https://github.com/CyDefUnicorn)
 * [olliencc](https://github.com/olliencc)
@@ -118,17 +119,18 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [mikeesparza](https://github.com/mikeesparza)
 * [dlee35](https://github.com/dlee35)
 * [chrissanders](https://github.com/chrissanders)
-* [punchdrunktux](https://github.com/punchdrunktux)
 * [jaredhaight](https://github.com/jaredhaight)
 * [iamfuntime](https://github.com/iamfuntime)
 * [Luct0r](https://github.com/Luct0r)
+* [zhuma549](https://github.com/zhuma549)
+* +1 private sponsor
 
 ### Standard Sponsors:
-* [dtonomy](https://github.com/dtonomy)
 * [braimee](https://github.com/braimee)
-* [iLoC0dez](https://github.com/iLoC0dez)
 * [defensivedepth](https://github.com/defensivedepth)
-* [elreydetoda](https://github.com/elreydetoda)
 * [kafkaesqu3](https://github.com/kafkaesqu3)
-* [anthonysecurity](https://github.com/anthonysecurity)
+* [mdtro](https://github.com/mdtro)
+* [ealaney](https://github.com/ealaney)
+* [elreydetoda](https://github.com/elreydetoda)
+* [DevBits1702](https://github.com/DevBits1702)
 * +2 private sponsors

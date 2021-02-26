@@ -15,6 +15,9 @@ If ($(hostname) -eq "win10") {
   & "C:\Program Files\Classic Shell\ClassicStartMenu.exe" "-xml" "c:\vagrant\resources\windows\MenuSettings.xml"
   regedit /s c:\vagrant\resources\windows\MenuStyle_Default_Win7.reg
 }
-choco install -y --limit-output --no-progress NotepadPlusPlus GoogleChrome WinRar 
+choco install -y --limit-output --no-progress NotepadPlusPlus WinRar processhacker
+
+# This repo often causes failures due to incorrect checksums, so we ignore them for Chrome
+choco install -y --limit-output --no-progress --ignore-checksums GoogleChrome 
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Utilties installation complete!"

@@ -1,3 +1,4 @@
+Azure/Ansible/inventory.yml
 Vagrant/.vagrant/*
 Vagrant/vagrant*.log
 Packer/packer_cache/*
@@ -14,3 +15,4 @@ inventory.yml.bak
 manifest.xml
 HyperV/.vagrant/*
 logger_variables.sh
+ESXi/Packer/variables.json

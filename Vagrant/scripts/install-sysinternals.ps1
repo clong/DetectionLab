@@ -93,7 +93,9 @@ $Shortcut.TargetPath = $tcpviewPath
 $Shortcut.Save()
 
 # Restart Explorer so the taskbar shortcuts show up
-Stop-Process -ProcessName explorer -Force
+if (Get-Process -ProcessName explorer -ErrorAction 'silentlycontinue') {
+  Stop-Process -ProcessName explorer -Force
+}
 
 # Download Olaf Hartongs Sysmon config
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Olaf Hartong's Sysmon config..."

@@ -83,7 +83,7 @@
     },
     {
       "type": "qemu",
-      "vm_name": "windows_10",
+      "vm_name": "WindowsServer2016",
       "communicator": "winrm",
       "iso_url": "{{user `iso_url`}}",
       "iso_checksum": "{{user `iso_checksum`}}",

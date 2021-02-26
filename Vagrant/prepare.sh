@@ -119,6 +119,14 @@ check_vagrant_vmware_utility_installed() {
   fi
 }
 
+check_macos_bigsur() {
+  if sw_vers | grep ProductVersion | grep -c 11\. > /dev/null; then
+    echo "1"
+  else
+    echo "0"
+  fi
+}
+
 # List the available Vagrant providers present on the system
 list_providers() {
   VBOX_PRESENT=0
@@ -131,6 +139,7 @@ list_providers() {
     VMWARE_WORKSTATION_PRESENT=0 # Workstation doesn't exist on Darwain-based OS
     VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=$(check_vmware_desktop_vagrant_plugin_installed)
     VAGRANT_VMWARE_UTILITY_PRESENT=$(check_vagrant_vmware_utility_installed)
+    IS_BIGSUR=$(check_macos_bigsur)
   else
     VBOX_PRESENT=$(check_virtualbox_installed)
     VMWARE_WORKSTATION_PRESENT=$(check_vmware_workstation_installed)
@@ -158,6 +167,10 @@ list_providers() {
     (echo >&2  "${INFO} Please consider setting the VAGRANT_DEFAULT_PROVIDER environment variable to prevent confusion." )
     (echo >&2  "${INFO} More details can be found here: https://www.vagrantup.com/docs/providers/default" )
     (echo >&2  "${INFO} Additionally, please ensure only one providers' network adapters are active at any given time." )
+  fi
+  if [[ $VMWARE_FUSION_PRESENT -eq 1 ]] && [[ $IS_BIGSUR -eq 1 ]]; then
+    (echo >&2 "${INFO} A workaround is currently required to use VMware Fusion with Big Sur.")
+    (echo >&2 "${INFO} See https://github.com/clong/DetectionLab/issues/539 for more info.")
   fi
 }
 

@@ -193,6 +193,7 @@ resource "aws_instance" "logger" {
       "sudo sed -i 's/eth1/ens5/g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
       "sudo sed -i 's/ETH1/ens5/g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
       "sudo sed -i 's/eth1/ens5/g' /opt/DetectionLab/Vagrant/resources/suricata/suricata.yaml",
+      "sudo sed -i -e '127,130d' /opt/DetectionLab/Vagrant/resources/suricata/suricata.yaml",
       "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
       "sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config",
       "sudo service ssh restart",

@@ -124,11 +124,14 @@ logging:
       facility: local5
       format: "[%i] <%d> -- "
 af-packet:
+  - interface: eth0
+    cluster-id: 98
+    cluster-type: cluster_flow
+    defrag: yes
   - interface: eth1
     cluster-id: 99
     cluster-type: cluster_flow
     defrag: yes
-  - interface: default
 pcap-file:
   checksum-checks: auto
 app-layer:
