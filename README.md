@@ -42,6 +42,9 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 
 ## Building Detection Lab
 
+When preparing to build DetectionLab locally, be sure to use the `prepare.[sh|ps1]` scripts inside of the Vagrant folder
+to ensure your system passes the prerequisite checks for building DetectionLab.
+
 * [Prerequisites](https://www.detectionlab.network/introduction/prerequisites/)
 * [MacOS - Virtualbox or VMware Fusion](https://www.detectionlab.network/deployment/macosvm/)
 * [Windows - Virtualbox or VMware Workstation](https://www.detectionlab.network/deployment/windowsvm/)
