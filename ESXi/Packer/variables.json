@@ -3,5 +3,6 @@
     "esxi_datastore": "",
     "esxi_username": "",
     "esxi_password": "",
-    "esxi_network_with_dhcp_and_internet": ""
+    "esxi_network_with_dhcp_and_internet": "",
+    "http_server_address": "0.0.0.0"
 }
