@@ -9,6 +9,14 @@
   win_reboot:
   when: res.reboot_required
 
+- name: Remove HostOnly IP Address
+  win_shell: "(Get-NetAdapter | where {$_.MacAddress -eq '00-50-56-A1-B1-C4'}) | Remove-NetIPAddress -ErrorAction ignore -confirm:$false"
+  ignore_error: yes
+
+- name: Remove HostOnly Route
+  win_shell: "Remove-NetRoute -nexthop '192.168.38.1' -ErrorAction ignore -confirm:$false"
+  ignore_error: yes
+
 - name: Set HostOnly IP Address
   win_shell: "$adapter = (get-netadapter | where {$_.MacAddress -eq '00-50-56-A1-B1-C4'}).Name; New-NetIPAddress –InterfaceAlias $adapter –AddressFamily IPv4 -IPAddress 192.168.38.102 –PrefixLength 24 -DefaultGateway 192.168.38.1"
 
