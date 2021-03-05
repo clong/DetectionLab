@@ -21,7 +21,7 @@
                 " netcfg/get_domain=vm<wait>",
                 " netcfg/get_hostname=vagrant<wait>",
                 " grub-installer/bootdev=/dev/sda<wait>",
-                " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<wait>",
+                " preseed/url=http://{{user `http_server_address`}}:{{ .HTTPPort }}/preseed.cfg<wait>",
                 " -- <wait>",
                 "<enter><wait>"
             ],
@@ -30,6 +30,7 @@
             "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "ubuntu-64",
             "http_directory": "{{user `http_directory`}}",
+            "http_bind_address": "{{user `http_server_address`}}",
             "iso_checksum": "{{user `iso_checksum`}}",
             "iso_url": "{{user `mirror`}}/{{user `mirror_directory`}}/{{user `iso_name`}}",
             "keep_registered": true,
@@ -90,6 +91,7 @@
     "variables": {
         "box_basename": "ubuntu-18.04",
         "http_directory": "{{template_dir}}/http",
+        "http_server_address": "",
         "build_timestamp": "{{isotime \"20060102150405\"}}",
         "cpus": "2",
         "disk_size": "65536",
