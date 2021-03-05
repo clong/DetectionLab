@@ -11,6 +11,8 @@ network:
   ethernets:
     eth0:
       dhcp4: true
+    eth1:
+      dhcp4: true
 EOF
 else
   # Adding a 2 sec delay to the interface up, to make the dhclient happy
