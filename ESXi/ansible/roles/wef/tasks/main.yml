@@ -10,9 +10,9 @@
   when: res.reboot_required
 
 - name: Remove HostOnly IP Address
-  win_shell: "(Get-NetAdapter | where {$_.MacAddress -eq '00-50-56-A1-B4-C4'}) | Remove-NetIPAddress -ErrorAction ignore -confirm:$false"
-  ignore_error: yes
+  win_shell: "(Get-NetAdapter | where {$_.MacAddress -eq '00-50-56-A1-B4-C4'}) | Remove-NetIPAddress -confirm:$false"
 
+# Ignore failure to prevent the play from aborting
 - name: Remove HostOnly Route
   win_shell: "Remove-NetRoute -nexthop '192.168.38.1' -ErrorAction ignore -confirm:$false"
   ignore_error: yes
