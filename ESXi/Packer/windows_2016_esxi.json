@@ -1,0 +1,95 @@
+{
+  "builders": [
+    {
+      "boot_wait": "2m",
+      "communicator": "winrm",
+      "disk_size": 61440,
+      "floppy_files": [
+        "{{user `autounattend`}}",
+        "../../Packer/floppy/WindowsPowershell.lnk",
+        "../../Packer/floppy/PinTo10.exe",
+        "../../Packer/scripts/unattend.xml",
+        "../../Packer/scripts/sysprep.bat",
+        "../../Packer/scripts/disable-screensaver.ps1",
+        "../../Packer/scripts/disable-winrm.ps1",
+        "../../Packer/scripts/enable-winrm.ps1",
+        "../../Packer/scripts/microsoft-updates.bat",
+        "../../Packer/scripts/win-updates.ps1"
+      ],
+      "guest_os_type": "windows8srv-64",
+      "headless": false,
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "keep_registered": true,
+      "shutdown_timeout": "2h",
+      "shutdown_command": "a:/sysprep.bat",
+      "skip_export": true,
+      "remote_datastore": "{{user `esxi_datastore`}}",
+      "remote_host": "{{user `esxi_host`}}",
+      "remote_username": "{{user `esxi_username`}}",
+      "remote_password": "{{user `esxi_password`}}",
+      "remote_type": "esx5",
+      "type": "vmware-iso",
+      "version": 11,
+      "vm_name": "WindowsServer2016",
+      "vnc_disable_password": true,
+      "vmx_data": {
+        "ethernet0.networkName": "{{user `esxi_network_with_dhcp_and_internet`}}",
+        "memsize": "2048",
+        "numvcpus": "2",
+        "scsi0.virtualDev": "lsisas1068",
+        "tools.syncTime": "0",
+        "time.synchronize.continue": "0",
+        "time.synchronize.restore": "0",
+        "time.synchronize.resume.disk": "0",
+        "time.synchronize.shrink": "0",
+        "time.synchronize.tools.startup": "0",
+        "time.synchronize.tools.enable": "0",
+        "time.synchronize.resume.host": "0"
+      },
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "windows-shell",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../../Packer/scripts/vm-guest-tools.bat",
+        "../../Packer/scripts/enable-rdp.bat"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "../../Packer/scripts/debloat-windows.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "windows-shell",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../../Packer/scripts/pin-powershell.bat",
+        "../../Packer/scripts/set-winrm-automatic.bat",
+        "../../Packer/scripts/compile-dotnet-assemblies.bat",
+        "../../Packer/scripts/uac-enable.bat",
+        "../../Packer/scripts/compact.bat"
+      ]
+    }
+  ],
+  "variables": {
+    "esxi_datastore": "",
+    "esxi_host": "",
+    "esxi_username": "",
+    "esxi_password": "",
+    "iso_url": "https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
+    "iso_checksum": "md5:70721288BBCDFE3239D8F8C0FAE55F1F",
+    "autounattend": "../../Packer/answer_files/2016/Autounattend.xml"
+  }
+}
+

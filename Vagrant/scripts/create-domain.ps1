@@ -46,10 +46,12 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
     -Force:$true
 
   $newDNSServers = "127.0.0.1", "8.8.8.8", "4.4.4.4"
+
   $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.IPAddress -And ($_.IPAddress).StartsWith($subnet) }
   if ($adapters) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting DNS"
-    $adapters | ForEach-Object {$_.SetDNSServerSearchOrder($newDNSServers)}
+    # Don't do this in Azure. If the network adatper description contains "Hyper-V", this won't apply changes.
+    $adapters | ForEach-Object {if (!($_.Description).Contains("Hyper-V")) {$_.SetDNSServerSearchOrder($newDNSServers)}}
   }
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting timezone to UTC"
   c:\windows\system32\tzutil.exe /s "UTC"
@@ -61,24 +63,29 @@ if ((gwmi win32_computersystem).partofdomain -eq $false) {
   dnscmd /ResetListenAddresses  $dnslistenip
 
   $nics=Get-WmiObject "Win32_NetworkAdapterConfiguration where IPEnabled='TRUE'" |? { $_.IPAddress[0] -ilike "10.*" }
-  foreach($nic in $nics)
-  {
+  foreach($nic in $nics) {
     $nic.DomainDNSRegistrationEnabled = $false
     $nic.SetDynamicDNSRegistration($false) |Out-Null
-    }
-
-
- #Get-DnsServerResourceRecord -ZoneName $domain -type 1 -Name "@" |Select-Object HostName,RecordType -ExpandProperty RecordData |Where-Object {$_.IPv4Address -ilike "10.*"}|Remove-DnsServerResourceRecord
- $RRs= Get-DnsServerResourceRecord -ZoneName $domain -type 1 -Name "@"
-
- foreach($RR in $RRs)
- {
-  if ( (Select-Object  -InputObject $RR HostName,RecordType -ExpandProperty RecordData).IPv4Address -ilike "10.*")
-  {
-   Remove-DnsServerResourceRecord -ZoneName $domain -RRType A -Name "@" -RecordData $RR.RecordData.IPv4Address -Confirm
   }
 
- }
+  $RRs= Get-DnsServerResourceRecord -ZoneName $domain -type 1 -Name "@"
+  foreach($RR in $RRs) {
+    if ( (Select-Object  -InputObject $RR HostName,RecordType -ExpandProperty RecordData).IPv4Address -ilike "10.*") {
+      Remove-DnsServerResourceRecord -ZoneName $domain -RRType A -Name "@" -RecordData $RR.RecordData.IPv4Address -Confirm
+    }
+  }
   Restart-Service DNS
+}
 
+# Uninstall Windows Defender
+If ((Get-Service -Name WinDefend -ErrorAction SilentlyContinue).status -eq 'Running') {
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Uninstalling Windows Defender..."
+  Try {
+    Uninstall-WindowsFeature Windows-Defender -ErrorAction Stop
+    Uninstall-WindowsFeature Windows-Defender-Features -ErrorAction Stop
+  }
+  Catch {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Windows Defender did not uninstall successfully..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) We'll try again during install-red-team.ps1"
+  }
 }

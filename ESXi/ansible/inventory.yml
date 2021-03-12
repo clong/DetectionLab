@@ -1,0 +1,23 @@
+---
+
+logger:
+  hosts:
+    192.168.3.205:
+      ansible_user: vagrant
+      ansible_password: vagrant
+      ansible_port: 22
+      ansible_connection: ssh
+      ansible_ssh_common_args: '-o UserKnownHostsFile=/dev/null'
+
+dc:
+  hosts:
+    192.168.3.202:
+
+wef:
+  hosts:
+    192.168.3.203:
+
+win10:
+  hosts:
+    192.168.3.204:
+

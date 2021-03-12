@@ -1,0 +1,9 @@
+[Unit]
+Description=Kolide Fleet
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/fleet serve --mysql_address=127.0.0.1:3306 --mysql_database=kolide --mysql_username=root --mysql_password=kolide --redis_address=127.0.0.1:6379  --server_cert=/opt/fleet/server.crt --server_key=/opt/fleet/server.key --logging_json --osquery_result_log_file=/var/log/fleet/osquery_result  --osquery_status_log_file=/var/log/fleet/osquery_status --auth_jwt_key=dasdsadasdjhshgfhdfb --server_address 0.0.0.0:8412 --osquery_enable_log_rotation
+
+[Install]
+WantedBy=multi-user.target

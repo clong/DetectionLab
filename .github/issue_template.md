@@ -1,9 +1,6 @@
 * Operating System Version:
-* Provider (VirtualBox/VMWare):
-* Vagrant Version:
-* Packer Version:
-* Are you using stock boxes (downloaded) or were they built from scratch using Packer?
-* Is the issue reproducible or intermittent?
+* Deploying via (VirtualBox/VMWare/AWS/Azure/ESXi):
+* Vagrant Version (if applicable): 
 
 Please verify that you are building from an updated Master branch before filing an issue.
 

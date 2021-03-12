@@ -1,11 +1,10 @@
 {
   "builders": [
     {
-      "vm_name":"WindowsServer2016",
+      "vm_name": "WindowsServer2016",
       "type": "vmware-iso",
       "communicator": "winrm",
       "iso_url": "{{user `iso_url`}}",
-      "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "headless": false,
       "boot_wait": "2m",
@@ -40,11 +39,10 @@
       }
     },
     {
-      "vm_name":"WindowsServer2016",
+      "vm_name": "WindowsServer2016",
       "type": "virtualbox-iso",
       "communicator": "winrm",
       "iso_url": "{{user `iso_url`}}",
-      "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "headless": false,
       "boot_wait": "2m",
@@ -82,6 +80,55 @@
           "2"
         ]
       ]
+    },
+    {
+      "type": "qemu",
+      "vm_name": "WindowsServer2016",
+      "communicator": "winrm",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "headless": false,
+      "boot_wait": "6m",
+      "boot_command": "",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h",
+      "shutdown_command": "a:/sysprep.bat",
+      "shutdown_timeout": "2h",
+      "accelerator": "kvm",
+      "disk_size": "{{user `disk_size`}}",
+      "output_directory": "{{ user `packer_build_dir`}}",
+      "qemuargs": [
+        [
+          "-m",
+          "2048"
+        ],
+        [
+          "-smp",
+          "2"
+        ],
+        [
+          "-drive",
+          "file={{ user `virtio_win_iso` }},media=cdrom,index=3"
+        ],
+        [
+          "-drive",
+          "file={{ user `packer_build_dir`}}/{{ .Name }},if=virtio,cache=writeback,discard=ignore,format=qcow2,index=1"
+        ]
+      ],
+      "floppy_files": [
+        "{{user `autounattend_virtio`}}",
+        "./floppy/WindowsPowershell.lnk",
+        "./floppy/WindowsPowershell.lnk",
+        "./floppy/PinTo10.exe",
+        "./scripts/unattend.xml",
+        "./scripts/sysprep.bat",
+        "./scripts/disable-screensaver.ps1",
+        "./scripts/disable-winrm.ps1",
+        "./scripts/enable-winrm.ps1",
+        "./scripts/microsoft-updates.bat",
+        "./scripts/win-updates.ps1"
+      ]
     }
   ],
   "provisioners": [
@@ -89,14 +136,15 @@
       "type": "windows-shell",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "./scripts/vm-guest-tools.bat",
         "./scripts/enable-rdp.bat"
       ]
     },
     {
       "type": "powershell",
       "scripts": [
-        "./scripts/debloat-windows.ps1"
+        "./scripts/vm-guest-tools.ps1",
+        "./scripts/debloat-windows.ps1",
+        "./scripts/download-microsoft-ata.ps1"
       ]
     },
     {
@@ -124,8 +172,11 @@
   ],
   "variables": {
     "iso_url": "https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
-    "iso_checksum_type": "md5",
-    "iso_checksum": "70721288BBCDFE3239D8F8C0FAE55F1F",
-    "autounattend": "./answer_files/2016/Autounattend.xml"
+    "iso_checksum": "md5:70721288BBCDFE3239D8F8C0FAE55F1F",
+    "disk_size": "61440",
+    "autounattend": "./answer_files/2016/Autounattend.xml",
+    "virtio_win_iso": "./virtio-win.iso",
+    "autounattend_virtio": "./answer_files/2016_virtio/Autounattend.xml",
+    "packer_build_dir": "./win2016"
   }
 }

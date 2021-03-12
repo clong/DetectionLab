@@ -1,4 +1,5 @@
 # Purpose: Installs a handful of SysInternals tools on the host into c:\Tools\Sysinternals
+# Also installs Sysmon and Olaf Harton's Sysmon config
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing SysInternals Tooling..."
 $sysinternalsDir = "C:\Tools\Sysinternals"
@@ -6,14 +7,14 @@ $sysmonDir = "C:\ProgramData\Sysmon"
 If(!(test-path $sysinternalsDir)) {
   New-Item -ItemType Directory -Force -Path $sysinternalsDir
 } Else {
-  Write-Host "Tools directory exists. Exiting."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Tools directory exists, no need to re-install. Exiting."
   exit
 }
 
 If(!(test-path $sysmonDir)) {
   New-Item -ItemType Directory -Force -Path $sysmonDir
 } Else {
-  Write-Host "Sysmon directory exists. Exiting."
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Sysmon directory exists, no need to re-install. Exiting."
   exit
 }
 
@@ -24,23 +25,77 @@ $procexpPath = "C:\Tools\Sysinternals\procexp64.exe"
 $sysmonPath = "C:\Tools\Sysinternals\Sysmon64.exe"
 $tcpviewPath = "C:\Tools\Sysinternals\Tcpview.exe"
 $sysmonConfigPath = "$sysmonDir\sysmonConfig.xml"
+$shortcutLocation = "$ENV:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs\"
 
+$WScriptShell = New-Object -ComObject WScript.Shell
 
 # Microsoft likes TLSv1.2 as well
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Autoruns64.exe..."
-(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Autoruns64.exe', $autorunsPath)
+Try { 
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Autoruns64.exe', $autorunsPath) 
+} Catch { 
+  Write-Host "HTTPS connection failed. Switching to HTTP :("
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Autoruns64.exe', $autorunsPath) 
+}
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Autoruns.lnk")
+$Shortcut.TargetPath = $autorunsPath
+$Shortcut.Save()
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Procmon.exe..."
-(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Procmon.exe', $procmonPath)
+Try { 
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Procmon.exe', $procmonPath)
+} Catch { 
+  Write-Host "HTTPS connection failed. Switching to HTTP :("
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Procmon.exe', $procmonPath)
+}
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Process Monitor.lnk")
+$Shortcut.TargetPath = $procmonPath
+$Shortcut.Save()
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading PsExec64.exe..."
-(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/PsExec64.exe', $psexecPath)
+Try { 
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/PsExec64.exe', $psexecPath)
+} Catch { 
+  Write-Host "HTTPS connection failed. Switching to HTTP :("
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/PsExec64.exe', $psexecPath)
+}
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading procexp64.exe..."
-(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/procexp64.exe', $procexpPath)
+Try { 
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/procexp64.exe', $procexpPath)
+} Catch { 
+  Write-Host "HTTPS connection failed. Switching to HTTP :("
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/procexp64.exe', $procexpPath)
+}
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Process Explorer.lnk")
+$Shortcut.TargetPath = $procexpPath
+$Shortcut.Save()
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Sysmon64.exe..."
-(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Sysmon64.exe', $sysmonPath)
-Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Tcpview.exe..."
-(New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Tcpview.exe', $tcpviewPath)
+Try { 
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Sysmon64.exe', $sysmonPath)
+} Catch { 
+  Write-Host "HTTPS connection failed. Switching to HTTP :("
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Sysmon64.exe', $sysmonPath)
+}
 Copy-Item $sysmonPath $sysmonDir
+
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Tcpview.exe..."
+Try { 
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/Tcpview.exe', $tcpviewPath)
+} Catch { 
+  Write-Host "HTTPS connection failed. Switching to HTTP :("
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/Tcpview.exe', $tcpviewPath)
+}
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Tcpview.lnk")
+$Shortcut.TargetPath = $tcpviewPath
+$Shortcut.Save()
+
+# Restart Explorer so the taskbar shortcuts show up
+if (Get-Process -ProcessName explorer -ErrorAction 'silentlycontinue') {
+  Stop-Process -ProcessName explorer -Force
+}
 
 # Download Olaf Hartongs Sysmon config
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Olaf Hartong's Sysmon config..."

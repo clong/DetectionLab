@@ -1,12 +1,15 @@
-![DetectionLab](./img/DetectionLab.png)
 # Detection Lab
+![DetectionLab](./img/DetectionLab.png)
+
 DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to ensure that builds are passing.
 
 [![CircleCI](https://circleci.com/gh/clong/DetectionLab/tree/master.svg?style=shield)](https://circleci.com/gh/clong/DetectionLab/tree/master)
+![Lint Code Base](https://github.com/clong/DetectionLab/workflows/Lint%20Code%20Base/badge.svg)
 [![license](https://img.shields.io/github/license/clong/DetectionLab.svg?style=flat-square)](https://github.com/clong/DetectionLab/blob/master/license.md)
-![Maintenance](https://img.shields.io/maintenance/yes/2020.svg?style=flat-square)
+![Maintenance](https://img.shields.io/maintenance/yes/2021.svg?style=flat-square)
 [![GitHub last commit](https://img.shields.io/github/last-commit/clong/DetectionLab.svg?style=flat-square)](https://github.com/clong/DetectionLab/commit/master)
 [![Twitter](https://img.shields.io/twitter/follow/DetectionLab.svg?style=social)](https://twitter.com/DetectionLab)
+[![Slack](https://img.shields.io/badge/Slack-DetectionLab-blue)](https://join.slack.com/t/detectionlab/shared_invite/zt-mv1qnw9f-3qo2ZrB0IbIKhvinfsgYhg)
 
 #### Donate to the project:
 
@@ -25,98 +28,42 @@ NOTE: This lab has not been hardened in any way and runs with default vagrant cr
 
 ## Primary Lab Features:
 * Microsoft Advanced Threat Analytics (https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics) is installed on the WEF machine, with the lightweight ATA gateway installed on the DC
-* Splunk forwarders are pre-installed and all indexes are pre-created. Technology add-ons for Windows are also preconfigured.
+* A Splunk forwarder is pre-installed and all indexes are pre-created. Technology add-ons are also preconfigured.
 * A custom Windows auditing configuration is set via GPO to include command line process auditing and additional OS-level logging
 * [Palantir's Windows Event Forwarding](http://github.com/palantir/windows-event-forwarding)  subscriptions and custom channels are implemented
 * Powershell transcript logging is enabled. All logs are saved to `\\wef\pslogs`
 * osquery comes installed on each host and is pre-configured to connect to a [Fleet](https://kolide.co/fleet) server via TLS. Fleet is preconfigured with the configuration from [Palantir's osquery Configuration](https://github.com/palantir/osquery-configuration)
-* Sysmon is installed and configured using SwiftOnSecurity’s open-sourced configuration
+* Sysmon is installed and configured using [Olaf Hartong's open-sourced Sysmon configuration](https://github.com/olafhartong/sysmon-modular)
 * All autostart items are logged to Windows Event Logs via [AutorunsToWinEventLog](https://github.com/palantir/windows-event-forwarding/tree/master/AutorunsToWinEventLog)
-* SMBv1 Auditing is enabled
-
-
-## Requirements
-* 55GB+ of free disk space
-* 16GB+ of RAM
-* Packer 1.3.2 or newer
-* Vagrant 2.2.2 or newer
-* Virtualbox or VMWare Fusion/Workstation
+* Zeek and Suricata are pre-configured to monitor and alert on network traffic
+* Apache Guacamole is installed to easily access all hosts from your local browser
 
 ---
 
-## Quickstart
-* [AWS](https://github.com/clong/DetectionLab/wiki/Quickstart---AWS-(Terraform))
-* [MacOS](https://github.com/clong/DetectionLab/wiki/Quickstart---MacOS)
-* [Windows](https://github.com/clong/DetectionLab/wiki/Quickstart---Windows)
-* [Linux](https://github.com/clong/DetectionLab/wiki/Quickstart-Linux)
+## Building Detection Lab
+
+When preparing to build DetectionLab locally, be sure to use the `prepare.[sh|ps1]` scripts inside of the Vagrant folder
+to ensure your system passes the prerequisite checks for building DetectionLab.
+
+* [Prerequisites](https://www.detectionlab.network/introduction/prerequisites/)
+* [MacOS - Virtualbox or VMware Fusion](https://www.detectionlab.network/deployment/macosvm/)
+* [Windows - Virtualbox or VMware Workstation](https://www.detectionlab.network/deployment/windowsvm/)
+* [Linux - Virtualbox or VMware Workstation](https://www.detectionlab.network/deployment/linuxvm/)
+* [AWS via Terraform](https://www.detectionlab.network/deployment/aws/)
+* [Azure via Terraform & Ansible](https://www.detectionlab.network/deployment/azure/)
+* [ESXi via Terraform & Ansible](https://www.detectionlab.network/deployment/esxi/)
+* [HyperV](https://www.detectionlab.network/deployment/hyperv/)
+* [LibVirt](https://www.detectionlab.network/deployment/libvirt/)
 
 ---
 
-## Building DetectionLab from Scratch
-1. Determine which Vagrant provider you want to use. Current supported providers are:
+## DetectionLab Documentation
 
-  - Virtualbox
-  - VMware Workstation & Fusion
-    - Note: Virtualbox is free, the [VMWare Desktop Vagrant plugin](https://www.vagrantup.com/vmware/#buy-now) is $80 and is required to use Vagrant with VMware.
+The primary documentation site is located at https://detectionlab.network
 
-There are currently three ways to build the lab:
-* **Recommended**: Use the boxes hosted on [Vagrant Cloud](https://app.vagrantup.com/detectionlab). This method should take **~2 hours** total to download the boxes and provision the lab.
-* Build the boxes yourself using Packer. This method will take ~4 hours to build the boxes and another ~90-120 minutes to provision them for a total of **5-6 hours**.
-* [Provision the lab in AWS using Terraform](Terraform/README.md). The lab can be brought online in under **30 minutes**.
-
-If you choose to use the boxes hosted on Vagrant Cloud, you may skip steps 2 and 3. If you don't trust pre-built boxes, I recommend following steps 2 and 3 to build them on your machine.
-
-
-2. `cd` to the Packer directory and build the Windows 10 and Windows Server 2016 boxes using the commands below. Each build will take about 1 hour. As far as I know, you can only build one box at a time.
-
-```
-$ cd detectionlab/Packer
-$ packer build --only=[vmware|virtualbox]-iso windows_10.json
-$ packer build --only=[vmware|virtualbox]-iso windows_2016.json
-```
-
-3. Once both boxes have built successfully, move the resulting boxes (.box files) in the Packer folder to the Boxes folder:
-
-    `mv *.box ../Boxes`
-
-4. `cd` into the Vagrant directory: `cd ../Vagrant` and edit the `Vagrantfile`. Change the lines `cfg.vm.box = "detectionlab/win2016"` and `cfg.vm.box = "detectionlab/win10` to `cfg.vm.box = "../Boxes/windows_2016_<provider>.box"` and "`cfg.vm.box = "../Boxes/windows_10_<provider>.box"` respectively.
-
-5. Install the Vagrant-Reload plugin: `vagrant plugin install vagrant-reload`
-
-6. **VMware Only:**  
-  * [Buy a license](https://www.vagrantup.com/vmware/index.html#buy-now) for the VMware plugin
-  * Install it with `vagrant plugin install vagrant-vmware-desktop`.
-  * License it with `vagrant plugin license vagrant-vmware-desktop <path_to_.lic>`.
-  * Download and install the VMware Vagrant utility: https://www.vagrantup.com/vmware/downloads.html
-
-7. Ensure you are in the base DetectionLab folder and run `./build.sh` (Mac & Linux) or `./build.ps1` (Windows). This script will do the following:
-  * Provision the logger host. This host will run the [Fleet](https://kolide.co/fleet) osquery manager and a fully featured pre-configured Splunk instance.
-  * Provision the DC host and configure it as a Domain Controller
-  * Provision the WEF host and configure it as a Windows Event Collector in the Servers OU
-  * Provision the Win10 host and configure it as a computer in the Workstations OU
-
-8. Build logs will be present in the `Vagrant` folder as `vagrant_up_<host>.log`. If filing an issue, please paste the contents of that log into a Gist to help with debugging efforts.
-
-9. Navigate to https://192.168.38.105:8000 in a browser to access the Splunk instance on logger. Default credentials are admin:changeme (you will have the option to change them on the next screen)
-10. Navigate to https://192.168.38.105:8412 in a browser to access the Fleet server on logger. Default credentials are admin:admin123#. Query packs are pre-configured with queries from [palantir/osquery-configuration](https://github.com/palantir/osquery-configuration).
-
----
-
-## Basic Vagrant Usage
-
-Moved to the wiki: [Basic Vagrant Usage](https://github.com/clong/DetectionLab/wiki/Vagrant-Usage)
-
----
-
-## Lab Information
-
-Moved to the wiki: [Lab Information & Credentials](https://github.com/clong/DetectionLab/wiki/Lab-Information-&-Credentials)
-
----
-
-## Known Issues and Workarounds
-
-Moved to the wiki: [Known Issues and Workarounds](https://github.com/clong/DetectionLab/wiki/Known-Issues-and-Workarounds)
+* [Basic Vagrant Usage](https://www.detectionlab.network/introduction/basicvagrant/)
+* [Lab Information & Credentials](https://www.detectionlab.network/introduction/infoandcreds/)
+* [Troubleshooting and Known Issues](https://www.detectionlab.network/deployment/troubleshooting/)
 
 ---
 
@@ -137,7 +84,7 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [Microsoft Advanced Threat Analytics](https://www.microsoft.com/en-us/cloud-platform/advanced-threat-analytics)
 * [Splunk](https://www.splunk.com)
 * [osquery](https://osquery.io)
-* [Fleet](https://kolide.co/fleet)
+* [Fleet](https://github.com/fleetdm/fleet)
 * [Windows Event Forwarding for Network Defense](https://medium.com/@palantir/windows-event-forwarding-for-network-defense-cb208d5ff86f)
 * [palantir/windows-event-forwarding](http://github.com/palantir/windows-event-forwarding)
 * [osquery Across the Enterprise](https://medium.com/@palantir/osquery-across-the-enterprise-3c3c9d13ec55)
@@ -153,3 +100,40 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [ThreatHunting](https://github.com/olafhartong/ThreatHunting)
 * [sysmon-modular](https://github.com/olafhartong/sysmon-modular)
 * [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team)
+* [Hunting for Beacons](http://findingbad.blogspot.com/2020/05/hunting-for-beacons-part-2.html)
+* [Velociraptor](https://github.com/Velocidex/velociraptor)
+* [BadBlood](https://github.com/davidprowe/BadBlood)
+* [PurpleSharp](https://github.com/mvelazc0/PurpleSharp)
+* [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES)
+
+# DetectionLab Sponsors
+#### Lated updated: 02/04/2020
+I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
+
+### Diamond Sponsors:
+* [Veramine](https://github.com/veramine)
+* [Thinkst](https://github.com/ThinkstAppliedResearch)
+* [kungskal](https://github.com/kungskal)
+* [swizzlez](https://github.com/swizzlez)
+* [CyDefUnicorn](https://github.com/CyDefUnicorn)
+* [olliencc](https://github.com/olliencc)
+
+### Premium Sponsors:
+* [mikeesparza](https://github.com/mikeesparza)
+* [dlee35](https://github.com/dlee35)
+* [chrissanders](https://github.com/chrissanders)
+* [jaredhaight](https://github.com/jaredhaight)
+* [iamfuntime](https://github.com/iamfuntime)
+* [Luct0r](https://github.com/Luct0r)
+* [zhuma549](https://github.com/zhuma549)
+* +1 private sponsor
+
+### Standard Sponsors:
+* [braimee](https://github.com/braimee)
+* [defensivedepth](https://github.com/defensivedepth)
+* [kafkaesqu3](https://github.com/kafkaesqu3)
+* [mdtro](https://github.com/mdtro)
+* [ealaney](https://github.com/ealaney)
+* [elreydetoda](https://github.com/elreydetoda)
+* [DevBits1702](https://github.com/DevBits1702)
+* +2 private sponsors

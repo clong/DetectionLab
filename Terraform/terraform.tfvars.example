@@ -1,7 +1,0 @@
-region = "us-west-1"
-profile = "terraform"
-shared_credentials_file = "/home/user/.aws/credentials"
-public_key_name = "id_logger"
-public_key_path = "/home/user/.ssh/id_logger.pub"
-private_key_path = "/home/user/.ssh/id_logger"
-ip_whitelist = ["1.2.3.4/32"]
