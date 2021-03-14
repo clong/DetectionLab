@@ -18,6 +18,10 @@ output "win10_public_ip" {
   value = azurerm_public_ip.win10-publicip.ip_address 
 }
 
+output "exchange_public_ip" {
+  value = azurerm_public_ip.exchange-publicip.ip_address 
+}
+
 output "ata_url" {
   value = local.ata_url
 }
@@ -35,5 +39,9 @@ output "guacamole_url" {
 }
 
 output "velociraptor_url" {
+  value = local.velociraptor_url
+}
+
+output "exchange_url" {
   value = local.velociraptor_url
 }

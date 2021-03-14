@@ -121,6 +121,36 @@ resource "esxi_guest" "wef" {
   guest_shutdown_timeout = 30
 }
 
+resource "esxi_guest" "exchange" {
+  # See https://blog.gruntwork.io/terraform-tips-tricks-loops-if-statements-and-gotchas-f739bbae55f9#0223 for explanation about count
+  count = var.create_exchange_server ? 1 : 0
+  guest_name = "exchange"
+  disk_store = var.esxi_datastore
+  guestos    = "windows9srv-64"
+
+  boot_disk_type = "thin"
+
+  memsize            = "8192"
+  numvcpus           = "4"
+  resource_pool_name = "/"
+  power              = "on"
+  clone_from_vm = "WindowsServer2016"
+  # This is the network that bridges your host machine with the ESXi VM
+  network_interfaces {
+    virtual_network = var.vm_network
+    mac_address     = "00:50:56:a1:b2:c5"
+    nic_type        = "e1000"
+  }
+  # This is the local network that will be used for 192.168.38.x addressing
+  network_interfaces {
+    virtual_network = var.hostonly_network
+    mac_address     = "00:50:56:a1:b4:c5"
+    nic_type        = "e1000"
+  }
+  guest_startup_timeout  = 45
+  guest_shutdown_timeout = 30
+}
+
 resource "esxi_guest" "win10" {
   guest_name = "win10"
   disk_store = var.esxi_datastore

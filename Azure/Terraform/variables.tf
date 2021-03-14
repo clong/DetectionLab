@@ -40,3 +40,9 @@ variable "external_dns_servers" {
   type        = list(string)
   default     = ["8.8.8.8"]
 }
+
+variable "create_exchange_server" {
+  description = "If set to true, adds an additional host that installs exchange"
+  type        = bool
+  default     = false
+}
