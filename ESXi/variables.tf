@@ -30,3 +30,9 @@ variable "vm_network" {
 variable "hostonly_network" {
   default = "HostOnly Network"
 }
+
+variable "create_exchange_server" {
+  description = "If set to true, adds an additional host that installs exchange"
+  type        = bool
+  default     = false
+}

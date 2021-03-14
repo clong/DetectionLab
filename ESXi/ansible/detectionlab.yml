@@ -21,3 +21,9 @@
     - win10
     - common
   tags: win10
+
+- hosts: exchange
+  roles:
+    - exchange
+    - common
+  tags: exchange

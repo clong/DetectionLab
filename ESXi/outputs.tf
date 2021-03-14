@@ -22,6 +22,14 @@ output "wef_ips" {
   value = esxi_guest.wef.ip_address
 }
 
+output "exchange_interfaces" {
+  value = esxi_guest.exchange.network_interfaces
+}
+
+output "exchange_ips" {
+  value = esxi_guest.exchange.ip_address
+}
+
 output "win10_interfaces" {
   value = esxi_guest.win10.network_interfaces
 }

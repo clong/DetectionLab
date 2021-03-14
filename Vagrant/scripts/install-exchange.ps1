@@ -28,8 +28,8 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Attempting to install Microsoft e
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Please note, you will have to reboot and re-run this script after the prerequisites have been installed."
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Failure to reboot will cause the Exchange installation to fail."
 
-# Warn the user if less than 4GB of memory
-If ($physicalMemory -lt 4000000000) {
+# Warn the user if less than 8GB of memory
+If ($physicalMemory -lt 8000000000) {
     Write-Host "It is STRONGLY recommended that you provide this host with 4GB+ of memory before continuing or it is highly likely that it will run out of memory while installing Exchange."
     $ignore = Read-Host "Type 'ignore' to continue anyways, otherwise this script will exit."
     If ($ignore -ne "ignore") {
@@ -153,19 +153,18 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
     # Create a file so this script knows to skip pre-req installation upon next run.
     New-Item -Path "c:\exchange_prereqs_complete.txt" -ItemType "file"
     Write-Host "A reboot is required to continue installation of exchange."
-    $reboot = Read-Host "Would you like to reboot now? [y/n]"
-    If ($reboot -eq "y") {
-        Write-Host "Rebooting in 3 seconds..."
-        Start-Sleep -Seconds 3
-        shutdown /r /t 1
-        exit
-    } Else {
-        Write-Host "Okay, exiting."
-        exit
-    }
+    # $reboot = Read-Host "Would you like to reboot now? [y/n]"
+    # If ($reboot -eq "y") {
+    #     Write-Host "Rebooting in 3 seconds..."
+    #     Start-Sleep -Seconds 3
+    #     shutdown /r /t 1
+    #     exit
+    # } Else {
+    #     Write-Host "Okay, exiting."
+    #     exit
+    # }
 } Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) It appears the Exchange prerequisites have been installed already. Continuing installation..."
-    Remove-Item "c:\exchange_prereqs_complete.txt" -Force
 }
 
 If (-not (Test-Path $exchangeFolder)) {
@@ -174,7 +173,7 @@ If (-not (Test-Path $exchangeFolder)) {
 Set-Location -Path $exchangeFolder
 
 
-# Download and install Exchange
+# Download Exchange ISO and mount it
 $ProgressPreference = 'SilentlyContinue'
 If (-not (Test-Path $exchangeISOPath)) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading the Exchange 2016 ISO..."
@@ -184,10 +183,22 @@ If (-not (Test-Path $exchangeISOPath)) {
 }
 If (-not (Test-Path "E:\Setup.EXE")) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Mounting the Exchange 2016 ISO..."
-    Mount-DiskImage -ImagePath $exchangeISOPath
+    if (Mount-DiskImage -ImagePath $exchangeISOPath) {
+        Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) ISO mounted successfully."
+    }
+} Else {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO was already mounted. Moving On."
 }
 
-If (Test-Path "E:\Setup.exe") {
+###################################
+##      DEBUGGING STUFF          ##
+###################################
+## Probably a good idea to add some code to see if this script is being run manually or by ansible or not
+## Or maybe just split this into two separate scripts - prereq install + exchange install
+# (Get-CimInstance win32_process -Filter "ProcessID=$PID" | ? { $_.processname -eq "pwsh.exe" }) | select commandline
+# https://stackoverflow.com/questions/9738535/powershell-test-for-noninteractive-mode
+
+<# If (Test-Path "E:\Setup.exe") {
     Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
     Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/PrepareAD", "/OrganizationName:`"Detection Lab`"", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
     Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
@@ -195,5 +206,5 @@ If (Test-Path "E:\Setup.exe") {
 Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong downloading or mounting the ISO..."
 }
-
+ #>
 
