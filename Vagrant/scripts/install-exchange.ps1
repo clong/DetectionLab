@@ -30,7 +30,7 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Failure to reboot will cause the 
 
 # Warn the user if less than 8GB of memory
 If ($physicalMemory -lt 8000000000) {
-    Write-Host "It is STRONGLY recommended that you provide this host with 4GB+ of memory before continuing or it is highly likely that it will run out of memory while installing Exchange."
+    Write-Host "It is STRONGLY recommended that you provide this host with 8GB+ of memory before continuing or it is highly likely that it will run out of memory while installing Exchange."
     $ignore = Read-Host "Type 'ignore' to continue anyways, otherwise this script will exit."
     If ($ignore -ne "ignore") {
         Write-Host "Exiting."

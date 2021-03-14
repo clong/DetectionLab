@@ -553,7 +553,7 @@ resource "azurerm_virtual_machine" "exchange" {
   }
 
   storage_os_disk {
-    name              = "OsDiskWef"
+    name              = "OsDiskExchange"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
