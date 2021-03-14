@@ -377,7 +377,7 @@ resource "azurerm_network_interface" "exchange-nic" {
     subnet_id                     = azurerm_subnet.detectionlab-subnet.id
     private_ip_address_allocation = "Static"
     private_ip_address            = "192.168.38.106"
-    public_ip_address_id          = azurerm_public_ip.exchange-publicip.id
+    public_ip_address_id          = azurerm_public_ip.exchange-publicip[count.index].id
   }
 }
 
@@ -511,7 +511,7 @@ resource "azurerm_virtual_machine" "exchange" {
   name = "exchange.windomain.local"
   location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
-  network_interface_ids = [azurerm_network_interface.exchange-nic.id]
+  network_interface_ids = [azurerm_network_interface.exchange-nic[count.index].id]
   vm_size               = "Standard_D3_v2"
 
   delete_os_disk_on_termination = true

@@ -24,6 +24,8 @@ TF_OUTPUT=$(terraform output)
 DC_IP=$(echo "$TF_OUTPUT" | grep -E -o "dc_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
 WEF_IP=$(echo "$TF_OUTPUT" | grep -E -o "wef_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
 WIN10_IP=$(echo "$TF_OUTPUT" | grep -E -o "win10_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
+# Code needs to be added for exchange
+
 
 # Don't update unless there's default values in inventory.yml
 GREP_COUNT=$(grep -E -c 'x\.x\.x\.x|y\.y\.y\.y|z\.z\.z\.z' ../Ansible/inventory.yml)
