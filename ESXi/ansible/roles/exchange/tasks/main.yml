@@ -83,7 +83,6 @@
     ansible_become_user: WINDOMAIN.local\Administrator
     ansible_become_password: vagrant
   register: prepare_schema
-  changed_when: "prepare_schema.rc == 0"
 
 - name: Prepare AD
   win_package:
@@ -99,7 +98,6 @@
     ansible_become_user: WINDOMAIN.local\Administrator
     ansible_become_password: vagrant
   register: prepare_ad
-  changed_when: "prepare_ad.rc == 0"
 
 - name: Install Exchange
   win_package:
@@ -115,7 +113,6 @@
     ansible_become_user: WINDOMAIN.local\Administrator
     ansible_become_password: vagrant
   register: install_exchange
-  changed_when: "install_exchange.rc == 0"
 
 - name: Reboot after Exchange Installation
   win_reboot:
