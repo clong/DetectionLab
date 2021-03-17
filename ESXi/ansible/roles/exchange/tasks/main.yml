@@ -124,10 +124,3 @@
 - name: Clear Event Logs
   win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
 
-- name: Configure EXCHANGE with raw Commands
-  win_shell: "{{ item }}"
-  with_items:
-    - "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
-    - "Set-SmbServerConfiguration -AuditSmb1Access $true -Force"
-
-
