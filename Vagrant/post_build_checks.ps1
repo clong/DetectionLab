@@ -66,7 +66,7 @@ function post_build_checks {
         Write-Host '[!] Velociraptor was unreachable and may not have installed correctly.' -ForegroundColor red
     }
     else {
-        Write-Host '  ['$($checkmark)'] Velocirpator is running and reachable!' -ForegroundColor Green
+        Write-Host '  ['$($checkmark)'] Velociraptor is running and reachable!' -ForegroundColor Green
     }
     Write-Host ''
 
