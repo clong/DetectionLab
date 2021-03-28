@@ -92,10 +92,8 @@ If (-not (Test-Path "c:\Tools\PurpleSharp")) {
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Purplesharp..."
 $tag = (Invoke-WebRequest "https://api.github.com/repos/mvelazc0/PurpleSharp/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $purplesharpDownloadUrl = "https://github.com/mvelazc0/PurpleSharp/releases/download/$tag/PurpleSharp.exe"
-$purplesharpDllDownloadURL = "https://github.com/mvelazc0/PurpleSharp/releases/download/$tag/Newtonsoft.Json.dll"
 If (-not (Test-Path "c:\Tools\PurpleSharp\PurpleSharp.exe")) {
   Invoke-WebRequest -Uri $purplesharpDownloadUrl -OutFile "c:\Tools\PurpleSharp\PurpleSharp.exe"
-  Invoke-WebRequest -Uri $purplesharpDllDownloadUrl -OutFile "c:\Tools\PurpleSharp\Newtonsoft.Json.dll"
 } Else {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) PurpleSharp was already installed. Moving On."
 }
