@@ -88,6 +88,18 @@ data "aws_ami" "wef_ami" {
   }
 }
 
+# Uncomment after this AMI has been created and uploaded to AWS
+# # Use Data Sources to resolve the AMI-ID for the pre-built EXCHANGE host
+# data "aws_ami" "exchange_ami" {
+#   owners      = ["505638924199"]
+#   most_recent = true
+
+#   filter {
+#     name   = "name"
+#     values = ["detectionlab-exchange"]
+#   }
+# }
+
 # Use Data Sources to resolve the AMI-ID for the pre-built Win10 host
 data "aws_ami" "win10_ami" {
   owners      = ["505638924199"]
@@ -116,7 +128,19 @@ variable "wef_ami" {
   default = ""
 }
 
+variable "exchange_ami" {
+  type    = string
+  default = ""
+}
+
 variable "win10_ami" {
   type    = string
   default = ""
+}
+
+# Set to "true" in terraform.tfvars if you want to add the Exchange server
+variable "create_exchange_server" {
+  description = "If set to true, adds an additional host that installs exchange"
+  type        = bool
+  default     = false
 }
