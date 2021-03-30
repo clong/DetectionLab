@@ -37,6 +37,12 @@ If ($physicalMemory -lt 8000000000) {
     }
 }
 
+# Gotta temporarily re-enable these services
+Set-Service TrustedInstaller -StartupType Automatic
+Start-Service TrustedInstaller
+Set-Service wuauserv -StartupType Automatic
+Start-Service wuauserv
+
 If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of prerequisites..."
     # Install Prerequisites 
@@ -49,11 +55,6 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
 
     If ((Get-WindowsOptionalFeature -Online -FeatureName "RSAT-AD-Tools-Feature").State -ne "Enabled") {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing a bunch of items from Microsoft Optional Components..."
-        # Gotta temporarily re-enable these services
-        Set-Service TrustedInstaller -StartupType Automatic
-        Start-Service TrustedInstaller
-        Set-Service wuauserv -StartupType Automatic
-        Start-Service wuauserv
         Install-WindowsFeature `
             NET-Framework-45-Features,
             RPC-over-HTTP-proxy,
@@ -153,6 +154,10 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
     # Create a file so this script knows to skip pre-req installation upon next run.
     New-Item -Path "c:\exchange_prereqs_complete.txt" -ItemType "file"
     Write-Host "A reboot is required to continue installation of exchange."
+    Write-Host "Rebooting in 3 seconds..."
+    Start-Sleep -Seconds 3
+    shutdown /r /t 1
+    
     # $reboot = Read-Host "Would you like to reboot now? [y/n]"
     # If ($reboot -eq "y") {
     #     Write-Host "Rebooting in 3 seconds..."
@@ -200,7 +205,7 @@ If (-not (Test-Path "E:\Setup.EXE")) {
 
 <# If (Test-Path "E:\Setup.exe") {
     Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
-    Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/PrepareAD", "/OrganizationName:`"Detection Lab`"", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+    Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
     Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
 }
 Else {

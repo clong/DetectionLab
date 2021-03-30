@@ -54,16 +54,10 @@
 
 - debug: msg="{{ redteam.stdout_lines }}"
 
-- name: Install Utilities 
-  win_chocolatey:
-    name:
-    - NotepadPlusPlus
-    - GoogleChrome
-    - WinRar
-    - wireshark
-    - winpcap
-    state: present
-    ignore_checksums: yes
-
-
-
+- name: Install Utilities
+  win_shell: ".\\install-utilities.ps1"
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: utilities
+  failed_when: "'Exception' in utilities.stdout"
+  ignore_errors: true
