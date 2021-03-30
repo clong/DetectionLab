@@ -40,9 +40,9 @@ fi
 echo "Replacing the default values in DetectionLab/Azure/Ansible/inventory.yml..."
 sed -i.bak "s/x.x.x.x/$DC_IP/g; s/y.y.y.y/$WEF_IP/g; s/z.z.z.z/$WIN10_IP/g" ../Ansible/inventory.yml
 
-if [ -z $EXCHANGE_IP ]; then
+if [ ! -z $EXCHANGE_IP ]; then
   echo "Found Exchange IP address in Terraform output. Adding to inventory."
-  sed -i.bak "s/#exchange:/exchange:/g; s/#  hosts:/  hosts:/g; s/#    w.w.w.w:/    $EXCHANGE_IP/g" ../Ansible/inventory.yml
+  sed -i.bak "s/#exchange:/exchange:/g; s/#  hosts:/  hosts:/g; s/#    w.w.w.w/    $EXCHANGE_IP/g" ../Ansible/inventory.yml
 fi
 
 echo "Displaying the updated inventory.yml below!"
