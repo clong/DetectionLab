@@ -23,11 +23,11 @@ output "wef_ips" {
 }
 
 output "exchange_interfaces" {
-  value = esxi_guest.exchange.network_interfaces
+  value = esxi_guest.exchange[0].network_interfaces
 }
 
 output "exchange_ips" {
-  value = esxi_guest.exchange.ip_address
+  value = "${var.create_exchange_server ? esxi_guest.exchange[0].ip_address : null}"
 }
 
 output "win10_interfaces" {

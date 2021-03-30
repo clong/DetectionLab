@@ -1,3 +1,5 @@
+build_exchange = false
+
 Vagrant.configure("2") do |config|
 
   config.vm.define "logger" do |cfg|
@@ -177,6 +179,67 @@ Vagrant.configure("2") do |config|
       lv.memory = 2048
       lv.cpus = 2
       override.vm.synced_folder '.', '/', type: 'winrm' 
+    end
+  end
+
+  if build_exchange
+    config.vm.define "exchange" do |cfg|
+      cfg.vm.box = "detectionlab/win2016"
+      cfg.vm.hostname = "exchange"
+      cfg.vm.boot_timeout = 600
+      cfg.vm.communicator = "winrm"
+      cfg.winrm.basic_auth_only = true
+      cfg.winrm.timeout = 300
+      cfg.winrm.retry_limit = 20
+      cfg.vm.network :private_network, ip: "192.168.38.106", gateway: "192.168.38.1", dns: "192.168.38.102"
+
+      cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.106 -dns 8.8.8.8 -gateway 192.168.38.1" 
+      cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
+      cfg.vm.provision "reload"
+      cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
+      cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
+      cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
+      cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: false
+      cfg.vm.provision "shell", path: "scripts/install-windows_ta.ps1", privileged: false
+      cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: false
+      cfg.vm.provision "shell", path: "scripts/install-redteam.ps1", privileged: false
+      cfg.vm.provision "shell", path: "scripts/install-choco-extras.ps1", privileged: false
+      cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
+      cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
+      cfg.vm.provision "shell", path: "scripts/install-velociraptor.ps1", privileged: false 
+      cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
+      cfg.vm.provision "shell", inline: 'cscript c:\windows\system32\slmgr.vbs /dlv', privileged: false
+
+      cfg.vm.provider "vmware_desktop" do |v, override|
+        v.vmx["displayname"] = "exchange.windomain.local"
+        v.memory = 8192
+        v.cpus = 4
+        v.gui = true
+        v.enable_vmrun_ip_lookup = false
+      end
+
+      cfg.vm.provider "virtualbox" do |vb, override|
+        vb.gui = true
+        vb.name = "exchange.windomain.local"
+        vb.default_nic_type = "82545EM"
+        vb.customize ["modifyvm", :id, "--memory", 8192]
+        vb.customize ["modifyvm", :id, "--cpus", 4]
+        vb.customize ["modifyvm", :id, "--vram", "32"]
+        vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+      end
+
+      cfg.vm.provider "libvirt" do |lv, override|
+        lv.graphics_type = "spice"
+        lv.video_type = "qxl"
+        lv.input :type => "tablet", :bus => "usb"
+        override.vm.box = "../Boxes/windows_2016_libvirt.box"
+        lv.video_vram = 32768
+        lv.memory = 8192
+        lv.cpus = 4
+        override.vm.synced_folder '.', '/', type: 'winrm' 
+      end
     end
   end
 
