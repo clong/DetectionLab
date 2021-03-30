@@ -22,7 +22,7 @@ $cplusplusInstallerUrl = "https://download.microsoft.com/download/2/E/6/2E61CFA4
 $cplusplusInstallerPath = "$env:TEMP/vcredist_x64.exe"
 $cplusplusLogPath = "$env:TEMP/cplusplus_install_log.txt"
 $maxSleepTime = 900 
-$physicalMemory = get-ciminstance -class "cim_physicalmemory" | % { $_.Capacity }
+$physicalMemory = get-ciminstance -class "cim_physicalmemory" | % { $_.Capacity } | Select-Object -Last 1
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Attempting to install Microsoft exchange."
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Please note, you will have to reboot and re-run this script after the prerequisites have been installed."

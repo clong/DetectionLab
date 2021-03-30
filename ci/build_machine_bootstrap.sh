@@ -98,10 +98,6 @@ sysctl -p /etc/sysctl.conf > /dev/null
 cd /opt/DetectionLab/Vagrant || exit 1
 sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
 
-# Temporary workaround for VB 6.1 until this is fixed in Vagrant
-# https://github.com/clong/DetectionLab/issues/374
-sed -i 's/--clipboard/--clipboard-mode/g' /opt/DetectionLab/Vagrant/Vagrantfile
-
 # If the boxes are present on external storage, we can modify the Vagrantfile to
 # point to the boxes on disk so we don't have to download them
 if [ $BOXES_PRESENT -eq 1 ]; then
