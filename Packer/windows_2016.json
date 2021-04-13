@@ -114,6 +114,10 @@
         [
           "-drive",
           "file={{ user `packer_build_dir`}}/{{ .Name }},if=virtio,cache=writeback,discard=ignore,format=qcow2,index=1"
+        ],
+        [
+          "-drive",
+          "file={{ user `iso_url` }},media=cdrom,index=2"
         ]
       ],
       "floppy_files": [
