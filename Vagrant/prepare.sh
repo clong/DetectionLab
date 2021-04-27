@@ -131,21 +131,27 @@ check_macos_bigsur() {
 list_providers() {
   VBOX_PRESENT=0
   VMWARE_FUSION_PRESENT=0
+  VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=0
+  VAGRANT_VMWARE_UTILITY_PRESENT=0
 
   if [ "$(uname)" == "Darwin" ]; then
     # Detect Providers on OSX
     VBOX_PRESENT=$(check_virtualbox_installed)
     VMWARE_FUSION_PRESENT=$(check_vmware_fusion_installed)
     VMWARE_WORKSTATION_PRESENT=0 # Workstation doesn't exist on Darwain-based OS
-    VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=$(check_vmware_desktop_vagrant_plugin_installed)
-    VAGRANT_VMWARE_UTILITY_PRESENT=$(check_vagrant_vmware_utility_installed)
+    if [ "$VMWARE_FUSION_PRESENT" -eq 1 ]; then
+      VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=$(check_vmware_desktop_vagrant_plugin_installed)
+      VAGRANT_VMWARE_UTILITY_PRESENT=$(check_vagrant_vmware_utility_installed)
+    fi
     IS_BIGSUR=$(check_macos_bigsur)
   else
     VBOX_PRESENT=$(check_virtualbox_installed)
     VMWARE_WORKSTATION_PRESENT=$(check_vmware_workstation_installed)
     VMWARE_FUSION_PRESENT=0 # Fusion doesn't exist on non-Darwin OS
-    VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=$(check_vmware_desktop_vagrant_plugin_installed)
-    VAGRANT_VMWARE_UTILITY_PRESENT=$(check_vagrant_vmware_utility_installed)
+    if [ "$VMWARE_WORKSTATION_PRESENT" -eq 1 ]; then
+      VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT=$(check_vmware_desktop_vagrant_plugin_installed)
+      VAGRANT_VMWARE_UTILITY_PRESENT=$(check_vagrant_vmware_utility_installed)
+    fi
   fi
 
   (echo >&2 "Available Providers:")
