@@ -13,7 +13,12 @@ If ($hostname -eq "win10") {
   # Adding Defender exclusions just in case
   Set-MpPreference -ExclusionPath "C:\Tools"
   Add-MpPreference -ExclusionPath "C:\Users\vagrant\AppData\Local\Temp"
-  Set-MpPreference -DisableRealtimeMonitoring $true
+
+  . c:\vagrant\scripts\Invoke-CommandAs.ps1
+  Invoke-CommandAs 'NT SERVICE\TrustedInstaller' {
+    Set-Service WinDefend -StartupType Disabled
+    Stop-Service WinDefend
+  }
 }
 
 # Windows Defender should be disabled by the GPO or uninstalled already, but we'll keep this just in case
