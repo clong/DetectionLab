@@ -10,6 +10,7 @@ Boxes/*
 *.tfvars
 inventory.yml
 inventory.yml.bak
+**/inventory.yml
 *.box
 manifest.xml
 HyperV/.vagrant/*
