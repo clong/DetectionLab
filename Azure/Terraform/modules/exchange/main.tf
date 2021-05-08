@@ -3,6 +3,11 @@ locals {
     custom_data_content  = file("${path.module}/../../files/winrm.ps1")
 }
 
+provider "azurerm" {
+  version = "=2.12.0"
+  features {}
+}
+
 resource "azurerm_virtual_machine" "exchange" {
   name = "exchange.windomain.local"
   location = var.region
