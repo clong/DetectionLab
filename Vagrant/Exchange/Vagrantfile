@@ -8,20 +8,20 @@
       cfg.winrm.retry_limit = 20
       cfg.vm.network :private_network, ip: "192.168.38.106", gateway: "192.168.38.1", dns: "192.168.38.102"
 
-      cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.106 -dns 8.8.8.8 -gateway 192.168.38.1" 
-      cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.106 -dns 8.8.8.8 -gateway 192.168.38.1" 
+      cfg.vm.provision "shell", path: "../scripts/provision.ps1", privileged: false
       cfg.vm.provision "reload"
-      cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
-      cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/provision.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/download_palantir_wef.ps1", privileged: false
       cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
-      cfg.vm.provision "shell", path: "scripts/install-splunkuf.ps1", privileged: false
-      cfg.vm.provision "shell", path: "scripts/install-windows_ta.ps1", privileged: false
-      cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: false
-      cfg.vm.provision "shell", path: "scripts/install-redteam.ps1", privileged: false
-      cfg.vm.provision "shell", path: "scripts/install-choco-extras.ps1", privileged: false
-      cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
-      cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
-      cfg.vm.provision "shell", path: "scripts/install-velociraptor.ps1", privileged: false 
+      cfg.vm.provision "shell", path: "../scripts/install-splunkuf.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/install-windows_ta.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/install-utilities.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/install-redteam.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/install-choco-extras.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/install-osquery.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/install-sysinternals.ps1", privileged: false
+      cfg.vm.provision "shell", path: "../scripts/install-velociraptor.ps1", privileged: false 
       cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
       cfg.vm.provision "shell", inline: 'cscript c:\windows\system32\slmgr.vbs /dlv', privileged: false
 

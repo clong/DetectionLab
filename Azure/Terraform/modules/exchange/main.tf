@@ -1,8 +1,13 @@
+# https://github.com/terraform-providers/terraform-provider-azurerm/blob/1940d84dba45e41b2f1f868a22d7f7af1adea8a0/examples/virtual-machines/virtual_machine/vm-joined-to-active-directory/modules/active-directory/2-virtual-machine.tf
+locals {
+    custom_data_content  = file("${path.module}/../../files/winrm.ps1")
+}
+
 resource "azurerm_virtual_machine" "exchange" {
   name = "exchange.windomain.local"
   location = var.region
-  resource_group_name  = azurerm_resource_group.detectionlab.name
-  network_interface_ids = [azurerm_network_interface.exchange-nic[count.index].id]
+  resource_group_name  = var.resource_group_name
+  network_interface_ids = [azurerm_network_interface.exchange-nic.id]
   vm_size               = "Standard_D3_v2"
 
   delete_os_disk_on_termination = true
@@ -39,7 +44,7 @@ resource "azurerm_virtual_machine" "exchange" {
       pass         = "oobeSystem"
       component    = "Microsoft-Windows-Shell-Setup"
       setting_name = "FirstLogonCommands"
-      content      = file("${path.module}/files/FirstLogonCommands.xml")
+      content      = file("${path.module}/../../files/FirstLogonCommands.xml")
     }
   }
 
@@ -58,21 +63,21 @@ resource "azurerm_virtual_machine" "exchange" {
 resource "azurerm_network_interface" "exchange-nic" {
   name = "exchange-nic"
   location = var.region
-  resource_group_name  = azurerm_resource_group.detectionlab.name
+  resource_group_name  = var.resource_group_name
 
   ip_configuration {
     name                          = "myNicConfiguration"
-    subnet_id                     = azurerm_subnet.detectionlab-subnet.id
+    subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Static"
     private_ip_address            = "192.168.38.106"
-    public_ip_address_id          = azurerm_public_ip.exchange-publicip[count.index].id
+    public_ip_address_id          = azurerm_public_ip.exchange-publicip.id
   }
 }
 
 resource "azurerm_public_ip" "exchange-publicip" {
   name                = "exchange-public-ip"
   location            = var.region
-  resource_group_name = azurerm_resource_group.detectionlab.name
+  resource_group_name = var.resource_group_name
   allocation_method   = "Static"
 
   tags = {

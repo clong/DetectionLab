@@ -1,6 +1,0 @@
----
-- hosts: exchange
-  roles:
-    - exchange
-    - common
-  tags: exchange
