@@ -53,11 +53,13 @@
     post_reboot_delay: 60
 
 - name: Install Exchange Prereqs
-  win_shell: .\\install-exchange.ps1
+  win_command: powershell.exe .\\install-exchange.ps1
   args:
     chdir: 'c:\vagrant\scripts'
   register: exchange_prereqs
   changed_when: "'A reboot is required to continue installation of exchange.' in exchange_prereqs.stdout"
+
+- debug: msg="{{ exchange_prereqs.stdout_lines }}"
 
 - name: Reboot After Installing Exchange PreReqs
   win_reboot:

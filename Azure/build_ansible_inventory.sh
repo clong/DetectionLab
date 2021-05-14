@@ -23,10 +23,8 @@ TF_OUTPUT=$(terraform output)
 
 DC_IP=$(echo "$TF_OUTPUT" | grep -E -o "dc_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
 WEF_IP=$(echo "$TF_OUTPUT" | grep -E -o "wef_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
-EXCHANGE_IP=$(echo "$TF_OUTPUT" | grep -E -o "exchange_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
 WIN10_IP=$(echo "$TF_OUTPUT" | grep -E -o "win10_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
-# Code needs to be added for exchange
-
+EXCHANGE_IP=$(echo "$TF_OUTPUT" | grep -E -o "exchange_public_ip = ([0-9]{1,3}[\.]){3}[0-9]{1,3}" | cut -d '=' -f 2 | tr -d ' ')
 
 # Don't update unless there's default values in inventory.yml
 GREP_COUNT=$(grep -E -c 'x\.x\.x\.x|y\.y\.y\.y|z\.z\.z\.z' ../Ansible/inventory.yml)
@@ -40,9 +38,9 @@ fi
 echo "Replacing the default values in DetectionLab/Azure/Ansible/inventory.yml..."
 sed -i.bak "s/x.x.x.x/$DC_IP/g; s/y.y.y.y/$WEF_IP/g; s/z.z.z.z/$WIN10_IP/g" ../Ansible/inventory.yml
 
-if [ ! -z $EXCHANGE_IP ]; then
-  echo "Found Exchange IP address in Terraform output. Adding to inventory."
-  sed -i.bak "s/#exchange:/exchange:/g; s/#  hosts:/  hosts:/g; s/#    w.w.w.w/    $EXCHANGE_IP/g" ../Ansible/inventory.yml
+if [ ! -e "$EXCHANGE_IP" ]; then
+  echo "Exchange server found! Adding the IP to the Ansible inventory..."
+  sed -i.bak "s/# v.v.v.v/$EXCHANGE_IP/g" ../Ansible/inventory.yml
 fi
 
 echo "Displaying the updated inventory.yml below!"

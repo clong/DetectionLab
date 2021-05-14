@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Download and Install Terraform
           command: |
-            wget -O terraform.zip https://releases.hashicorp.com/terraform/0.12.2/terraform_0.12.2_linux_amd64.zip
+            wget -O terraform.zip https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
             unzip terraform.zip
             sudo mv terraform /usr/local/bin/terraform
 

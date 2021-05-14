@@ -12,7 +12,6 @@ win10:
   hosts:
     z.z.z.z:
 
-#exchange:
-#  hosts:
-#    w.w.w.w:
-
+exchange:
+  hosts:
+    # v.v.v.v:
