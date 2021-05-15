@@ -36,27 +36,40 @@ do
   vagrant winrm -s powershell -c "cscript c:\windows\system32\slmgr.vbs /dlv" $host
   sleep 2
 done
+
+## Check for exchange box
+if [ -f "/opt/DetectionLab/Vagrant/Exchange/.vagrant/machines/exchange/*/private_key" ]; then
+  EXCHANGE_EXISTS=1
+  cd /opt/DetectionLab/Vagrant/Exchange || exit 1
+  echo "Exchange appears to have been built! Running the above commands on exchange."
+  host="exchange"
+  echo "Running 'Set-NetFirewallRule -Name WINRM-HTTP-In-TCP -Profile Any' on $host..."
+  vagrant winrm -e -c "Set-NetFirewallRule -Name 'WINRM-HTTP-In-TCP' -Profile Any" -s powershell $host; sleep 2
+  echo "Running 'Set-NetFirewallRule -Name WINRM-HTTP-In-TCP-NoScope -Profile Any' on $host..."
+  vagrant winrm -c "Set-NetFirewallRule -Name 'WINRM-HTTP-In-TCP-NoScope' -Profile Any" -s powershell $host; sleep 2
+  echo "Clearing event logs on $host..."
+  vagrant winrm -e -s powershell -c "Clear-Eventlog -Log Application, System" $host
+  echo "Printing activivation status..."
+  vagrant winrm -s powershell -c "cscript c:\windows\system32\slmgr.vbs /dlv" $host
+fi
+
 echo "If you're ready to continue, type y:"
 read READY
-
 if [ "$READY" != "y" ]; then
   echo "Okay, quitting"
   exit 1
 fi
 
-#echo "Re-arming WEF"
-#vagrant winrm -e -s powershell -c "cscript c:\windows\system32\slmgr.vbs /rearm" wef
-#echo "Activating Win10..."
-#vagrant winrm -e -s powershell -c "Set-Service TrustedInstaller -StartupType Automatic" win10
-#sleep 2
-#vagrant winrm -e -s powershell -c "Start-Service TrustedInstaller" win10
-#sleep 10
-#vagrant winrm -e -s powershell -c "cscript c:\windows\system32\slmgr.vbs /ato " win10
-
 # Stop vagrant and export each box as an OVA
 cd /opt/DetectionLab/Vagrant || exit 1
 echo "Halting all VMs..."
 vagrant halt
+
+if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
+  cd /opt/DetectionLab/Vagrant/Exchange || exit 1
+  echo "Halting Exchange..."
+  vagrant halt
+fi
 
 echo "Creating a new tmux session..."
 sn=tmuxsession
@@ -64,20 +77,37 @@ tmux new-session -s "$sn" -d
 tmux new-window -t "$sn:2" -n "dc" -d
 tmux new-window -t "$sn:3" -n "wef" -d
 tmux new-window -t "$sn:4" -n "win10" -d
+if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
+  tmux new-window -t "$sn:5" -n "exchange" -d
+fi
+
 if which vmrun; then
   tmux send-keys -t "$sn:2" 'ovftool /opt/DetectionLab/Vagrant/.vagrant/machines/dc/vmware_desktop/*/WindowsServer2016.vmx /root/dc.ova && echo -n "success" > /root/dc.export || echo "failed" > /root/dc.export' Enter
   tmux send-keys -t "$sn:3" 'ovftool /opt/DetectionLab/Vagrant/.vagrant/machines/wef/vmware_desktop/*/WindowsServer2016.vmx /root/wef.ova && echo -n "success" > /root/wef.export || echo "failed" > /root/wef.export' Enter
   tmux send-keys -t "$sn:4" 'ovftool /opt/DetectionLab/Vagrant/.vagrant/machines/win10/vmware_desktop/*/windows_10.vmx /root/win10.ova && echo -n "success" > /root/win10.export || echo "failed" > /root/win10.export' Enter
+  if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
+    tmux send-keys -t "$sn:4" 'ovftool /opt/DetectionLab/Vagrant/Exchange/.vagrant/machines/exchange/vmware_desktop/*/exchange.vmx /root/exchange.ova && echo -n "success" > /root/exchange.export || echo "failed" > /root/exchange.export' Enter
+  fi
 else
   tmux send-keys -t "$sn:2" 'vboxmanage export dc.windomain.local -o /root/dc.ova && echo -n "success" > /root/dc.export || echo "failed" > /root/dc.export' Enter
   tmux send-keys -t "$sn:3" 'vboxmanage export wef.windomain.local -o /root/wef.ova && echo -n "success" > /root/wef.export || echo "failed" > /root/wef.export' Enter
   tmux send-keys -t "$sn:4" 'vboxmanage export win10.windomain.local -o /root/win10.ova && echo -n "success" > /root/win10.export || echo "failed" > /root/win10.export' Enter
+  if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
+    tmux send-keys -t "$sn:4" 'vboxmanage export exchange.windomain.local -o /root/exchange.ova && echo -n "success" > /root/exchange.export || echo "failed" > /root/exchange.export' Enter
+  fi
 fi
 
 # Sleep until all exports are complete
 while [[ ! -f /root/dc.export || ! -f /root/wef.export || ! -f /root/win10.export ]];
-  do sleep 5
-  echo "Waiting for the OVA export to complete. Sleeping for 5."
+  if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
+    if [ ! -f /root/exchange.export ]; 
+      do sleep 5
+      echo "Waiting for the OVA export to complete. Sleeping for 5."
+    fi
+  else
+      do sleep 5
+      echo "Waiting for the OVA export to complete. Sleeping for 5."
+  fi
 done
 
 # Copy each OVA into S3
@@ -86,6 +116,10 @@ if [[ "$(cat /root/dc.export)" == "success" && "$(cat /root/wef.export)" == "suc
   do
     aws s3 cp /root/$file.ova s3://$BUCKET_NAME/disks/
   done
+fi
+
+if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
+  aws s3 cp /root/exchange.ova s3://$BUCKET_NAME/disks/
 fi
 
 # Fix the bucket
@@ -102,3 +136,6 @@ done
 aws ec2 import-image --description "dc" --license-type byol --disk-containers file:///opt/DetectionLab/AWS/Terraform/vm_import/dc.json
 aws ec2 import-image --description "wef" --license-type byol --disk-containers file:///opt/DetectionLab/AWS/Terraform/vm_import/wef.json
 aws ec2 import-image --description "win10" --license-type byol --disk-containers file:///opt/DetectionLab/AWS/Terraform/vm_import/win10.json
+if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
+  aws ec2 import-image --description "exchange" --license-type byol --disk-containers file:///opt/DetectionLab/AWS/Terraform/vm_import/exchange.json
+fi
