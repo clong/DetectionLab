@@ -1,4 +1,5 @@
 ## Remove the block comment to enable the creation of the Exchange server
+/*
 module "exchange" {
   source = "./modules/exchange"
   region = var.region
@@ -8,4 +9,5 @@ module "exchange" {
   custom-tags = var.custom-tags
   exchange_ami = var.exchange_ami
 }
+*/
 
