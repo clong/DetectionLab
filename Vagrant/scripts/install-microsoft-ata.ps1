@@ -92,23 +92,23 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
     Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'
 
     # Enable web requests to endpoints with invalid SSL certs (like self-signed certs)
-    If (-not("SSLValidator" -as [type])) {
-        add-type -TypeDefinition @"
-    using System;
-    using System.Net;
-    using System.Net.Security;
-    using System.Security.Cryptography.X509Certificates;
-    public static class SSLValidator {
-        public static bool ReturnTrue(object sender,
-            X509Certificate certificate,
-            X509Chain chain,
-            SslPolicyErrors sslPolicyErrors) { return true; }
-        public static RemoteCertificateValidationCallback GetDelegate() {
-            return new RemoteCertificateValidationCallback(SSLValidator.ReturnTrue);
-        }
-    }
-"@
-    }
+     #If (-not("SSLValidator" -as [type])) {
+      #   add-type -TypeDefinition @"
+     #using System;
+     #using System.Net;
+     #using System.Net.Security;
+     #using System.Security.Cryptography.X509Certificates;
+     #public static class SSLValidator {
+     #    public static bool ReturnTrue(object sender,
+       #      X509Certificate certificate,
+       #      X509Chain chain,
+         #    SslPolicyErrors sslPolicyErrors) { return true; }
+        # public static RemoteCertificateValidationCallback GetDelegate() {
+         #    return new RemoteCertificateValidationCallback(SSLValidator.ReturnTrue);
+         #}
+    # }
+ #"@
+  #   }
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = [SSLValidator]::GetDelegate()
 
     If (-not (Test-Path "$env:temp\gatewaysetup.zip")) {
@@ -151,7 +151,7 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
     }
     # Disable invalid web requests to endpoints with invalid SSL certs again
     [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $null
-}
+#}
 
 # Set the DC as the domain synchronizer
 $config = Invoke-RestMethod -Uri "https://localhost/api/management/systemProfiles/gateways" -UseDefaultCredentials -UseBasicParsing
