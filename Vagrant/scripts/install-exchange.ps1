@@ -195,9 +195,9 @@ If (-not (Test-Path "d:\Setup.EXE")) {
 If (Test-Path "d:\Setup.exe") {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of Exchange 2016..."
     # Debugging: I need to figure out how to run these commands one-by-one and have them wait properly.
-    Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
-    Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
-    Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installation complete!"
 }
 Else {
