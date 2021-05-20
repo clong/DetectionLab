@@ -36,6 +36,9 @@ vagrant plugin install vagrant-reload
 # Make the Vagrant instances headless
 cd /opt/DetectionLab/Vagrant || exit 1
 sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
+cd /opt/DetectionLab/Vagrant/Exchange || exit 1
+sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
+cd /opt/DetectionLab/Vagrant || exit 1
 
 # Install Packer
 mkdir /opt/packer
