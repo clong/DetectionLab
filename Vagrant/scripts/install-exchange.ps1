@@ -160,7 +160,7 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] A reboot is required to continue installation of exchange."
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Rebooting in 3 seconds..."
     Start-Sleep -Seconds 3
-    shutdown /r /t 1
+    #shutdown /r /t 1
     exit 0
     
 } Else {
@@ -194,6 +194,7 @@ If (-not (Test-Path "d:\Setup.EXE")) {
 
 If (Test-Path "d:\Setup.exe") {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of Exchange 2016..."
+    # Debugging: I need to figure out how to run these commands one-by-one and have them wait properly.
     Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
     Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
     Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
@@ -203,3 +204,6 @@ Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong downloading or mounting the ISO..."
 }
 
+# Cleanup
+# Shink disk
+c:\Tools\Sysinternals\sdelete64.exe c: -z
