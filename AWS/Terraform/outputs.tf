@@ -38,10 +38,10 @@ output "velociraptor_url" {
   value = local.velociraptor_url
 }
 
-output "exchange_public_ip" {
-  value = module.exchange.exchange_public_ip
-}
+#output "exchange_public_ip" {
+#  value = module.exchange.exchange_public_ip
+#}
 
-output "exchange_url" {
-  value = module.exchange.exchange_url
-}
+#output "exchange_url" {
+#  value = module.exchange.exchange_url
+#}
