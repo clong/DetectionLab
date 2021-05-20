@@ -33,7 +33,14 @@ If ($physicalMemory -lt 8000000000) {
     Write-Host "It is STRONGLY recommended that you provide this host with 8GB+ of memory before continuing or it is highly likely that it will run out of memory while installing Exchange."
 }
 
+# If we're installing Exchange, we can remove the ATA ISO
+if (Test-Path "C:\Microsoft ATA 1.9.iso") {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Removing the ATA ISO to save space"
+    Remove-Item -Path "C:\Microsoft ATA 1.9.iso"
+}
+
 # Gotta temporarily re-enable these services
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Temporarily re-enabling TrustedInstaller and Windows Update services..."
 Set-Service TrustedInstaller -StartupType Automatic
 Start-Service TrustedInstaller
 Set-Service wuauserv -StartupType Automatic
@@ -143,29 +150,21 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
             Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) C++ 2013 Redistributable installation successfully completed!"
         }
     }
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Re-disabling TrustedInstaller and Windows Update services..."
     Stop-Service wuauserv
     Set-Service wuauserv -StartupType Disabled
     Set-Service TrustedInstaller -StartupType Disabled
     Stop-Service TrustedInstaller
     # Create a file so this script knows to skip pre-req installation upon next run.
     New-Item -Path "c:\exchange_prereqs_complete.txt" -ItemType "file"
-    Write-Host "A reboot is required to continue installation of exchange."
-    Write-Host "Rebooting in 3 seconds..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] A reboot is required to continue installation of exchange."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Rebooting in 3 seconds..."
     Start-Sleep -Seconds 3
-    shutdown /r /t 1
+    #shutdown /r /t 1
+    exit 0
     
-    # $reboot = Read-Host "Would you like to reboot now? [y/n]"
-    # If ($reboot -eq "y") {
-    #     Write-Host "Rebooting in 3 seconds..."
-    #     Start-Sleep -Seconds 3
-    #     shutdown /r /t 1
-    #     exit
-    # } Else {
-    #     Write-Host "Okay, exiting."
-    #     exit
-    # }
 } Else {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) It appears the Exchange prerequisites have been installed already. Continuing installation..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] It appears the Exchange prerequisites have been installed already. Continuing installation..."
 }
 
 If (-not (Test-Path $exchangeFolder)) {
@@ -177,12 +176,14 @@ Set-Location -Path $exchangeFolder
 # Download Exchange ISO and mount it
 $ProgressPreference = 'SilentlyContinue'
 If (-not (Test-Path $exchangeISOPath)) {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading the Exchange 2016 ISO..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Exchange ISO not found at $exchangeISOPath..."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Downloading the Exchange 2016 ISO..."
     Invoke-WebRequest -Uri "$exchangeDownloadUrl" -OutFile $exchangeISOPath
 } Else {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO was already downloaded. Moving On."
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] The Exchange ISO was already downloaded. Moving On."
 }
-If (-not (Test-Path "E:\Setup.EXE")) {
+If (-not (Test-Path "d:\Setup.EXE")) {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO doesn't appear to be mounted."
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Mounting the Exchange 2016 ISO..."
     if (Mount-DiskImage -ImagePath $exchangeISOPath) {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) ISO mounted successfully."
@@ -191,21 +192,18 @@ If (-not (Test-Path "E:\Setup.EXE")) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO was already mounted. Moving On."
 }
 
-###################################
-##      DEBUGGING STUFF          ##
-###################################
-## Probably a good idea to add some code to see if this script is being run manually or by ansible or not
-## Or maybe just split this into two separate scripts - prereq install + exchange install
-# (Get-CimInstance win32_process -Filter "ProcessID=$PID" | ? { $_.processname -eq "pwsh.exe" }) | select commandline
-# https://stackoverflow.com/questions/9738535/powershell-test-for-noninteractive-mode
-
-<# If (Test-Path "E:\Setup.exe") {
-    Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
-    Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
-    Start-Process cmd.exe -ArgumentList "/k", "e:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+If (Test-Path "d:\Setup.exe") {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of Exchange 2016..."
+    # Debugging: I need to figure out how to run these commands one-by-one and have them wait properly.
+    Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+    Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+    Start-Process cmd.exe -ArgumentList "/k", "d:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installation complete!"
 }
 Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong downloading or mounting the ISO..."
 }
- #>
 
+# Cleanup
+# Shink disk
+c:\Tools\Sysinternals\sdelete64.exe c: -z

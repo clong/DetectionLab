@@ -97,6 +97,9 @@ sysctl -p /etc/sysctl.conf > /dev/null
 # Make the Vagrant instances headless
 cd /opt/DetectionLab/Vagrant || exit 1
 sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
+cd /opt/DetectionLab/Vagrant/Exchange || exit 1
+sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
+cd /opt/DetectionLab/Vagrant || exit 1
 
 # If the boxes are present on external storage, we can modify the Vagrantfile to
 # point to the boxes on disk so we don't have to download them

@@ -33,3 +33,4 @@ resource "aws_instance" "exchange" {
     delete_on_termination = true
   }
 }
+

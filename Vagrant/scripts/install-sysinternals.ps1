@@ -23,6 +23,7 @@ $procmonPath = "C:\Tools\Sysinternals\Procmon.exe"
 $psexecPath = "C:\Tools\Sysinternals\PsExec64.exe"
 $procexpPath = "C:\Tools\Sysinternals\procexp64.exe"
 $sysmonPath = "C:\Tools\Sysinternals\Sysmon64.exe"
+$sdeletePath = "C:\Tools\Sysinternals\Sdelete64.exe"
 $tcpviewPath = "C:\Tools\Sysinternals\Tcpview.exe"
 $sysmonConfigPath = "$sysmonDir\sysmonConfig.xml"
 $shortcutLocation = "$ENV:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs\"
@@ -71,6 +72,15 @@ Try {
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation + "Process Explorer.lnk")
 $Shortcut.TargetPath = $procexpPath
 $Shortcut.Save()
+
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading sdelete64.exe..."
+Try { 
+  (New-Object System.Net.WebClient).DownloadFile('https://live.sysinternals.com/sdelete64.exe', $sdeletePath)
+}
+Catch { 
+  Write-Host "HTTPS connection failed. Switching to HTTP :("
+  (New-Object System.Net.WebClient).DownloadFile('http://live.sysinternals.com/sdelete64.exe', $sdeletePath)
+}
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Sysmon64.exe..."
 Try { 

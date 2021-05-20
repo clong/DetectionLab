@@ -8,9 +8,11 @@ aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
 aws configure set default.region us-west-1
 export BUCKET_NAME="FILL_ME_IN"
 
+EXCHANGE_EXISTS=0
+
 cd /opt/DetectionLab/Vagrant || exit 1
 echo "Clearing out Splunk indexes"
-ssh -i /opt/DetectionLab/Vagrant/.vagrant/machines/logger/virtualbox/private_key vagrant@192.168.38.105 'sudo /opt/splunk/bin/splunk stop && sudo /opt/splunk/bin/splunk clean eventdata -f'
+ssh -o StrictHostKeyChecking=no -i /opt/DetectionLab/Vagrant/.vagrant/machines/logger/virtualbox/private_key vagrant@192.168.38.105 'sudo /opt/splunk/bin/splunk stop && sudo /opt/splunk/bin/splunk clean eventdata -f'
 
 echo "Running WinRM Commands to open WinRM on the firewall..."
 for host in dc wef win10;
@@ -25,7 +27,7 @@ echo "Running WinRM Commands to clear the event logs..."
 for host in dc wef win10;
 do
   echo "Clearing event logs on $host..."
-  vagrant winrm -e -s powershell -c "Clear-Eventlog -Log Application, System" $host
+  vagrant winrm -e -s powershell -c 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}' $host
   sleep 2
 done
 
@@ -38,17 +40,15 @@ do
 done
 
 ## Check for exchange box
-if [ -f "/opt/DetectionLab/Vagrant/Exchange/.vagrant/machines/exchange/*/private_key" ]; then
+if ls /opt/DetectionLab/Vagrant/Exchange/.vagrant/machines/exchange/*/id 1> /dev/null 2>&1; then
   EXCHANGE_EXISTS=1
   cd /opt/DetectionLab/Vagrant/Exchange || exit 1
-  echo "Exchange appears to have been built! Running the above commands on exchange."
+  echo "Exchange appears to have been built. Running the above commands on exchange."
   host="exchange"
   echo "Running 'Set-NetFirewallRule -Name WINRM-HTTP-In-TCP -Profile Any' on $host..."
   vagrant winrm -e -c "Set-NetFirewallRule -Name 'WINRM-HTTP-In-TCP' -Profile Any" -s powershell $host; sleep 2
-  echo "Running 'Set-NetFirewallRule -Name WINRM-HTTP-In-TCP-NoScope -Profile Any' on $host..."
-  vagrant winrm -c "Set-NetFirewallRule -Name 'WINRM-HTTP-In-TCP-NoScope' -Profile Any" -s powershell $host; sleep 2
   echo "Clearing event logs on $host..."
-  vagrant winrm -e -s powershell -c "Clear-Eventlog -Log Application, System" $host
+  vagrant winrm -e -s powershell -c 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}' $host
   echo "Printing activivation status..."
   vagrant winrm -s powershell -c "cscript c:\windows\system32\slmgr.vbs /dlv" $host
 fi
@@ -86,26 +86,27 @@ if which vmrun; then
   tmux send-keys -t "$sn:3" 'ovftool /opt/DetectionLab/Vagrant/.vagrant/machines/wef/vmware_desktop/*/WindowsServer2016.vmx /root/wef.ova && echo -n "success" > /root/wef.export || echo "failed" > /root/wef.export' Enter
   tmux send-keys -t "$sn:4" 'ovftool /opt/DetectionLab/Vagrant/.vagrant/machines/win10/vmware_desktop/*/windows_10.vmx /root/win10.ova && echo -n "success" > /root/win10.export || echo "failed" > /root/win10.export' Enter
   if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
-    tmux send-keys -t "$sn:4" 'ovftool /opt/DetectionLab/Vagrant/Exchange/.vagrant/machines/exchange/vmware_desktop/*/exchange.vmx /root/exchange.ova && echo -n "success" > /root/exchange.export || echo "failed" > /root/exchange.export' Enter
+    tmux send-keys -t "$sn:5" 'ovftool /opt/DetectionLab/Vagrant/Exchange/.vagrant/machines/exchange/vmware_desktop/*/exchange.vmx /root/exchange.ova && echo -n "success" > /root/exchange.export || echo "failed" > /root/exchange.export' Enter
   fi
 else
   tmux send-keys -t "$sn:2" 'vboxmanage export dc.windomain.local -o /root/dc.ova && echo -n "success" > /root/dc.export || echo "failed" > /root/dc.export' Enter
   tmux send-keys -t "$sn:3" 'vboxmanage export wef.windomain.local -o /root/wef.ova && echo -n "success" > /root/wef.export || echo "failed" > /root/wef.export' Enter
   tmux send-keys -t "$sn:4" 'vboxmanage export win10.windomain.local -o /root/win10.ova && echo -n "success" > /root/win10.export || echo "failed" > /root/win10.export' Enter
   if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
-    tmux send-keys -t "$sn:4" 'vboxmanage export exchange.windomain.local -o /root/exchange.ova && echo -n "success" > /root/exchange.export || echo "failed" > /root/exchange.export' Enter
+    tmux send-keys -t "$sn:5" 'vboxmanage export exchange.windomain.local -o /root/exchange.ova && echo -n "success" > /root/exchange.export || echo "failed" > /root/exchange.export' Enter
   fi
 fi
 
 # Sleep until all exports are complete
 while [[ ! -f /root/dc.export || ! -f /root/wef.export || ! -f /root/win10.export ]];
+do 
   if [ "$EXCHANGE_EXISTS" -eq 1 ]; then
-    if [ ! -f /root/exchange.export ]; 
-      do sleep 5
+    if [ ! -f /root/exchange.export ]; then
+      sleep 5
       echo "Waiting for the OVA export to complete. Sleeping for 5."
     fi
   else
-      do sleep 5
+      sleep 5
       echo "Waiting for the OVA export to complete. Sleeping for 5."
   fi
 done
