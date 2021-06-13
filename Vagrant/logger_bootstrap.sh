@@ -372,6 +372,9 @@ install_zeek() {
   redef Intel::read_files += {
     "/opt/zeek/etc/intel.dat"
   };
+  
+  redef ignore_checksums = T;
+  
   ' >>/opt/zeek/share/zeek/site/local.zeek
 
   # Configure Zeek
