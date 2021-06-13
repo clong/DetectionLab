@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-# This script is used to manually prepare an Ubuntu 16.04 server for DetectionLab building
+# This script is used to manually prepare an Ubuntu 18.04 server for DetectionLab building
 export DEBIAN_FRONTEND=noninteractive
 sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
 

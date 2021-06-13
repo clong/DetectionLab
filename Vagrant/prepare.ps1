@@ -121,7 +121,7 @@ function check_vmware_vagrant_plugin_installed {
   }
   else {
     Write-Host '  [!] VMware Workstation is installed, but the vagrant-vmware-desktop plugin is not.' -ForegroundColor red
-    Write-Host '  [-] Visit https://www.vagrantup.com/vmware/index.html#buy-now for more information on how to purchase ($80) and install it' -ForegroundColor yellow
+    Write-Host '  [-] Please install it via "vagrant plugin install vagrant-vmware-desktop"' -ForegroundColor yellow
     Write-Host '  [-] VMware Workstation will not be listed as a provider until the Vagrant plugin has been installed.' -ForegroundColor yellow
     Write-Host '  [-] NOTE: The plugin does not work with trial versions of VMware Workstation' -ForegroundColor yellow
     return $false
