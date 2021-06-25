@@ -568,6 +568,33 @@ postinstall_tasks() {
   curl -s -A "DetectionLab-logger" "https:/ping.detectionlab.network/logger" || echo "Unable to connect to ping.detectionlab.network"
 }
 
+configure_splunk_inputs() {
+  # Suricata
+  crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata index suricata
+  crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata sourcetype suricata:json
+  crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata whitelist 'eve.json'
+  crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata disabled 0
+  crudini --set /opt/splunk/etc/apps/search/local/props.conf suricata:json TRUNCATE 0
+
+  # Fleet
+    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
+    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
+
+  # Zeek
+  mkdir -p /opt/splunk/etc/apps/Splunk_TA_bro/local && touch /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager index zeek
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager sourcetype zeek:json
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager whitelist '.*\.log$'
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager blacklist '.*(communication|stderr)\.log$'
+  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager disabled 0
+
+  # Ensure permissions are correct and restart splunk
+  chown -R splunk:splunk /opt/splunk/etc/apps/Splunk_TA_bro
+  /opt/splunk/bin/splunk restart
+
+
+}
+
 main() {
   apt_install_prerequisites
   modify_motd
@@ -583,5 +610,15 @@ main() {
   postinstall_tasks
 }
 
-main
+splunk_only() {
+  install_splunk
+  configure_splunk_inputs
+}
+
+# Allow custom modes via CLI args
+if [ ! -z $1 ]; then
+  eval $1
+else
+  main
+fi
 exit 0
