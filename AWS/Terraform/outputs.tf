@@ -7,7 +7,7 @@ output "logger_public_ip" {
 }
 
 output "logger_ssh_access" {
-  value = "ssh vagrant@aws_instance.logger.public_ip (password=vagrant)"
+  value = "ssh vagrant@${aws_instance.logger.public_ip} (password=vagrant)"
 }
 
 output "dc_public_ip" {
