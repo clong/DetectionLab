@@ -181,38 +181,30 @@ resource "aws_instance" "logger" {
   key_name               = aws_key_pair.auth.key_name
   private_ip             = "192.168.38.105"
 
-  # Provision the AWS Ubuntu 18.04 AMI from scratch.
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get -qq update && sudo apt-get -qq install -y git",
-      "echo 'logger' | sudo tee /etc/hostname && sudo hostnamectl set-hostname logger",
-      "sudo adduser --disabled-password --gecos \"\" vagrant && echo 'vagrant:vagrant' | sudo chpasswd",
-      "sudo mkdir /home/vagrant/.ssh && sudo cp /home/ubuntu/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys && sudo chown -R vagrant:vagrant /home/vagrant/.ssh",
-      "echo 'vagrant    ALL=(ALL:ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers",
-      "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
-      "sudo sed -i 's/eth1/ens5/g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
-      "sudo sed -i 's/ETH1/ens5/g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
-      "sudo sed -i 's/eth1/ens5/g' /opt/DetectionLab/Vagrant/resources/suricata/suricata.yaml",
-      "sudo sed -i -e '127,130d' /opt/DetectionLab/Vagrant/resources/suricata/suricata.yaml",
-      "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
-      "sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config",
-      "sudo service ssh restart",
-      "sudo chmod +x /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
       "sudo apt-get -qq update",
-      "sudo /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
+      "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
+      "sudo chmod +x /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
+      "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
+      "sudo yq d -i /etc/suricata/suricata.yaml af-packet[1]", 
+      "sudo sed -i '1s/^/\\%YAML 1.1\\n---\\n/g' /etc/suricata/suricata.yaml",
+      "sudo cp /opt/DetectionLab/Vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service && sudo systemctl daemon-reload && sudo service fleet restart",
+      "sudo service suricata restart",
+      "sudo /opt/DetectionLab/Vagrant/logger_bootstrap.sh splunk_only",
     ]
 
     connection {
       host        = coalesce(self.public_ip, self.private_ip)
       type        = "ssh"
-      user        = "ubuntu"
-      private_key = file(var.private_key_path)
+      user        = "vagrant"
+      password    = "vagrant"
     }
   }
 
   root_block_device {
     delete_on_termination = true
-    volume_size           = 64
+    volume_size           = 64 
   }
 }
 
