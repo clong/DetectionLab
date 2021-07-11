@@ -25,8 +25,8 @@ git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab
 # Install Vagrant
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget https://releases.hashicorp.com/vagrant/2.2.16/vagrant_2.2.16_x86_64.deb
-dpkg -i vagrant_2.2.16_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.2.17/vagrant_2.2.17_x86_64.deb
+dpkg -i vagrant_2.2.17_x86_64.deb
 
 # Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
 echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
@@ -43,8 +43,8 @@ cd /opt/DetectionLab/Vagrant || exit 1
 # Install Packer
 mkdir /opt/packer
 cd /opt/packer || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/packer/1.6.6/packer_1.6.6_linux_amd64.zip
-unzip packer_1.6.6_linux_amd64.zip
+wget --progress=bar:force https://releases.hashicorp.com/packer/1.7.3/packer_1.7.3_linux_amd64.zip
+unzip packer_1.7.3_linux_amd64.zip
 cp packer /usr/local/bin/packer
 
 # Make the Packer images headless
