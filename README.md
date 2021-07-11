@@ -107,17 +107,18 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES)
 
 # DetectionLab Sponsors
-#### Lated updated: 04/10/2021
+#### Lated updated: 07/09/2021
 I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
 
 ### Diamond Sponsors:
 * [Veramine](https://github.com/veramine)
 * [Thinkst](https://github.com/ThinkstAppliedResearch)
 * [kungskal](https://github.com/kungskal)
-* [swizzlez](https://github.com/swizzlez)
 * [CyDefUnicorn](https://github.com/CyDefUnicorn)
 * [olliencc](https://github.com/olliencc)
 * [snaplabsio](https://github.com/snaplabsio)
+* [0x0lolbin](https://github.com/0x0lolbin)
+* [materaj2](https://github.com/materaj2)
 
 ### Premium Sponsors:
 * [mikeesparza](https://github.com/mikeesparza)
@@ -127,7 +128,6 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [iamfuntime](https://github.com/iamfuntime)
 * [Luct0r](https://github.com/Luct0r)
 * [secdev-01](https://github.com/secdev-01)
-* +1 private sponsor
 
 ### Standard Sponsors:
 * [braimee](https://github.com/braimee)
@@ -137,4 +137,4 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [ealaney](https://github.com/ealaney)
 * [elreydetoda](https://github.com/elreydetoda)
 * [DevBits1702](https://github.com/DevBits1702)
-* +2 private sponsors
+* +1 private sponsor
