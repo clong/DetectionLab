@@ -94,6 +94,10 @@ fi
 echo "net.ipv6.conf.all.disable_ipv6=0" >> /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf > /dev/null
 
+## Git Clone DL (Only needed when manually building)
+#git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab
+
+
 # Make the Vagrant instances headless
 cd /opt/DetectionLab/Vagrant || exit 1
 sed -i 's/vb.gui = true/vb.gui = false/g' Vagrantfile
@@ -113,78 +117,50 @@ fi
 cat << 'EOF' > /opt/DetectionLab/build.sh
 #! /usr/bin/env bash
 
-# Brings up a single host using Vagrant
-vagrant_up_host() {
-  HOST="$1"
-  (echo >&2 "Attempting to bring up the $HOST host using Vagrant")
-  cd "$DL_DIR"/Vagrant || exit 1
-  $(which vagrant) up "$HOST" &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log"
-  echo "$?"
-}
-
-# Attempts to reload and re-provision a host if the intial "vagrant up" fails
-vagrant_reload_host() {
-  HOST="$1"
-  cd "$DL_DIR"/Vagrant || exit 1
-  # Attempt to reload the host if the vagrant up command didn't exit cleanly
-  $(which vagrant) reload "$HOST" --provision >>"$DL_DIR/Vagrant/vagrant_up_$HOST.log" 2>&1
-  echo "$?"
-}
-
-# A series of checks to ensure important services are responsive after the build completes.
-post_build_checks() {
-  # If the curl operation fails, we'll just leave the variable equal to 0
-  # This is needed to prevent the script from exiting if the curl operation fails
-  SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk' || echo "")
-  FLEET_CHECK=$(curl -ks -m 2 https://192.168.38.105:8412 | grep -c 'Kolide Fleet' || echo "")
-  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.38.103 -m 2)
-  [[ $ATA_CHECK == 401 ]] && ATA_CHECK=1
-
-  BASH_MAJOR_VERSION=$(/bin/bash --version | grep 'GNU bash' | grep -oi version\.\.. | cut -d ' ' -f 2 | cut -d '.' -f 1)
-  # Associative arrays are only supported in bash 4 and up
-  if [ "$BASH_MAJOR_VERSION" -ge 4 ]; then
-    declare -A SERVICES
-    SERVICES=(["splunk"]="$SPLUNK_CHECK" ["fleet"]="$FLEET_CHECK" ["ms_ata"]="$ATA_CHECK")
-    for SERVICE in "${!SERVICES[@]}"; do
-      if [ "${SERVICES[$SERVICE]}" -lt 1 ]; then
-        (echo >&2 "Warning: $SERVICE failed post-build tests and may not be functioning correctly.")
-      fi
-    done
-  else
-    if [ "$SPLUNK_CHECK" -lt 1 ]; then
-      (echo >&2 "Warning: Splunk failed post-build tests and may not be functioning correctly.")
-    fi
-    if [ "$FLEET_CHECK" -lt 1 ]; then
-      (echo >&2 "Warning: Fleet failed post-build tests and may not be functioning correctly.")
-    fi
-    if [ "$ATA_CHECK" -lt 1 ]; then
-      (echo >&2 "Warning: MS ATA failed post-build tests and may not be functioning correctly.")
-    fi
-  fi
-}
 
 build_vagrant_hosts() {
-  LAB_HOSTS=("logger" "dc" "wef" "win10")
 
-  # Vagrant up each box and attempt to reload one time if it fails
-  for VAGRANT_HOST in "${LAB_HOSTS[@]}"; do
-    RET=$(vagrant_up_host "$VAGRANT_HOST")
-    if [ "$RET" -eq 0 ]; then
-      (echo >&2 "Good news! $VAGRANT_HOST was built successfully!")
-    fi
-    # Attempt to recover if the intial "vagrant up" fails
-    if [ "$RET" -ne 0 ]; then
-      (echo >&2 "Something went wrong while attempting to build the $VAGRANT_HOST box.")
-      (echo >&2 "Attempting to reload and reprovision the host...")
-      RETRY_STATUS=$(vagrant_reload_host "$VAGRANT_HOST")
-      if [ "$RETRY_STATUS" -eq 0 ]; then
-        (echo >&2 "Good news! $VAGRANT_HOST was built successfully after a reload!")
-      else
-        (echo >&2 "Failed to bring up $VAGRANT_HOST after a reload. Exiting.")
-        exit 1
-      fi
-    fi
-  done
+# Kick off builds for logger and dc
+cd "$DL_DIR"/Vagrant || exit 1
+for HOST in logger dc; do
+  (vagrant up $HOST &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log" || vagrant reload $HOST --provision &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log") &
+  declare ${HOST}_PID=$!
+done
+
+# We only have to wait for DC to create the domain before kicking off wef and win10 builds
+DC_CREATION_TIMEOUT=30
+MINUTES_PASSED=0
+while ! grep 'I am domain joined!' "$DL_DIR/Vagrant/vagrant_up_dc.log" > /dev/null; do
+    (echo >&2 "[$(date +%H:%M:%S)]: Waiting for DC to complete creation of the domain...")
+    sleep 60
+    ((MINUTES_PAST += 1))
+    if [ $MINUTES_PAST -gt $DC_CREATION_TIMEOUT ]; then
+      (echo >&2 "Timed out waiting for DC to create the domain controller. Exiting.")
+      exit 1
+    fi 
+done;
+
+# Kick off builds for wef and win10
+cd "$DL_DIR"/Vagrant || exit 1
+for HOST in wef win10; do
+  (vagrant up $HOST &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log" || vagrant reload $HOST --provision &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log") &
+  declare ${HOST}_PID=$!
+done
+
+# Wait for all the builds to finish
+while ps -p $logger_PID > /dev/null || ps -p $dc_PID > /dev/null || ps -p $wef_PID > /dev/null || ps -p $win10_PID > /dev/null; do
+  (echo >&2 "[$(date +%H:%M:%S)]: Waiting for all of the builds to complete...")
+  sleep 60
+done
+
+for HOST in logger dc wef win10; do
+  if wait $HOST_PID; then # After this command, the return code gets set to what the return code of the PID was
+    (echo >&2 "$HOST was built successfully!")
+  else 
+    (echo >&2 "Failed to bring up $HOST after a reload. Exiting")
+    exit 1
+  fi
+done
 }
 
 main() {
@@ -195,7 +171,7 @@ main() {
   # Build and Test Vagrant hosts 
   cd Vagrant
   build_vagrant_hosts
-  post_build_checks
+  /bin/bash $DL_DIR/Vagrant/post_build_checks.sh
 }
 
 main
