@@ -125,11 +125,13 @@
     fi
     # There's a fun issue where dhclient keeps messing with eth1 despite the fact
     # that eth1 has a static IP set. We workaround this by setting a static DHCP lease.
+    if ! grep 'interface "eth1"' /etc/dhcp/dhclient.conf; then
     echo -e 'interface "eth1" {
       send host-name = gethostname();
       send dhcp-requested-address 192.168.38.105;
     }' >>/etc/dhcp/dhclient.conf
     netplan apply
+    fi
     # Fix eth1 if the IP isn't set correctly
     ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
     if [ "$ETH1_IP" != "192.168.38.105" ]; then
@@ -307,8 +309,12 @@
       cd /opt || exit 1
 
       echo "[$(date +%H:%M:%S)]: Installing Fleet..."
-      echo -e "\n127.0.0.1       fleet" >>/etc/hosts
-      echo -e "\n127.0.0.1       logger" >>/etc/hosts
+      if ! grep 'fleet' /etc/hosts; then
+        echo -e "\n127.0.0.1       fleet" >>/etc/hosts
+      fi
+      if ! grep 'logger' /etc/hosts; then
+        echo -e "\n127.0.0.1       logger" >>/etc/hosts
+      fi
 
       # Set MySQL username and password, create fleet database
       mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'fleet';"
@@ -327,11 +333,14 @@
       cp /vagrant/resources/fleet/server.* /opt/fleet/
       cp /vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service
 
+      # Create directory for logs
       mkdir /var/log/fleet
 
+      # Install the service file
       /bin/systemctl enable fleet.service
       /bin/systemctl start fleet.service
 
+      # Start Fleet
       echo "[$(date +%H:%M:%S)]: Waiting for fleet service to start..."
       while true; do
         result=$(curl --silent -k https://127.0.0.1:8412)
@@ -494,6 +503,22 @@
       echo "Suricata attempted to start but is not running. Exiting"
       exit 1
     fi
+
+    # Configure a logrotate policy for Suricata
+    cat >/etc/logrotate.d/suricata <<EOF
+    /var/log/suricata/*.log /var/log/suricata/*.json
+    {
+      hourly
+      rotate 0
+      missingok
+      nocompress
+      size=500M
+      sharedscripts
+      postrotate
+            /bin/kill -HUP \`cat /var/run/suricata.pid 2>/dev/null\` 2>/dev/null || true
+      endscript
+    }
+    EOF
   register: install_suricata
   failed_when: "'error' in install_suricata.stderr"
 
@@ -504,7 +529,9 @@
   become: yes
   shell: |
     echo "[$(date +%H:%M:%S)]: Installing Zeek..."
-    sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
+    if ! grep 'zeek' /etc/apt/sources.list.d/security:zeek.list; then
+      sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
+    fi
     wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_18.04/Release.key -O /tmp/Release.key
     apt-key add - </tmp/Release.key &>/dev/null
 

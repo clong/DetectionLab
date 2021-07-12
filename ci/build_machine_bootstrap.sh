@@ -116,64 +116,56 @@ fi
 # Recreate a barebones version of the build script so we have some sense of return codes
 cat << 'EOF' > /opt/DetectionLab/build.sh
 #! /usr/bin/env bash
-
-
 build_vagrant_hosts() {
-
-# Kick off builds for logger and dc
-cd "$DL_DIR"/Vagrant || exit 1
-for HOST in logger dc; do
-  (vagrant up $HOST &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log" || vagrant reload $HOST --provision &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log") &
-  declare ${HOST}_PID=$!
-done
-
-# We only have to wait for DC to create the domain before kicking off wef and win10 builds
-DC_CREATION_TIMEOUT=30
-MINUTES_PASSED=0
-while ! grep 'I am domain joined!' "$DL_DIR/Vagrant/vagrant_up_dc.log" > /dev/null; do
+  # Kick off builds for logger and dc
+  cd "$DL_DIR"/Vagrant || exit 1
+  for HOST in logger dc; do
+    (vagrant up $HOST &>"$DL_DIR/Vagrant/vagrant_up_$HOST.log" || vagrant reload $HOST --provision &>"$DL_DIR/Vagrant/vagrant_up_$HOST.log") &
+    declare ${HOST}_PID=$!
+  done
+  # We only have to wait for DC to create the domain before kicking off wef and win10 builds
+  DC_CREATION_TIMEOUT=30
+  MINUTES_PASSED=0
+  while ! grep 'I am domain joined!' "$DL_DIR/Vagrant/vagrant_up_dc.log" >/dev/null; do
     (echo >&2 "[$(date +%H:%M:%S)]: Waiting for DC to complete creation of the domain...")
     sleep 60
-    ((MINUTES_PAST += 1))
-    if [ $MINUTES_PAST -gt $DC_CREATION_TIMEOUT ]; then
+    ((MINUTES_PASSED += 1))
+    if [ "$MINUTES_PASSED" -gt "$DC_CREATION_TIMEOUT" ]; then
       (echo >&2 "Timed out waiting for DC to create the domain controller. Exiting.")
       exit 1
-    fi 
-done;
-
-# Kick off builds for wef and win10
-cd "$DL_DIR"/Vagrant || exit 1
-for HOST in wef win10; do
-  (vagrant up $HOST &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log" || vagrant reload $HOST --provision &> "$DL_DIR/Vagrant/vagrant_up_$HOST.log") &
-  declare ${HOST}_PID=$!
-done
-
-# Wait for all the builds to finish
-while ps -p $logger_PID > /dev/null || ps -p $dc_PID > /dev/null || ps -p $wef_PID > /dev/null || ps -p $win10_PID > /dev/null; do
-  (echo >&2 "[$(date +%H:%M:%S)]: Waiting for all of the builds to complete...")
-  sleep 60
-done
-
-for HOST in logger dc wef win10; do
-  if wait $HOST_PID; then # After this command, the return code gets set to what the return code of the PID was
-    (echo >&2 "$HOST was built successfully!")
-  else 
-    (echo >&2 "Failed to bring up $HOST after a reload. Exiting")
-    exit 1
-  fi
-done
+    fi
+  done
+  # Kick off builds for wef and win10
+  cd "$DL_DIR"/Vagrant || exit 1
+  for HOST in wef win10; do
+    (vagrant up $HOST &>>"$DL_DIR/Vagrant/vagrant_up_$HOST.log" || vagrant reload $HOST --provision &>>"$DL_DIR/Vagrant/vagrant_up_$HOST.log") &
+    declare ${HOST}_PID=$!
+  done
+  # Wait for all the builds to finish
+  # shellcheck disable=SC2154
+  while ps -p "$logger_PID" >/dev/null || ps -p "$dc_PID" >/dev/null || ps -p "$wef_PID" >/dev/null || ps -p "$win10_PID" >/dev/null; do
+    (echo >&2 "[$(date +%H:%M:%S)]: Waiting for all of the hosts to finish provisioning...")
+    sleep 60
+  done
+  for HOST in logger dc wef win10; do
+    if wait "$HOST_PID"; then # After this command, the return code gets set to what the return code of the PID was
+      (echo >&2 "[$(date +%H:%M:%S)]: $HOST was built successfully!")
+    else
+      (echo >&2 "Failed to bring up $HOST after a reload. Exiting")
+      exit 1
+    fi
+  done
 }
 
 main() {
   # Get location of build.sh
   # https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
   DL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-  # Build and Test Vagrant hosts 
-  cd Vagrant
+  # Build and Test Vagrant hosts
+  cd Vagrant || exit 1
   build_vagrant_hosts
-  /bin/bash $DL_DIR/Vagrant/post_build_checks.sh
+  /bin/bash "$DL_DIR/Vagrant/post_build_checks.sh"
 }
-
 main
 exit 0
 EOF
