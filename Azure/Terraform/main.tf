@@ -12,7 +12,6 @@
 
 # Specify the provider and access details
 provider "azurerm" {
-  version = "=2.12.0"
   features {}
 }
 
