@@ -41,7 +41,7 @@ Vagrant.configure("2") do |config|
       # Which storage pool path to use. Default to /var/lib/libvirt/images or ~/.local/share/libvirt/images depending on if you are running a system or user QEMU/KVM session.
       #libvirt.storage_pool_path = '/media/storage_nvme/system_session_vm_pool'
       lv.storage_pool_name = 'default'
-      override.vm.box = "generic/ubuntu1604"
+      override.vm.box = "generic/ubuntu1804"
       override.vm.synced_folder './', '/vagrant', type: 'rsync' 
     end
   end
