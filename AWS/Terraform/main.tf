@@ -278,7 +278,7 @@ resource "aws_instance" "wef" {
 }
 
 resource "aws_instance" "win10" {
-  instance_type = "t2.medium"
+  instance_type = "t2.large"
 
   provisioner "remote-exec" {
     inline = [
