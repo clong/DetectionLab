@@ -159,6 +159,7 @@ resource "aws_security_group" "windows" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -213,7 +214,7 @@ resource "aws_instance" "dc" {
 
   provisioner "file" {
     source      = "scripts/bootstrap.ps1"
-    destination = "C:\\Temp\\script.ps1"
+    destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
       type     = "winrm"
@@ -224,7 +225,7 @@ resource "aws_instance" "dc" {
   }
 
   provisioner "remote-exec" {
-    inline = ["powershell.exe -File C:\\Temp\\script.ps1"]
+    inline = ["powershell.exe -File C:\\Temp\\bootstrap.ps1"]
 
     connection {
       type     = "winrm"
@@ -255,7 +256,7 @@ resource "aws_instance" "wef" {
 
   provisioner "file" {
     source      = "scripts/bootstrap.ps1"
-    destination = "C:\\Temp\\script.ps1"
+    destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
       type     = "winrm"
@@ -266,7 +267,7 @@ resource "aws_instance" "wef" {
   }
 
   provisioner "remote-exec" {
-    inline = ["powershell.exe -File C:\\Temp\\script.ps1"]
+    inline = ["powershell.exe -File C:\\Temp\\bootstrap.ps1"]
 
     connection {
       type     = "winrm"
@@ -297,7 +298,7 @@ resource "aws_instance" "win10" {
 
   provisioner "file" {
     source      = "scripts/bootstrap.ps1"
-    destination = "C:\\Temp\\script.ps1"
+    destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
       type     = "winrm"
@@ -308,7 +309,7 @@ resource "aws_instance" "win10" {
   }
 
   provisioner "remote-exec" {
-    inline = ["powershell.exe -File C:\\Temp\\script.ps1"]
+    inline = ["powershell.exe -File C:\\Temp\\bootstrap.ps1"]
 
     connection {
       type     = "winrm"
