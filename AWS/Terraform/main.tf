@@ -211,12 +211,20 @@ resource "aws_instance" "logger" {
 resource "aws_instance" "dc" {
   instance_type = "t3.medium"
 
+  provisioner "file" {
+    source      = "scripts/bootstrap.ps1"
+    destination = "C:\\Temp\\script.ps1"
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
+
   provisioner "remote-exec" {
-    inline = [
-      "choco install -force -y winpcap",
-      "ipconfig /renew",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'\"",
-      ]
+    inline = ["powershell.exe -File C:\\Temp\\script.ps1"]
 
     connection {
       type     = "winrm"
@@ -245,13 +253,20 @@ resource "aws_instance" "dc" {
 resource "aws_instance" "wef" {
   instance_type = "t3.medium"
 
+  provisioner "file" {
+    source      = "scripts/bootstrap.ps1"
+    destination = "C:\\Temp\\script.ps1"
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
+
   provisioner "remote-exec" {
-    inline = [
-      "choco install -force -y winpcap",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'\"",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'\"",
-      "ipconfig /renew",
-    ]
+    inline = ["powershell.exe -File C:\\Temp\\script.ps1"]
 
     connection {
       type     = "winrm"
@@ -280,13 +295,20 @@ resource "aws_instance" "wef" {
 resource "aws_instance" "win10" {
   instance_type = "t2.large"
 
+  provisioner "file" {
+    source      = "scripts/bootstrap.ps1"
+    destination = "C:\\Temp\\script.ps1"
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
+
   provisioner "remote-exec" {
-    inline = [
-      "choco install -force -y winpcap",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'\"",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'\"",
-      "ipconfig /renew",
-    ]
+    inline = ["powershell.exe -File C:\\Temp\\script.ps1"]
 
     connection {
       type     = "winrm"

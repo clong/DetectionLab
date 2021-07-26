@@ -113,7 +113,6 @@ main() {
   /bin/bash "$DL_DIR/Vagrant/post_build_checks.sh"
 }
 main
-exit 0
 EOF
 chmod +x /opt/DetectionLab/build.sh
 
