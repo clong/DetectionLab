@@ -113,11 +113,11 @@ jobs:
               export STATUS=$(curl -s $IP_ADDRESS)
               if [ "$STATUS" == "building" ]; then
                 echo "[$(date +%H:%M:%S)]: $STATUS"
-                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
                 sleep 300
                 ((MINUTES_PAST += 5))
               else
-                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
                 echo "$STATUS" > /tmp/status
                 break
               fi
