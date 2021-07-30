@@ -110,10 +110,10 @@ main() {
   # Build and Test Vagrant hosts
   cd Vagrant || exit 1
   build_vagrant_hosts
-  /bin/bash "$DL_DIR/Vagrant/post_build_checks.sh"
+  /bin/bash "$DL_DIR/Vagrant/post_build_checks.sh" > $DL_DIR/Vagrant/post_build.log
+  exit 0
 }
 main
-exit 0
 EOF
 chmod +x /opt/DetectionLab/build.sh
 

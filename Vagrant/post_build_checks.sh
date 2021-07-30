@@ -65,4 +65,3 @@ post_build_checks() {
 }
 
 post_build_checks
-exit 0

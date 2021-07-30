@@ -36,8 +36,8 @@ resource "aws_subnet" "default" {
 # Adjust VPC DNS settings to not conflict with lab
 resource "aws_vpc_dhcp_options" "default" {
   domain_name          = "windomain.local"
-  domain_name_servers  = concat([aws_instance.dc.private_ip], var.external_dns_servers)
-  netbios_name_servers = [aws_instance.dc.private_ip]
+  domain_name_servers  = concat(["192.168.38.102"], var.external_dns_servers)
+  netbios_name_servers = ["192.168.38.102"]
   tags = var.custom-tags
 }
 
@@ -210,13 +210,25 @@ resource "aws_instance" "logger" {
 
 resource "aws_instance" "dc" {
   instance_type = "t3.medium"
+  depends_on = [
+    aws_vpc_dhcp_options.default,
+    aws_vpc_dhcp_options_association.default
+  ]
+
+  provisioner "file" {
+    source      = "scripts/bootstrap.ps1"
+    destination = "C:\\Temp\\bootstrap.ps1"
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
 
   provisioner "remote-exec" {
-    inline = [
-      "choco install -force -y winpcap",
-      "ipconfig /renew",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'\"",
-      ]
+    inline = ["powershell.exe -File C:\\Temp\\bootstrap.ps1"]
 
     connection {
       type     = "winrm"
@@ -244,14 +256,25 @@ resource "aws_instance" "dc" {
 
 resource "aws_instance" "wef" {
   instance_type = "t3.medium"
+    depends_on = [
+    aws_vpc_dhcp_options.default,
+    aws_vpc_dhcp_options_association.default
+  ]
+
+  provisioner "file" {
+    source      = "scripts/bootstrap.ps1"
+    destination = "C:\\Temp\\bootstrap.ps1"
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
 
   provisioner "remote-exec" {
-    inline = [
-      "choco install -force -y winpcap",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'\"",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'\"",
-      "ipconfig /renew",
-    ]
+    inline = ["powershell.exe -File C:\\Temp\\bootstrap.ps1"]
 
     connection {
       type     = "winrm"
@@ -279,14 +302,25 @@ resource "aws_instance" "wef" {
 
 resource "aws_instance" "win10" {
   instance_type = "t2.large"
+    depends_on = [
+    aws_vpc_dhcp_options.default,
+    aws_vpc_dhcp_options_association.default
+  ]
+
+  provisioner "file" {
+    source      = "scripts/bootstrap.ps1"
+    destination = "C:\\Temp\\bootstrap.ps1"
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
 
   provisioner "remote-exec" {
-    inline = [
-      "choco install -force -y winpcap",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'\"",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'\"",
-      "ipconfig /renew",
-    ]
+    inline = ["powershell.exe -File C:\\Temp\\bootstrap.ps1"]
 
     connection {
       type     = "winrm"
