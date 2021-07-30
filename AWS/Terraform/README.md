@@ -3,7 +3,7 @@
 ## Cost
 ```
 terraform state pull |  curl -s -X POST -H "Content-Type: application/json" -d @- https://cost.modules.tf/
-{"hourly": 0.17, "monthly": 123.26}
+{"hourly": 0.26, "monthly": 186.62}
 ```
 ---
 
