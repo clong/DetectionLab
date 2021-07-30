@@ -1,8 +1,5 @@
 # Purpose: Prepare the AWS AMIs for use
 
-# Install npcap so Wireshark recognizes the AWS network adapters
-Start-Job -ScriptBlock { choco install -y --force npcap --version 0.86 }
-
 # Hardcode IP addresses in the HOSTS file
 If ($env:COMPUTERNAME -eq "DC") {
   Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'
@@ -16,9 +13,12 @@ Else {
 # Keep renewing the IP address until the domain controller is set as a DNS server
 while (!(Get-DNSClientServerAddress | Where-Object { $_.ServerAddresses -eq "192.168.38.102" })) { 
   write-host "Waiting to receive the correct DNS settings from DHCP..."; 
-  start-sleep 1; 
+  start-sleep 5; 
   ipconfig /renew
 }
+
+# Install npcap so Wireshark recognizes the AWS network adapters
+Start-Job -ScriptBlock { choco install -y --force npcap --version 0.86 }
 
 # Check if gpupdate works
 if ($env:COMPUTERNAME -ne "DC") { 
