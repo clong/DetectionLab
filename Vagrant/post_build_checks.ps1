@@ -30,6 +30,18 @@ function download {
 function post_build_checks {
     $checkmark = ([char]8730)
 
+    if ((Get-NetAdapter | where {$_.name -eq "VMware Network Adapter VMnet2"}).ifIndex) {
+      Write-Host '[*] Verifying vmnet2 interface has its IP address set correctly'
+      $vmnet2idx=(Get-NetAdapter | where {$_.name -eq "VMware Network Adapter VMnet2"}).ifIndex
+      if ((get-netipaddress -AddressFamily IPv4 | where { $_.InterfaceIndex -eq $vmnet2idx }).IPAddress -ne "192.168.38.1") {
+        Write-Host '[!] Your vmnet2 network adapter is not set with a static IP address of 192.168.38.1' -ForegroundColor red
+        Write-Host '[!] Please match your adapter settings to the screenshot shown here: https://github.com/clong/DetectionLab/issues/681#issuecomment-890442441' -ForegroundColor red
+      }
+      Else {
+        Write-Host '  ['$($checkmark)'] VMNet2 is correctly set to 192.168.38.1!' -ForegroundColor Green
+      }
+    }
+
     Write-Host '[*] Verifying that Splunk is reachable...'
     $SPLUNK_CHECK = download -URL 'https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
     if ($SPLUNK_CHECK -eq $false) {
