@@ -1,7 +1,7 @@
 # Shouldnt need this but alas: https://github.com/hashicorp/terraform-provider-aws/issues/14917
 provider "aws" {
-  region = var.region
-  profile = var.profile
+  region                  = var.region
+  profile                 = var.profile
   shared_credentials_file = var.shared_credentials_file
 }
 
@@ -15,7 +15,7 @@ resource "aws_instance" "exchange" {
       "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'\"",
       "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'\"",
       "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'\"",
-      ]
+    ]
 
     connection {
       type     = "winrm"
@@ -29,7 +29,7 @@ resource "aws_instance" "exchange" {
   ami = coalesce(var.exchange_ami, data.aws_ami.exchange_ami.image_id)
 
   tags = merge(var.custom-tags, tomap(
-    {"Name" = "${var.instance_name_prefix}exchange.windomain.local"}
+    { "Name" = "${var.instance_name_prefix}exchange.windomain.local" }
   ))
 
   subnet_id              = var.subnet_id
