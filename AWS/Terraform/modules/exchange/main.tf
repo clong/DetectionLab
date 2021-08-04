@@ -1,6 +1,8 @@
 # Shouldnt need this but alas: https://github.com/hashicorp/terraform-provider-aws/issues/14917
 provider "aws" {
   region = var.region
+  profile = var.profile
+  shared_credentials_file = var.shared_credentials_file
 }
 
 resource "aws_instance" "exchange" {
