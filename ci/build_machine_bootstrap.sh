@@ -120,4 +120,4 @@ chmod +x /opt/DetectionLab/build.sh
 # Start the build in a tmux session
 sn=tmuxsession
 tmux new-session -s "$sn" -d
-tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab && ./build.sh && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html; umount /mnt && /usr/local/bin/packet-block-storage-detach' Enter
+tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab && ./build.sh && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html' Enter
