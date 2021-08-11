@@ -571,12 +571,15 @@ install_guacamole() {
   cd /var/lib/tomcat8/webapps || echo "[-] Unable to find the tomcat8/webapps folder."
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/binary/guacamole-1.0.0.war" -O guacamole.war
   mkdir /etc/guacamole
+  mkdir /etc/guacamole/shares
+  sudo chmod 777 mkdir /etc/guacamole/shares
   mkdir /usr/share/tomcat8/.guacamole
   cp /vagrant/resources/guacamole/user-mapping.xml /etc/guacamole/
   cp /vagrant/resources/guacamole/guacamole.properties /etc/guacamole/
   cp /vagrant/resources/guacamole/guacd.service /lib/systemd/system
   sudo ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat8/.guacamole/
   sudo ln -s /etc/guacamole/user-mapping.xml /usr/share/tomcat8/.guacamole/
+  sudo ln -s /usr/local/lib/freerdp /usr/lib/x86_64-linux-gnu/
   systemctl enable guacd
   systemctl enable tomcat8
   systemctl start guacd
