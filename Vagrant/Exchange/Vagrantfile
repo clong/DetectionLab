@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-velociraptor.ps1", privileged: false 
     cfg.vm.provision "shell", path: "scripts/install-exchange.ps1", privileged: true
     cfg.vm.provision "reload"
-    cfg.vm.provision "shell", path: "scripts/install-exchange.ps1", privileged: false 
+    cfg.vm.provision "shell", path: "scripts/install-exchange.ps1", privileged: true 
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
     cfg.vm.provision "shell", inline: 'cscript c:\windows\system32\slmgr.vbs /dlv', privileged: false
 
