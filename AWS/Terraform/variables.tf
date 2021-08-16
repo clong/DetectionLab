@@ -59,11 +59,11 @@ variable "external_dns_servers" {
 
 # Use Data Sources to resolve the AMI-ID for the Ubuntu 18.04 AMI
 data "aws_ami" "logger_ami" {
-  owners = ["099720109477"]
+  owners = ["505638924199"]
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20191113"]
+    values = ["detectionlab-logger"]
   }
 }
 
@@ -112,6 +112,11 @@ variable "dc_ami" {
 }
 
 variable "wef_ami" {
+  type    = string
+  default = ""
+}
+
+variable "exchange_ami" {
   type    = string
   default = ""
 }

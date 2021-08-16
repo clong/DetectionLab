@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Download and Install Terraform
           command: |
-            wget -O terraform.zip https://releases.hashicorp.com/terraform/0.12.2/terraform_0.12.2_linux_amd64.zip
+            wget -O terraform.zip https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
             unzip terraform.zip
             sudo mv terraform /usr/local/bin/terraform
 
@@ -113,15 +113,15 @@ jobs:
               export STATUS=$(curl -s $IP_ADDRESS)
               if [ "$STATUS" == "building" ]; then
                 echo "[$(date +%H:%M:%S)]: $STATUS"
-                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
                 sleep 300
                 ((MINUTES_PAST += 5))
               else
-                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
+                scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/*.log /tmp/artifacts/ || echo "Vagrant log not yet present"
                 echo "$STATUS" > /tmp/status
                 break
               fi
-              if [ "$MINUTES_PAST" -gt 240 ]; then
+              if [ "$MINUTES_PAST" -gt 120 ]; then
                 echo "[$(date +%H:%M:%S)]: Serer timed out. Uptime: $MINUTES_PAST minutes."
                 scp -q -i ~/.ssh/id_rsa root@"$IP_ADDRESS":/opt/DetectionLab/Vagrant/vagrant_up_*.log /tmp/artifacts/
                 curl -s -X DELETE --header 'Accept: application/json' --header 'X-Auth-Token: '"$PACKET_API_TOKEN" 'https://api.packet.net/devices/'"$DEVICE_ID"'?force_delete=true'

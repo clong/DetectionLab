@@ -18,6 +18,16 @@
             <param name="ignore-cert">true</param>
         </connection>
 
+        <connection name="exchange">
+            <protocol>rdp</protocol>
+            <param name="hostname">192.168.38.106</param>
+            <param name="port">3389</param>
+            <param name="username">vagrant</param>
+            <param name="password">vagrant</param>
+            <param name="security">nla</param>
+            <param name="ignore-cert">true</param>
+        </connection>
+
         <connection name="win10">
             <protocol>rdp</protocol>
             <param name="hostname">192.168.38.104</param>

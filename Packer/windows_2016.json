@@ -83,7 +83,7 @@
     },
     {
       "type": "qemu",
-      "vm_name": "windows_10",
+      "vm_name": "WindowsServer2016",
       "communicator": "winrm",
       "iso_url": "{{user `iso_url`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
@@ -114,6 +114,10 @@
         [
           "-drive",
           "file={{ user `packer_build_dir`}}/{{ .Name }},if=virtio,cache=writeback,discard=ignore,format=qcow2,index=1"
+        ],
+        [
+          "-drive",
+          "file={{ user `iso_url` }},media=cdrom,index=2"
         ]
       ],
       "floppy_files": [

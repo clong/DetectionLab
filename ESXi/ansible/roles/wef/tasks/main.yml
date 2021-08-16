@@ -11,7 +11,7 @@
 
 # This needs to be made idempodent
 - name: Set HostOnly IP Address
-  win_shell: "$adapter = (get-netadapter | where {$_.MacAddress -eq '00-50-56-A1-B4-C4'}).Name; New-NetIPAddress –InterfaceAlias $adapter –AddressFamily IPv4 -IPAddress 192.168.38.103 –PrefixLength 24 -DefaultGateway 192.168.38.1"
+  win_shell: "If (-not(get-netipaddress | where {$_.IPAddress -eq '192.168.38.103'})) {$adapter = (get-netadapter | where {$_.MacAddress -eq '00-50-56-A1-B4-C4'}).Name; New-NetIPAddress –InterfaceAlias $adapter –AddressFamily IPv4 -IPAddress 192.168.38.103 –PrefixLength 24 -DefaultGateway 192.168.38.1 } Else { Write-Host 'IP Address Already Created.' }"
 
 # This needs to be made idempodent
 - name: Set HostOnly DNS Address

@@ -6,6 +6,10 @@ output "logger_public_ip" {
   value = aws_instance.logger.public_ip
 }
 
+output "logger_ssh_access" {
+  value = "ssh vagrant@${aws_instance.logger.public_ip} (password=vagrant)"
+}
+
 output "dc_public_ip" {
   value = aws_instance.dc.public_ip
 }
@@ -37,3 +41,11 @@ output "guacamole_url" {
 output "velociraptor_url" {
   value = local.velociraptor_url
 }
+
+#output "exchange_public_ip" {
+#  value = module.exchange.exchange_public_ip
+#}
+
+#output "exchange_url" {
+#  value = module.exchange.exchange_url
+#}

@@ -125,11 +125,13 @@
     fi
     # There's a fun issue where dhclient keeps messing with eth1 despite the fact
     # that eth1 has a static IP set. We workaround this by setting a static DHCP lease.
+    if ! grep 'interface "eth1"' /etc/dhcp/dhclient.conf; then
     echo -e 'interface "eth1" {
       send host-name = gethostname();
       send dhcp-requested-address 192.168.38.105;
     }' >>/etc/dhcp/dhclient.conf
     netplan apply
+    fi
     # Fix eth1 if the IP isn't set correctly
     ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
     if [ "$ETH1_IP" != "192.168.38.105" ]; then
@@ -212,6 +214,7 @@
       /opt/splunk/bin/splunk add index suricata -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index threathunting -auth 'admin:changeme'
       /opt/splunk/bin/splunk add index evtx_attack_samples -auth 'admin:changeme'
+      /opt/splunk/bin/splunk add index msexchange -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_forwarder/splunk-add-on-for-microsoft-windows_700.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/splunk-add-on-for-microsoft-sysmon_1062.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/asn-lookup-generator_110.tgz -auth 'admin:changeme'
@@ -221,7 +224,7 @@
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/punchcard-custom-visualization_130.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
       /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
-      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_144.tgz -auth 'admin:changeme'
+      /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_1492.tgz -auth 'admin:changeme'
       
       # Fix ASNGen App - https://github.com/doksu/TA-asngen/issues/18#issuecomment-685691630
       echo 'python.version = python2' >> /opt/splunk/etc/apps/TA-asngen/default/commands.conf
@@ -300,37 +303,44 @@
     executable: /bin/bash
   become: yes
   shell: |
-    if [ -f "/opt/fleet" ]; then
+    if [ -d "/opt/fleet" ]; then
       echo "[$(date +%H:%M:%S)]: Fleet is already installed"
     else
       cd /opt || exit 1
 
       echo "[$(date +%H:%M:%S)]: Installing Fleet..."
-      echo -e "\n127.0.0.1       fleet" >>/etc/hosts
-      echo -e "\n127.0.0.1       logger" >>/etc/hosts
+      if ! grep 'fleet' /etc/hosts; then
+        echo -e "\n127.0.0.1       fleet" >>/etc/hosts
+      fi
+      if ! grep 'logger' /etc/hosts; then
+        echo -e "\n127.0.0.1       logger" >>/etc/hosts
+      fi
 
-      # Set MySQL username and password, create kolide database
-      mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'kolide';"
-      mysql -uroot -pkolide -e "create database kolide;"
+      # Set MySQL username and password, create fleet database
+      mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'fleet';"
+      mysql -uroot -pfleet -e "create database fleet;"
 
       # Always download the latest release of Fleet
-      curl -s https://api.github.com/repos/fleetdm/fleet/releases/latest | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | wget --progress=bar:force -i -
+      curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' '  | head -1 | wget --progress=bar:force -i -
       unzip fleet.zip -d fleet
       cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
       cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
 
       # Prepare the DB
-      fleet prepare db --mysql_address=127.0.0.1:3306 --mysql_database=kolide --mysql_username=root --mysql_password=kolide
+      fleet prepare db --mysql_address=127.0.0.1:3306 --mysql_database=fleet --mysql_username=root --mysql_password=fleet
 
       # Copy over the certs and service file
       cp /vagrant/resources/fleet/server.* /opt/fleet/
       cp /vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service
 
+      # Create directory for logs
       mkdir /var/log/fleet
 
+      # Install the service file
       /bin/systemctl enable fleet.service
       /bin/systemctl start fleet.service
 
+      # Start Fleet
       echo "[$(date +%H:%M:%S)]: Waiting for fleet service to start..."
       while true; do
         result=$(curl --silent -k https://127.0.0.1:8412)
@@ -344,7 +354,7 @@
       fleetctl login --email admin@detectionlab.network --password 'admin123#'
 
       # Set the enrollment secret to match what we deploy to Windows hosts
-      mysql -uroot --password=kolide -e 'use kolide; update enroll_secrets set secret = "enrollmentsecret" where active=1;'
+      mysql -uroot --password=fleet -e 'use fleet; update enroll_secrets set secret = "enrollmentsecret";'
       echo "Updated enrollment secret"
     fi
   register: install_fleet
@@ -493,6 +503,22 @@
       echo "Suricata attempted to start but is not running. Exiting"
       exit 1
     fi
+
+    # Configure a logrotate policy for Suricata
+    cat >/etc/logrotate.d/suricata <<EOF
+    /var/log/suricata/*.log /var/log/suricata/*.json
+    {
+      hourly
+      rotate 0
+      missingok
+      nocompress
+      size=500M
+      sharedscripts
+      postrotate
+            /bin/kill -HUP \`cat /var/run/suricata.pid 2>/dev/null\` 2>/dev/null || true
+      endscript
+    }
+    EOF
   register: install_suricata
   failed_when: "'error' in install_suricata.stderr"
 
@@ -503,7 +529,9 @@
   become: yes
   shell: |
     echo "[$(date +%H:%M:%S)]: Installing Zeek..."
-    sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
+    if ! grep 'zeek' /etc/apt/sources.list.d/security:zeek.list; then
+      sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
+    fi
     wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_18.04/Release.key -O /tmp/Release.key
     apt-key add - </tmp/Release.key &>/dev/null
 

@@ -1,12 +1,19 @@
 # DetectionLab Terraform
 
+## Cost
+```
+terraform state pull |  curl -s -X POST -H "Content-Type: application/json" -d @- https://cost.modules.tf/
+{"hourly": 0.26, "monthly": 186.62}
+```
+---
+
 ### Method 1 - Pre-built AMIs
 
-#### Estimated time to build: 30 minutes
+#### Estimated time to build: ~5 minutes
 
 As of March 2019, I am now sharing pre-built AMIs on the Amazon Marketplace. The code inside of main.tf uses Terraform data sources to determine the correct AMI ID and will use the pre-built AMIs by default.
 
-Using this method, it should be possible to bring DetectionLab online in under 30 minutes.
+Using this method, it should be possible to bring DetectionLab online in under 10 minutes.
 
 The instructions for deploying DetectionLab in AWS using the pre-built AMIs are available here: [Pre-Built AMIs README](./Pre-Built_AMIs.md)
 
