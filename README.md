@@ -119,6 +119,7 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [snaplabsio](https://github.com/snaplabsio)
 * [0x0lolbin](https://github.com/0x0lolbin)
 * [materaj2](https://github.com/materaj2)
+* [OutpostSecurity](https://github.com/OutpostSecurity)
 
 ### Premium Sponsors:
 * [mikeesparza](https://github.com/mikeesparza)

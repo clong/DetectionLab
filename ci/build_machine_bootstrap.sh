@@ -34,8 +34,8 @@ ufw --force enable
 echo "[$(date +%H:%M:%S)]: Installing Vagrant..."
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.17/vagrant_2.2.17_x86_64.deb
-dpkg -i vagrant_2.2.17_x86_64.deb
+wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.18/vagrant_2.2.18_x86_64.deb
+dpkg -i vagrant_2.2.18_x86_64.deb
 echo "[$(date +%H:%M:%S)]: Installing vagrant-reload plugin..."
 vagrant plugin install vagrant-reload
 
@@ -93,12 +93,22 @@ build_vagrant_hosts() {
     (echo >&2 "[$(date +%H:%M:%S)]: Waiting for all of the hosts to finish provisioning...")
     sleep 60
   done
+  ### This code is absolutely terrible. Fix it at some point when I'm less lazy
   for HOST in logger dc wef win10; do
-    if wait "$HOST_PID"; then # After this command, the return code gets set to what the return code of the PID was
-      (echo >&2 "[$(date +%H:%M:%S)]: $HOST was built successfully!")
-    else
-      (echo >&2 "Failed to bring up $HOST after a reload. Exiting")
-      exit 1
+    if [ "$HOST" -eq "logger" ]; then
+      if grep 'logger: OK' "$DL_DIR/Vagrant/vagrant_up_$HOST.log" > /dev/null; then
+        (echo >&2 "[$(date +%H:%M:%S)]: $HOST was built successfully!")
+      else
+        (echo >&2 "Failed to bring up $HOST after a reload. Exiting")
+        exit 1
+      fi
+    else 
+      if grep -i "$HOST: $HOST Provisioning Complete!" "$DL_DIR/Vagrant/vagrant_up_$HOST.log" > /dev/null; then
+        (echo >&2 "[$(date +%H:%M:%S)]: $HOST was built successfully!")
+      else
+        (echo >&2 "Failed to bring up $HOST after a reload. Exiting")
+        exit 1
+      fi
     fi
   done
 }
