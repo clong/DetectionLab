@@ -15,10 +15,20 @@ variable "region" {
   default = ""
 }
 
+variable "profile" {
+  type    = string
+  default = ""
+}
+
+variable "shared_credentials_file" {
+  type    = string
+  default = ""
+}
+
 variable "custom-tags" {
-  type = map(string)
+  type        = map(string)
   description = "Optional mapping for additional tags to apply to all related AWS resources"
-  default = {}
+  default     = {}
 }
 
 variable "exchange_ami" {
