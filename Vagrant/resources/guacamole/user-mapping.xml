@@ -14,6 +14,9 @@
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/wef</param>
             <param name="security">nla</param>
             <param name="ignore-cert">true</param>
         </connection>
@@ -24,6 +27,9 @@
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/exchange</param>
             <param name="security">nla</param>
             <param name="ignore-cert">true</param>
         </connection>
@@ -34,6 +40,9 @@
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/win10</param>
             <param name="security">nla</param>
             <param name="ignore-cert">true</param>
         </connection>
@@ -44,6 +53,9 @@
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/dc</param>
             <param name="security">nla</param>
             <param name="ignore-cert">true</param>
         </connection>
