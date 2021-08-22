@@ -28,7 +28,8 @@
         "./scripts/disable-winrm.ps1",
         "./scripts/enable-winrm.ps1",
         "./scripts/microsoft-updates.bat",
-        "./scripts/win-updates.ps1"
+        "./scripts/win-updates.ps1",
+        "./scripts/install-credssp-fix.ps1"
       ],
       "vmx_data": {
         "RemoteDisplay.vnc.enabled": "false",
@@ -64,7 +65,8 @@
         "./scripts/enable-winrm.ps1",
         "./scripts/microsoft-updates.bat",
         "./scripts/win-updates.ps1",
-        "./scripts/oracle-cert.cer"
+        "./scripts/oracle-cert.cer",
+        "./scripts/install-credssp-fix.ps1"
       ],
       "vboxmanage": [
         [
@@ -131,7 +133,8 @@
         "./scripts/disable-winrm.ps1",
         "./scripts/enable-winrm.ps1",
         "./scripts/microsoft-updates.bat",
-        "./scripts/win-updates.ps1"
+        "./scripts/win-updates.ps1",
+        "./scripts/install-credssp-fix.ps1"
       ]
     }
   ],
@@ -146,6 +149,7 @@
     {
       "type": "powershell",
       "scripts": [
+        "./scripts/install-credssp-fix.ps1",
         "./scripts/vm-guest-tools.ps1",
         "./scripts/debloat-windows.ps1",
         "./scripts/download-microsoft-ata.ps1"

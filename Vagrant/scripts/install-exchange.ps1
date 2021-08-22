@@ -52,7 +52,8 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
     If (-not(choco list -lo | Where-object { $_.ToLower().StartsWith("ucma4".ToLower()) })) {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing UCMA4 from Chocolatey..."
         choco install -y --limit-output --no-progress ucma4
-    } Else {
+    }
+    Else {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) UCMA4 is already installed. Moving on..."
     }
 
@@ -60,39 +61,40 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing a bunch of items from Microsoft Optional Components..."
         Install-WindowsFeature `
             NET-Framework-45-Features,
-            RPC-over-HTTP-proxy,
-            RSAT-Clustering,
-            RSAT-Clustering-CmdInterface,
-            RSAT-Clustering-Mgmt,
-            RSAT-Clustering-PowerShell,
-            Web-Mgmt-Console,
-            WAS-Process-Model,
-            Web-Asp-Net45,
-            Web-Basic-Auth,
-            Web-Client-Auth,
-            Web-Digest-Auth,
-            Web-Dir-Browsing,
-            Web-Dyn-Compression,
-            Web-Http-Errors,
-            Web-Http-Logging,
-            Web-Http-Redirect,
-            Web-Http-Tracing,
-            Web-ISAPI-Ext,
-            Web-ISAPI-Filter,
-            Web-Lgcy-Mgmt-Console,
-            Web-Metabase,
-            Web-Mgmt-Console,
-            Web-Mgmt-Service,
-            Web-Net-Ext45,
-            Web-Request-Monitor,
-            Web-Server,
-            Web-Stat-Compression,
-            Web-Static-Content,
-            Web-Windows-Auth,
-            Web-WMI,
-            Windows-Identity-Foundation,
-            RSAT-ADDS
-    } Else {
+        RPC-over-HTTP-proxy,
+        RSAT-Clustering,
+        RSAT-Clustering-CmdInterface,
+        RSAT-Clustering-Mgmt,
+        RSAT-Clustering-PowerShell,
+        Web-Mgmt-Console,
+        WAS-Process-Model,
+        Web-Asp-Net45,
+        Web-Basic-Auth,
+        Web-Client-Auth,
+        Web-Digest-Auth,
+        Web-Dir-Browsing,
+        Web-Dyn-Compression,
+        Web-Http-Errors,
+        Web-Http-Logging,
+        Web-Http-Redirect,
+        Web-Http-Tracing,
+        Web-ISAPI-Ext,
+        Web-ISAPI-Filter,
+        Web-Lgcy-Mgmt-Console,
+        Web-Metabase,
+        Web-Mgmt-Console,
+        Web-Mgmt-Service,
+        Web-Net-Ext45,
+        Web-Request-Monitor,
+        Web-Server,
+        Web-Stat-Compression,
+        Web-Static-Content,
+        Web-Windows-Auth,
+        Web-WMI,
+        Windows-Identity-Foundation,
+        RSAT-ADDS
+    }
+    Else {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Windows Feature prerequisites are already installed"
     }
     # Install .NET 4.7.1
@@ -125,7 +127,8 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
         If ($secondsPassed -ge $MaxSleepTime) {
             Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Timed out waiting for .NET installation to complete."
             exit 
-        } Else {
+        }
+        Else {
             Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) .NET installation successfully completed!"
         }
     }
@@ -146,7 +149,8 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
         If ($secondsPassed -ge $MaxSleepTime) {
             Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Timed out waiting for C++ 2013 installation to complete."
             exit 
-        } Else {
+        }
+        Else {
             Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) C++ 2013 Redistributable installation successfully completed!"
         }
     }
@@ -157,13 +161,19 @@ If (-not(Test-Path c:\exchange_prereqs_complete.txt)) {
     Stop-Service TrustedInstaller
     # Create a file so this script knows to skip pre-req installation upon next run.
     New-Item -Path "c:\exchange_prereqs_complete.txt" -ItemType "file"
+    # Installing Splunk Inputs
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Adding Splunk inputs for Exchange"
+    $inputsPath = "C:\Program Files\SplunkUniversalForwarder\etc\apps\Splunk_TA_windows\local\inputs.conf"
+    Copy-Item c:\vagrant\resources\splunk_forwarder\exchange_inputs.conf $inputsPath -Force
+
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] A reboot is required to continue installation of exchange."
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Rebooting in 3 seconds..."
     Start-Sleep -Seconds 3
     #shutdown /r /t 1
     exit 0
     
-} Else {
+}
+Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] It appears the Exchange prerequisites have been installed already. Continuing installation..."
 }
 
@@ -179,7 +189,8 @@ If (-not (Test-Path $exchangeISOPath)) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Exchange ISO not found at $exchangeISOPath..."
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Downloading the Exchange 2016 ISO..."
     Invoke-WebRequest -Uri "$exchangeDownloadUrl" -OutFile $exchangeISOPath
-} Else {
+}
+Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] The Exchange ISO was already downloaded. Moving On."
 }
 If (-not (Test-Path "d:\Setup.EXE")) {
@@ -188,22 +199,38 @@ If (-not (Test-Path "d:\Setup.EXE")) {
     if (Mount-DiskImage -ImagePath $exchangeISOPath) {
         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) ISO mounted successfully."
     }
-} Else {
+}
+Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO was already mounted. Moving On."
 }
 
 If (Test-Path "d:\Setup.exe") {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of Exchange 2016..."
     # Debugging: I need to figure out how to run these commands one-by-one and have them wait properly.
-    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
-    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
-    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait
+    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step1stderr.txt -RedirectStandardOutput $exchangeFolder/step1stdout.txt 
+    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step2stderr.txt -RedirectStandardOutput $exchangeFolder/step2stdout.txt 
+    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step3stderr.txt -RedirectStandardOutput $exchangeFolder/step3stdout.txt 
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installation complete!"
 }
 Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong downloading or mounting the ISO..."
 }
 
-# Cleanup
-# Shink disk
-c:\Tools\Sysinternals\sdelete64.exe c: -z
+# Verify that Exchange actually installed properly
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Sleeping for 2 minutes..."
+Start-Sleep 120
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Ensuring Exchange is running..."
+if ((Get-Service -Name "MSExchangeFrontendTransport").Status -eq "Running") {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange was installed successfully!"
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Unmounting disk and cleaning up"
+    Dismount-DiskImage -ImagePath $exchangeISOPath
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Deleting the ISO to save space"
+    Remove-Item -Path $exchangeISOPath
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Shrinking the disk..."
+    c:\Tools\Sysinternals\sdelete64.exe c: -z
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Cleanup complete! All done."
+}
+Else {
+    "$('[{0:HH:mm}]' -f (Get-Date)) Exchange doesn't appear to be running. Manual intervention required :["
+}
+
