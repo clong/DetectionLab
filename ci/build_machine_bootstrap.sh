@@ -95,7 +95,7 @@ build_vagrant_hosts() {
   done
   ### This code is absolutely terrible. Fix it at some point when I'm less lazy
   for HOST in logger dc wef win10; do
-    if [ "$HOST" -eq "logger" ]; then
+    if [[ "$HOST" == "logger" ]]; then
       if grep 'logger: OK' "$DL_DIR/Vagrant/vagrant_up_$HOST.log" > /dev/null; then
         (echo >&2 "[$(date +%H:%M:%S)]: $HOST was built successfully!")
       else
