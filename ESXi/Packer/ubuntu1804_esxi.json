@@ -105,7 +105,7 @@
         "iso_name": "ubuntu-18.04.5-server-amd64.iso",
         "memory": "4096",
         "mirror": "http://cdimage.ubuntu.com",
-        "mirror_directory": "ubuntu/releases/18.04.4/release",
+        "mirror_directory": "ubuntu/releases/18.04.5/release",
         "name": "ubuntu-18.04",
         "no_proxy": "{{env `no_proxy`}}",
         "preseed_path": "preseed.cfg",
