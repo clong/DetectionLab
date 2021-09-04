@@ -19,7 +19,20 @@ $pass = ConvertTo-SecureString "vagrant" -AsPlainText -Force
 $DomainCred = New-Object System.Management.Automation.PSCredential $user, $pass
 
 # Place the computer in the correct OU based on hostname
+# Retry up to 3 times. Sleep 15 seconds between tries.
 If (($hostname -eq "wef") -or ($hostname -eq "exchange")) {
+  $tries = 0
+  While ($tries -lt 3) {
+    Try {
+      $tries += 1
+      Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Servers,dc=windomain,dc=local" -PassThru    
+      Break
+    } Catch {
+      $tries += 1
+      Write-Host $_.Exception.Message
+      Start-Sleep 15
+    }
+  }
   Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Servers,dc=windomain,dc=local" -PassThru
   # Attempt to fix Issue #517
   Set-ItemProperty -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control' -Name 'WaitToKillServiceTimeout' -Value '500' -Type String -Force -ea SilentlyContinue
