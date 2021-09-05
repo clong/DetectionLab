@@ -15,7 +15,7 @@ $username = 'windomain.local\administrator'
 $password = 'vagrant'
 $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential $username, $securePassword
-$dotNetInstallerUrl = 'https://download.microsoft.com/download/9/E/6/9E63300C-0941-4B45-A0EC-0008F96DD480/NDP471-KB4033342-x86-x64-AllOS-ENU.exe'
+$dotNetInstallerUrl = 'https://download.visualstudio.microsoft.com/download/pr/4312fa21-59b0-4451-9482-a1376f7f3ba4/9947fce13c11105b48cba170494e787f/ndp471-kb4033342-x86-x64-allos-enu.exe'
 $dotNetInstallerPath = "$env:TEMP/NDP471-KB4033342-x86-x64-AllOS-ENU.exe"
 $dotNetInstallLog = "$env:TEMP/dotnet_install_log.txt"
 $cplusplusInstallerUrl = "https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe"
@@ -193,28 +193,41 @@ If (-not (Test-Path $exchangeISOPath)) {
 Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] The Exchange ISO was already downloaded. Moving On."
 }
-If (-not (Test-Path "d:\Setup.EXE")) {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO doesn't appear to be mounted."
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Mounting the Exchange 2016 ISO..."
-    if (Mount-DiskImage -ImagePath $exchangeISOPath) {
-        Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) ISO mounted successfully."
-    }
-}
-Else {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO was already mounted. Moving On."
-}
 
-If (Test-Path "d:\Setup.exe") {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of Exchange 2016..."
-    # Debugging: I need to figure out how to run these commands one-by-one and have them wait properly.
-    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step1stderr.txt -RedirectStandardOutput $exchangeFolder/step1stdout.txt 
-    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step2stderr.txt -RedirectStandardOutput $exchangeFolder/step2stdout.txt 
-    Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step3stderr.txt -RedirectStandardOutput $exchangeFolder/step3stdout.txt 
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installation complete!"
-}
-Else {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong downloading or mounting the ISO..."
-}
+# If (-not (Test-Path "d:\Setup.EXE")) {
+#     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO doesn't appear to be mounted."
+#     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Mounting the Exchange 2016 ISO..."
+#     if (Mount-DiskImage -ImagePath $exchangeISOPath) {
+#         Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) ISO mounted successfully."
+#     }
+# }
+# Else {
+#     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO was already mounted. Moving On."
+# }
+
+# If (Test-Path "d:\Setup.exe") {
+#     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of Exchange 2016..."
+#     # Debugging: I need to figure out how to run these commands one-by-one and have them wait properly.
+#     Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step1stderr.txt -RedirectStandardOutput $exchangeFolder/step1stdout.txt 
+#     Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step2stderr.txt -RedirectStandardOutput $exchangeFolder/step2stdout.txt 
+#     Start-Process cmd.exe -ArgumentList "/c", "d:\setup.exe", "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step3stderr.txt -RedirectStandardOutput $exchangeFolder/step3stdout.txt 
+#     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installation complete!"
+# }
+# Else {
+#     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong downloading or mounting the ISO..."
+# }
+
+$Mount = Mount-DiskImage -ImagePath $exchangeISOPath -StorageType ISO -Access ReadOnly -PassThru
+$Volume = $Mount | Get-Volume
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of Exchange 2016..."
+echo $Volume
+$Install1 = Start-Process -FilePath ($Volume.DriveLetter + ":\setup.exe") -ArgumentList "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step1stderr.txt -RedirectStandardOutput $exchangeFolder/step1stdout.txt 
+$Install1
+$Install2 = Start-Process -FilePath ($Volume.DriveLetter + ":\setup.exe") -ArgumentList "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step2stderr.txt -RedirectStandardOutput $exchangeFolder/step2stdout.txt 
+$Install2
+$Install3 = Start-Process -FilePath ($Volume.DriveLetter + ":\setup.exe") -ArgumentList "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step3stderr.txt -RedirectStandardOutput $exchangeFolder/step3stdout.txt 
+$Install3
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installation complete!"
 
 # Verify that Exchange actually installed properly
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Sleeping for 2 minutes..."
