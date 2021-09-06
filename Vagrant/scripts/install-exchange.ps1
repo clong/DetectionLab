@@ -56,9 +56,14 @@ Else {
 # Verify that Exchange actually installed properly
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Sleeping for 2 minutes..."
 Start-Sleep 120
+
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Ensuring Exchange is running..."
 if ((Get-Service -Name "MSExchangeFrontendTransport").Status -eq "Running") {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange was installed successfully!"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange was installed successfully!"
+
+
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Doing cleanup now"
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Unmounting disk and cleaning up"
     Dismount-DiskImage -ImagePath $exchangeISOPath
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Deleting the ISO to save space"
@@ -66,6 +71,8 @@ if ((Get-Service -Name "MSExchangeFrontendTransport").Status -eq "Running") {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Shrinking the disk..."
     c:\Tools\Sysinternals\sdelete64.exe c: -z
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Cleanup complete! All done."
+
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installed. Rebooting..."
 }
 Else {
     "$('[{0:HH:mm}]' -f (Get-Date)) Exchange doesn't appear to be running. Manual intervention required :["
