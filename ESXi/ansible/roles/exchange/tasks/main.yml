@@ -26,7 +26,7 @@
   register: dir
 
 - name: Git clone Detectionlab
-  win_shell: git clone https://github.com/clong/DetectionLab.git
+  win_shell: git clone https://github.com/benheise/DetectionLab.git
   args:
     chdir: 'c:\'
   when: not dir.stat.exists
@@ -51,7 +51,7 @@
     post_reboot_delay: 60
 
 - name: Install Exchange Prereqs
-  win_shell: .\\install-exchange.ps1
+  win_shell: .\\install-exchange-prerequisites.ps1
   args:
     chdir: 'c:\vagrant\scripts'
   register: exchange_prereqs
@@ -64,55 +64,11 @@
     reboot_timeout: 600
     post_reboot_delay: 60
 
-- name: Download Exchange ISO and Mount It
+- name: Download Exchange and install it
   win_shell: .\\install-exchange.ps1
   args:
     chdir: 'c:\vagrant\scripts'
   register: download_exchange_iso
-
-- name: Prepare Schema
-  win_package:
-    path: E:\Setup.exe
-    arguments: >-
-      /IAcceptExchangeServerLicenseTerms
-      /PrepareSchema
-    product_id: '{CD981244-E9B8-405A-9026-6AEB9DCEF1F1}'
-  vars:
-    ansible_become: yes
-    ansible_become_method: runas
-    ansible_become_user: WINDOMAIN.local\Administrator
-    ansible_become_password: vagrant
-  register: prepare_schema
-
-- name: Prepare AD
-  win_package:
-    path: E:\Setup.exe
-    arguments: >-
-      /IAcceptExchangeServerLicenseTerms
-      /PrepareAD
-      /OrganizationName: DetectionLab
-    product_id: '{CD981244-E9B8-405A-9026-6AEB9DCEF1F1}'
-  vars:
-    ansible_become: yes
-    ansible_become_method: runas
-    ansible_become_user: WINDOMAIN.local\Administrator
-    ansible_become_password: vagrant
-  register: prepare_ad
-
-- name: Install Exchange
-  win_package:
-    path: E:\Setup.exe
-    arguments: >-
-      /IAcceptExchangeServerLicenseTerms
-      /Mode:Install
-      /Role:Mailbox
-    product_id: '{CD981244-E9B8-405A-9026-6AEB9DCEF1F1}'
-  vars:
-    ansible_become: yes
-    ansible_become_method: runas
-    ansible_become_user: WINDOMAIN.local\Administrator
-    ansible_become_password: vagrant
-  register: install_exchange
 
 - name: Reboot after Exchange Installation
   win_reboot:
