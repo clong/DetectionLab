@@ -1,4 +1,4 @@
-# Purpose: Joins a Windows host to the windomain.local domain which was created with "create-domain.ps1".
+# Purpose: Joins a Windows host to the windomain.local domain which was created with "create-domain.ps1"
 # Source: https://github.com/StefanScherer/adfs2
 
 $hostsFile = "c:\Windows\System32\drivers\etc\hosts"
