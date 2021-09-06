@@ -194,26 +194,19 @@ Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] The Exchange ISO was already downloaded. Moving On."
 }
 
-If (-not (Test-Path ($Volume.DriveLetter + ":\setup.exe")) {
+If (-not (Test-Path ($Volume.DriveLetter + ":\Setup.EXE"))) {
      Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO doesn't appear to be mounted."
      Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Mounting the Exchange 2016 ISO..."
-        if ($Mount = Mount-DiskImage -ImagePath $exchangeISOPath -StorageType ISO -Access ReadOnly -PassThru
-        $Volume = $Mount | Get-Volume
-        ) {
-        Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) ISO mounted successfully."
-    }
-}
- Else {
-     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO was already mounted. Moving On."
- }
+    $Mount = Mount-DiskImage -ImagePath $exchangeISOPath -StorageType ISO -Access ReadOnly -PassThru
+    $Volume = $Mount | Get-Volume
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The Exchange ISO is presumed to be mounted successfully, but we didn't really check..."
 
-If (Test-Path ($Volume.DriveLetter + ":\setup.exe")) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Beginning installation of Exchange 2016..."
-    $Install1 = Start-Process -FilePath ($Volume.DriveLetter + ":\setup.exe") -ArgumentList "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step1stderr.txt -RedirectStandardOutput $exchangeFolder/step1stdout.txt 
+    $Install1 = Start-Process -FilePath ($Volume.DriveLetter + ":\Setup.EXE") -ArgumentList "/PrepareSchema", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step1stderr.txt -RedirectStandardOutput $exchangeFolder/step1stdout.txt 
     $Install1
-    $Install2 = Start-Process -FilePath ($Volume.DriveLetter + ":\setup.exe") -ArgumentList "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step2stderr.txt -RedirectStandardOutput $exchangeFolder/step2stdout.txt 
+    $Install2 = Start-Process -FilePath ($Volume.DriveLetter + ":\Setup.EXE") -ArgumentList "/PrepareAD", "/OrganizationName: DetectionLab", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step2stderr.txt -RedirectStandardOutput $exchangeFolder/step2stdout.txt 
     $Install2
-    $Install3 = Start-Process -FilePath ($Volume.DriveLetter + ":\setup.exe") -ArgumentList "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step3stderr.txt -RedirectStandardOutput $exchangeFolder/step3stdout.txt 
+    $Install3 = Start-Process -FilePath ($Volume.DriveLetter + ":\Setup.EXE") -ArgumentList "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step3stderr.txt -RedirectStandardOutput $exchangeFolder/step3stdout.txt 
     $Install3
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installation complete!"
 }
