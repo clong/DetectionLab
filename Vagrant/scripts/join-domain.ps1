@@ -25,7 +25,7 @@ If (($hostname -eq "wef") -or ($hostname -eq "exchange")) {
   While ($tries -lt 3) {
     Try {
       $tries += 1
-      Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Servers,dc=windomain,dc=local" -PassThru    
+      Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Servers,dc=windomain,dc=local" -PassThru -ErrorAction Stop
       Break
     } Catch {
       $tries += 1
@@ -33,7 +33,6 @@ If (($hostname -eq "wef") -or ($hostname -eq "exchange")) {
       Start-Sleep 15
     }
   }
-  Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Servers,dc=windomain,dc=local" -PassThru
   # Attempt to fix Issue #517
   Set-ItemProperty -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control' -Name 'WaitToKillServiceTimeout' -Value '500' -Type String -Force -ea SilentlyContinue
   New-ItemProperty -LiteralPath 'HKCU:\Control Panel\Desktop' -Name 'AutoEndTasks' -Value 1 -PropertyType DWord -Force -ea SilentlyContinue
