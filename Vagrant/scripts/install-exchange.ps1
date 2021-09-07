@@ -13,7 +13,7 @@ If (Test-Path c:\exchange_prereqs_complete.txt) {
 }
 Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Exchange prerequisites don't appear to be installed. Manual intervention required :["
-    exit 0
+    exit 1
 }
 
 If (-not (Test-Path $exchangeFolder)) {
