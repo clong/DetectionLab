@@ -55,10 +55,6 @@ If (Test-Path ($Volume.DriveLetter + ":\setup.exe")) {
     $Install3 = Start-Process -FilePath ($Volume.DriveLetter + ":\setup.exe") -ArgumentList "/Mode:Install", "/Role:Mailbox", "/IAcceptExchangeServerLicenseTerms" -Credential $credential -Wait -RedirectStandardError $exchangeFolder/step3stderr.txt -RedirectStandardOutput $exchangeFolder/step3stdout.txt 
     $Install3
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Exchange installation complete!"
-}
-Else {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Something went wrong with installing Exchange..."
-}
 
 # Verify that Exchange actually installed properly
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Sleeping for 2 minutes..."
