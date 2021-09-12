@@ -117,6 +117,8 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Olaf Hartong's Sysmon con
 # Start Sysmon
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Starting Sysmon..."
 Start-Process -FilePath "$sysmonDir\Sysmon64.exe" -ArgumentList "-accepteula -i $sysmonConfigPath"
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Waiting 5 seconds to give the service time to install..."
+Start-Sleep 5
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Verifying that the Sysmon service is running..."
 
 # Poll the sysmon service every 5 seconds to see if it has started (up to 25 seconds)
