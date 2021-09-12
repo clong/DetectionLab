@@ -67,7 +67,7 @@
 - name: Make Exchange Directory
   win_file:
     path: 'C:\exchange2016'
-    state: exchangedirectory
+    state: directory
 
 - name: Download ISO
   win_get_url:
