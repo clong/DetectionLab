@@ -26,7 +26,7 @@
   register: dir
 
 - name: Git clone Detectionlab
-  win_shell: git clone https://github.com/benheise/DetectionLab.git
+  win_shell: git clone https://github.com/clong/DetectionLab.git
   args:
     chdir: 'c:\'
   when: not dir.stat.exists
@@ -64,11 +64,65 @@
     reboot_timeout: 600
     post_reboot_delay: 60
 
-- name: Download Exchange and install it
-  win_shell: .\\install-exchange.ps1
-  args:
-    chdir: 'c:\vagrant\scripts'
-  register: download_exchange_iso
+- name: Make Exchange Directory
+  win_file:
+    path: 'C:\exchange2016'
+    state: exchangedirectory
+
+- name: Download ISO
+  win_get_url:
+    url: 'https://download.microsoft.com/download/2/5/8/258D30CF-CA4C-433A-A618-FB7E6BCC4EEE/ExchangeServer2016-x64-cu12.iso'
+    dest: 'C:\exchange2016\ExchangeServer2016-x64-cu12.iso'
+
+- name: Ensure an ISO is mounted
+  win_disk_image:
+    image_path: 'C:\exchange2016\ExchangeServer2016-x64-cu12.iso'
+    state: present
+  register: disk_image_out
+
+- name: Prepare Schema
+  win_package:
+    path: '{{ disk_image_out.mount_paths[0] }}Setup.exe'
+    arguments: >-
+      /IAcceptExchangeServerLicenseTerms
+      /PrepareSchema
+    product_id: '{CD981244-E9B8-405A-9026-6AEB9DCEF1F1}'
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: WINDOMAIN.local\Administrator
+    ansible_become_password: vagrant
+  register: prepare_schema
+
+- name: Prepare AD
+  win_package:
+    path: '{{ disk_image_out.mount_paths[0] }}Setup.exe'
+    arguments: >-
+      /IAcceptExchangeServerLicenseTerms
+      /PrepareAD
+      /OrganizationName: DetectionLab
+    product_id: '{CD981244-E9B8-405A-9026-6AEB9DCEF1F1}'
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: WINDOMAIN.local\Administrator
+    ansible_become_password: vagrant
+  register: prepare_ad
+
+- name: Install Exchange
+  win_package:
+    path: '{{ disk_image_out.mount_paths[0] }}Setup.exe'
+    arguments: >-
+      /IAcceptExchangeServerLicenseTerms
+      /Mode:Install
+      /Role:Mailbox
+    product_id: '{CD981244-E9B8-405A-9026-6AEB9DCEF1F1}'
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: WINDOMAIN.local\Administrator
+    ansible_become_password: vagrant
+  register: install_exchange
 
 - name: Reboot after Exchange Installation
   win_reboot:
