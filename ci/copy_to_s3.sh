@@ -2,6 +2,12 @@
 
 # This script is used to prepare DetectionLab to be imported as VM in AWS
 
+if ! which aws > /dev/null; then
+  apt-get install -y python-pip
+  pip install awscli --upgrade --user
+  cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
+fi
+
 # Configure credentials for awscli
 aws configure set aws_access_key_id $AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY

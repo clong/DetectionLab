@@ -8,13 +8,33 @@ provider "aws" {
 resource "aws_instance" "exchange" {
   instance_type = "t3.xlarge"
 
+    provisioner "file" {
+    source      = "scripts/bootstrap.ps1"
+    destination = "C:\\Temp\\bootstrap.ps1"
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = ["powershell.exe -File C:\\Temp\\bootstrap.ps1"]
+
+    connection {
+      type     = "winrm"
+      user     = "vagrant"
+      password = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+    }
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "choco install -force -y winpcap",
-      "ipconfig /renew",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'\"",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'\"",
-      "powershell.exe -c \"Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'\"",
+      "powershell.exe -c \"get-service | ?{$_.Name -ilike 'MSexch*'} | set-service -StartupType Automatic\"",
+      "shutdown /r /f /t 1",
     ]
 
     connection {
