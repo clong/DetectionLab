@@ -33,7 +33,8 @@ resource "aws_instance" "exchange" {
 
   provisioner "remote-exec" {
     inline = [
-      "powershell.exe -c \"get-service | ?{$_.Name -ilike 'MSexch*'} | set-service -StartupType Automatic\"",
+      "powershell.exe -c \"Get-Service | ?{$_.Name -ilike 'MSexch*'} | Set-Service -StartupType Automatic\"",
+      "powershell.exe -c {$optionalServices = 'MSExchangeAntispamUpdate','MSExchangeEdgeSync','MSExchangeIMAP4','MSExchangeIMAP4BE','MSExchangePOP3','MSExchangePOP3BE','WSBExchange','MSExchangeTransportLogSearch','MSExchangeUM','MSExchangeUMCR'; ForEach ($service in $optionalServices) { Set-Service -Name $service -StartupType Disabled }}",
       "shutdown /r /f /t 1",
     ]
 
@@ -60,4 +61,3 @@ resource "aws_instance" "exchange" {
     delete_on_termination = true
   }
 }
-
