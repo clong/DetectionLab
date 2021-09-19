@@ -14,9 +14,9 @@ fi
 
 # Source variables from logger_variables.sh
 # shellcheck disable=SC1091
-source /vagrant/logger_variables.sh 2>/dev/null || \
-source /home/vagrant/logger_variables.sh 2>/dev/null || \
-echo "Unable to locate logger_variables.sh"
+source /vagrant/logger_variables.sh 2>/dev/null ||
+  source /home/vagrant/logger_variables.sh 2>/dev/null ||
+  echo "Unable to locate logger_variables.sh"
 
 if [ -z "$MAXMIND_LICENSE" ]; then
   echo "Note: You have not entered a MaxMind API key in logger_variables.sh, so the ASNgen Splunk app may not work correctly."
@@ -179,9 +179,9 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_1492.tgz -auth 'admin:changeme'
-    
+
     # Fix ASNGen App - https://github.com/doksu/TA-asngen/issues/18#issuecomment-685691630
-    echo 'python.version = python2' >> /opt/splunk/etc/apps/TA-asngen/default/commands.conf
+    echo 'python.version = python2' >>/opt/splunk/etc/apps/TA-asngen/default/commands.conf
 
     # Install the Maxmind license key for the ASNgen App if it was provided
     if [ -n "$MAXMIND_LICENSE" ]; then
@@ -192,7 +192,7 @@ install_splunk() {
 
     # Install a Splunk license if it was provided
     if [ -n "$BASE64_ENCODED_SPLUNK_LICENSE" ]; then
-      echo "$BASE64_ENCODED_SPLUNK_LICENSE" | base64 -d > /tmp/Splunk.License
+      echo "$BASE64_ENCODED_SPLUNK_LICENSE" | base64 -d >/tmp/Splunk.License
       /opt/splunk/bin/splunk add licenses /tmp/Splunk.License -auth 'admin:changeme'
       rm /tmp/Splunk.License
     fi
@@ -289,7 +289,7 @@ install_fleet_import_osquery_config() {
     mysql -uroot -pfleet -e "create database fleet;"
 
     # Always download the latest release of Fleet
-    curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' '  | head -1 | wget --progress=bar:force -i -
+    curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' ' | head -1 | wget --progress=bar:force -i -
     unzip fleet.zip -d fleet
     cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
     cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
@@ -408,16 +408,16 @@ install_zeek() {
 
   # Setup $CPUS numbers of Zeek workers
   # AWS only has a single interface (eth1), so don't monitor eth0 if we're in AWS
-  if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then 
-  # TL;DR of ^^^: if you can't reach the AWS metadata service, you're not running in AWS
-  # Therefore, it's ok to add this.
+  if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then
+    # TL;DR of ^^^: if you can't reach the AWS metadata service, you're not running in AWS
+    # Therefore, it's ok to add this.
     crudini --set $NODECFG worker-eth0 type worker
     crudini --set $NODECFG worker-eth0 host localhost
     crudini --set $NODECFG worker-eth0 interface eth0
     crudini --set $NODECFG worker-eth0 lb_method pf_ring
     crudini --set $NODECFG worker-eth0 lb_procs "$(nproc)"
   fi
-  
+
   crudini --set $NODECFG worker-eth1 type worker
   crudini --set $NODECFG worker-eth1 host localhost
   crudini --set $NODECFG worker-eth1 interface eth1
@@ -603,8 +603,8 @@ configure_splunk_inputs() {
   crudini --set /opt/splunk/etc/apps/search/local/props.conf suricata:json TRUNCATE 0
 
   # Fleet
-    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
-    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
+  /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
+  /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
 
   # Zeek
   mkdir -p /opt/splunk/etc/apps/Splunk_TA_bro/local && touch /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf
