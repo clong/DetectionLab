@@ -572,7 +572,7 @@ install_guacamole() {
   wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/binary/guacamole-1.0.0.war" -O guacamole.war
   mkdir /etc/guacamole
   mkdir /etc/guacamole/shares
-  sudo chmod 777 mkdir /etc/guacamole/shares
+  sudo chmod 777 /etc/guacamole/shares
   mkdir /usr/share/tomcat8/.guacamole
   cp /vagrant/resources/guacamole/user-mapping.xml /etc/guacamole/
   cp /vagrant/resources/guacamole/guacamole.properties /etc/guacamole/
