@@ -1,8 +1,8 @@
 {
-	"proxmox_host": "192.168.3.107",
-	"proxmox_node": "pve",
+	"proxmox_host": "192.168.3.234",
+	"proxmox_node": "pve4",
 	"proxmox_username": "root@pam",
 	"proxmox_password": "",
 	"proxmox_network_with_dhcp_and_internet": "vmbr0",
-	"http_server_address": "192.168.3.6"
+	"http_server_address": "192.168.3.60"
 }
