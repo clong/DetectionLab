@@ -34,7 +34,9 @@
         "memory": 32
       },
       "scsi_controller": "virtio-scsi-pci",
-      "iso_file": "local:iso/ubuntu-18.04.5-server-amd64.iso",
+      "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/18.04.6/release/ubuntu-18.04.6-server-amd64.iso",
+      "iso_storage_pool": "local",
+      "iso_checksum": "f5cbb8104348f0097a8e513b10173a07dbc6684595e331cb06f93f385d0aecf6",
       "http_directory": "{{template_dir}}/http",
       "boot_wait": "10s",
       "boot": "order=scsi0;ide2",
