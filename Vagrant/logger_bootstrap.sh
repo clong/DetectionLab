@@ -28,17 +28,17 @@ echo "apt-fast apt-fast/maxdownloads string 10" | debconf-set-selections
 echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections
 
 if ! grep 'mirrors.ubuntu.com/mirrors.txt' /etc/apt/sources.list; then
-  sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse" /etc/apt/sources.list
+  sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt focal main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt focal-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt focal-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt focal-security main restricted universe multiverse" /etc/apt/sources.list
 fi
 
 apt_install_prerequisites() {
   echo "[$(date +%H:%M:%S)]: Adding apt repositories..."
   # Add repository for apt-fast
-  add-apt-repository -y ppa:apt-fast/stable
+  add-apt-repository -y -n ppa:apt-fast/stable 
   # Add repository for yq
-  add-apt-repository -y ppa:rmescandon/yq
+  add-apt-repository -y -n ppa:rmescandon/yq 
   # Add repository for suricata
-  add-apt-repository -y ppa:oisf/suricata-stable
+  add-apt-repository -y -n ppa:oisf/suricata-stable 
   # Install prerequisites and useful tools
   echo "[$(date +%H:%M:%S)]: Running apt-get clean..."
   apt-get clean
@@ -46,7 +46,7 @@ apt_install_prerequisites() {
   apt-get -qq update
   apt-get -qq install -y apt-fast
   echo "[$(date +%H:%M:%S)]: Running apt-fast install..."
-  apt-fast -qq install -y jq whois build-essential git unzip htop yq mysql-server redis-server python-pip
+  apt-fast -qq install -y jq whois build-essential git unzip htop yq mysql-server redis-server python3-pip
 }
 
 modify_motd() {
@@ -62,7 +62,7 @@ modify_motd() {
 }
 
 test_prerequisites() {
-  for package in jq whois build-essential git unzip yq mysql-server redis-server python-pip; do
+  for package in jq whois build-essential git unzip yq mysql-server redis-server python3-pip; do
     echo "[$(date +%H:%M:%S)]: [TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
     if ! dpkg -S $package >/dev/null; then
@@ -206,12 +206,14 @@ install_splunk() {
 
     # Add props.conf to Splunk Zeek TA to properly parse timestamp
     # and avoid grouping events as a single event
-    cp /vagrant/resources/splunk_server/zeek_ta_props.conf /opt/splunk/etc/apps/Splunk_TA_bro/local/props.conf
+    mkdir /opt/splunk/etc/apps/Splunk_TA_bro/local && cp /vagrant/resources/splunk_server/zeek_ta_props.conf /opt/splunk/etc/apps/Splunk_TA_bro/local/props.conf
 
     # Add custom Macro definitions for ThreatHunting App
     cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
     # Fix some misc stuff
+    # shellcheck disable=SC2016
     sed -i 's/index=windows/`windows`/g' /opt/splunk/etc/apps/ThreatHunting/default/data/ui/views/computer_investigator.xml
+    # shellcheck disable=SC2016
     sed -i 's/$host$)/$host$*)/g' /opt/splunk/etc/apps/ThreatHunting/default/data/ui/views/computer_investigator.xml
     # This is probably horrible and may break some stuff, but I'm hoping it fixes more than it breaks
     find /opt/splunk/etc/apps/ThreatHunting -type f ! -path "/opt/splunk/etc/apps/ThreatHunting/default/props.conf" -exec sed -i -e 's/host_fqdn/ComputerName/g' {} \;
@@ -360,17 +362,17 @@ install_zeek() {
   echo "[$(date +%H:%M:%S)]: Installing Zeek..."
   # Environment variables
   NODECFG=/opt/zeek/etc/node.cfg
-  if ! grep 'zeek' /etc/apt/sources.list.d/security:zeek.list; then
-    sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
+  if ! grep 'zeek' /etc/apt/sources.list.d/security:zeek.list > /dev/null; then
+    sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_20.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
   fi
-  wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_18.04/Release.key -O /tmp/Release.key
+  wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_20.04/Release.key -O /tmp/Release.key
   apt-key add - </tmp/Release.key &>/dev/null
   # Update APT repositories
   apt-get -qq -ym update
   # Install tools to build and configure Zeek
   apt-get -qq -ym install zeek crudini
   export PATH=$PATH:/opt/zeek/bin
-  pip install zkg==2.1.1
+  pip3 install zkg==2.1.1
   zkg refresh
   zkg autoconfig
   zkg install --force salesforce/ja3
@@ -491,8 +493,8 @@ install_suricata() {
   cd /opt || exit 1
   git clone https://github.com/OISF/suricata-update.git
   cd /opt/suricata-update || exit 1
-  pip install pyyaml
-  python setup.py install
+  pip3 install pyyaml
+  python3 setup.py install
 
   cp /vagrant/resources/suricata/suricata.yaml /etc/suricata/suricata.yaml
   crudini --set --format=sh /etc/default/suricata '' iface eth1
@@ -563,27 +565,24 @@ test_suricata_prerequisites() {
 install_guacamole() {
   echo "[$(date +%H:%M:%S)]: Installing Guacamole..."
   cd /opt || exit 1
-  apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
-  wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz" -O guacamole-server-1.0.0.tar.gz
-  tar -xf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0 || echo "[-] Unable to find the Guacamole folder."
-  ./configure &>/dev/null && make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
+  apt-fast -qq install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev tomcat9 tomcat9-admin tomcat9-user tomcat9-common
+  cp /vagrant/resources/guacamole/guacd /usr/local/sbin && chmod +x /usr/local/sbin/guacd
   ldconfig
-  cd /var/lib/tomcat8/webapps || echo "[-] Unable to find the tomcat8/webapps folder."
-  wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/binary/guacamole-1.0.0.war" -O guacamole.war
+  cd /var/lib/tomcat9/webapps || echo "[-] Unable to find the tomcat9/webapps folder."
+  wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/binary/guacamole-1.3.0.war?action=download" -O guacamole.war
   mkdir /etc/guacamole
   mkdir /etc/guacamole/shares
   sudo chmod 777 /etc/guacamole/shares
-  mkdir /usr/share/tomcat8/.guacamole
+  mkdir /usr/share/tomcat9/.guacamole
   cp /vagrant/resources/guacamole/user-mapping.xml /etc/guacamole/
   cp /vagrant/resources/guacamole/guacamole.properties /etc/guacamole/
   cp /vagrant/resources/guacamole/guacd.service /lib/systemd/system
-  sudo ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat8/.guacamole/
-  sudo ln -s /etc/guacamole/user-mapping.xml /usr/share/tomcat8/.guacamole/
-  sudo ln -s /usr/local/lib/freerdp /usr/lib/x86_64-linux-gnu/
+  sudo ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat9/.guacamole/
+  sudo ln -s /etc/guacamole/user-mapping.xml /usr/share/tomcat9/.guacamole/
   systemctl enable guacd
-  systemctl enable tomcat8
+  systemctl enable tomcat9
   systemctl start guacd
-  systemctl start tomcat8
+  systemctl start tomcat9
 }
 
 postinstall_tasks() {
