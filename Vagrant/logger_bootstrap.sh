@@ -44,8 +44,9 @@ apt_install_prerequisites() {
   apt-get clean
   echo "[$(date +%H:%M:%S)]: Running apt-get update..."
   apt-get -qq update
+  echo "[$(date +%H:%M:%S)]: Installing apt-fast..."
   apt-get -qq install -y apt-fast
-  echo "[$(date +%H:%M:%S)]: Running apt-fast install..."
+  echo "[$(date +%H:%M:%S)]: Using apt-fast to install packages..."
   apt-fast -qq install -y jq whois build-essential git unzip htop yq mysql-server redis-server python3-pip
 }
 
@@ -566,7 +567,10 @@ install_guacamole() {
   echo "[$(date +%H:%M:%S)]: Installing Guacamole..."
   cd /opt || exit 1
   apt-fast -qq install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev tomcat9 tomcat9-admin tomcat9-user tomcat9-common
-  cp /vagrant/resources/guacamole/guacd /usr/local/sbin && chmod +x /usr/local/sbin/guacd
+  wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/source/guacamole-server-1.3.0.tar.gz?action=download" -O guacamole-server-1.3.0.tar.gz
+  tar -xvf guacamole-server-1.3.0.tar.gz
+  cd guacamole-server-1.3.0/ && ./configure --with-init-dir=/etc/init.d
+  make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
   ldconfig
   cd /var/lib/tomcat9/webapps || echo "[-] Unable to find the tomcat9/webapps folder."
   wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/binary/guacamole-1.3.0.war?action=download" -O guacamole.war
