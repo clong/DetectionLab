@@ -19,3 +19,4 @@ logger_variables.sh
 ESXi/Packer/variables.json
 .terraform.lock.hcl
 Proxmox/Packer/packer_cache/*
+Proxmox/Packer/variables.json

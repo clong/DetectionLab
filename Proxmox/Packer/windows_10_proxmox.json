@@ -33,18 +33,18 @@
           "type": "std",
           "memory": 256
         },
-        "iso_file": "local:iso/en_windows10.iso",
+        "iso_file": "local:iso/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
         "additional_iso_files": [
           {
-            "device": "sata3",
+            "device": "sata1",
             "iso_file": "local:iso/Autounattend.iso",
             "iso_checksum": "BC3D71AE85DA5EA44D986E8FB9D42A9A",
             "unmount": true
           },
           {
-            "device": "sata4",
-            "iso_file": "local:iso/virtio-win-0.1.204.iso",
-            "iso_checksum": "C97B2647B64F976C1D0BE9C841BC2869",
+            "device": "sata2",
+            "iso_file": "local:iso/virtio-win.iso",
+            "iso_checksum": "3bbc69bdcf1d46f4ee0ddaf35c2656f3",
             "unmount": true
           }
         ],
@@ -66,7 +66,6 @@
         "remote_path": "/tmp/script.bat",
         "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
         "scripts": [
-          "../../Packer/scripts/vm-guest-tools.bat",
           "../../Packer/scripts/enable-rdp.bat"
         ]
       },
