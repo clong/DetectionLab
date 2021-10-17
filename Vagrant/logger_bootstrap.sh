@@ -564,13 +564,15 @@ test_suricata_prerequisites() {
 }
 
 install_guacamole() {
-  echo "[$(date +%H:%M:%S)]: Installing Guacamole..."
+  echo "[$(date +%H:%M:%S)]: Setting up Guacamole..."
   cd /opt || exit 1
+  echo "[$(date +%H:%M:%S)]: Using apt-fast to install dependencies..."
   apt-fast -qq install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev tomcat9 tomcat9-admin tomcat9-user tomcat9-common
+  echo "[$(date +%H:%M:%S)]: Downloading Guacamole..."
   wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/source/guacamole-server-1.3.0.tar.gz?action=download" -O guacamole-server-1.3.0.tar.gz
-  tar -xvf guacamole-server-1.3.0.tar.gz
-  cd guacamole-server-1.3.0/ && ./configure --with-init-dir=/etc/init.d
-  make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
+  tar -xf guacamole-server-1.3.0.tar.gz && cd guacamole-server-1.3.0 || echo "[-] Unable to find the Guacamole folder."
+  echo "[$(date +%H:%M:%S)]: Configuring Guacamole and running 'make' and 'make install'..."
+  ./configure --with-init-dir=/etc/init.d && make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
   ldconfig
   cd /var/lib/tomcat9/webapps || echo "[-] Unable to find the tomcat9/webapps folder."
   wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/binary/guacamole-1.3.0.war?action=download" -O guacamole.war
@@ -587,6 +589,7 @@ install_guacamole() {
   systemctl enable tomcat9
   systemctl start guacd
   systemctl start tomcat9
+  echo "[$(date +%H:%M:%S)]: Guacamole installation complete!"
 }
 
 postinstall_tasks() {
