@@ -192,6 +192,10 @@ resource "aws_instance" "logger" {
       "sudo cp /opt/DetectionLab/Vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service && sudo systemctl daemon-reload && sudo service fleet restart",
       "sudo service suricata restart",
       "sudo /opt/DetectionLab/Vagrant/logger_bootstrap.sh splunk_only",
+      "sudo systemctl stop guacd",
+      "sudo useradd -M -d /var/lib/guacd/ -r -s /sbin/nologin -c 'Guacd User' guacd",
+      "sudo mkdir /var/lib/guacd && sudo chown -R guacd: /var/lib/guacd && sudo sed -i 's/daemon/guacd/' /lib/systemd/system/guacd.service",
+      "sudo systemctl daemon-reload && sudo systemctl start guacd"
     ]
 
     connection {

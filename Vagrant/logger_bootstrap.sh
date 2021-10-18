@@ -47,7 +47,7 @@ apt_install_prerequisites() {
   echo "[$(date +%H:%M:%S)]: Installing apt-fast..."
   apt-get -qq install -y apt-fast
   echo "[$(date +%H:%M:%S)]: Using apt-fast to install packages..."
-  apt-fast -qq install -y jq whois build-essential git unzip htop yq mysql-server redis-server python3-pip
+  apt-fast install -y jq whois build-essential git unzip htop yq mysql-server redis-server python3-pip libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev tomcat9 tomcat9-admin tomcat9-user tomcat9-common
 }
 
 modify_motd() {
@@ -566,8 +566,6 @@ test_suricata_prerequisites() {
 install_guacamole() {
   echo "[$(date +%H:%M:%S)]: Setting up Guacamole..."
   cd /opt || exit 1
-  echo "[$(date +%H:%M:%S)]: Using apt-fast to install dependencies..."
-  apt-fast -qq install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev tomcat9 tomcat9-admin tomcat9-user tomcat9-common
   echo "[$(date +%H:%M:%S)]: Downloading Guacamole..."
   wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/source/guacamole-server-1.3.0.tar.gz?action=download" -O guacamole-server-1.3.0.tar.gz
   tar -xf guacamole-server-1.3.0.tar.gz && cd guacamole-server-1.3.0 || echo "[-] Unable to find the Guacamole folder."
@@ -585,6 +583,11 @@ install_guacamole() {
   cp /vagrant/resources/guacamole/guacd.service /lib/systemd/system
   sudo ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat9/.guacamole/
   sudo ln -s /etc/guacamole/user-mapping.xml /usr/share/tomcat9/.guacamole/
+  # Thank you Kifarunix: https://kifarunix.com/install-guacamole-on-debian-11/
+  useradd -M -d /var/lib/guacd/ -r -s /sbin/nologin -c "Guacd User" guacd
+  mkdir /var/lib/guacd
+  chown -R guacd: /var/lib/guacd
+  systemctl daemon-reload
   systemctl enable guacd
   systemctl enable tomcat9
   systemctl start guacd
