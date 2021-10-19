@@ -36,13 +36,13 @@
         "iso_file": "local:iso/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
         "additional_iso_files": [
           {
-            "device": "sata1",
+            "device": "ide3",
             "iso_file": "local:iso/Autounattend.iso",
-            "iso_checksum": "BC3D71AE85DA5EA44D986E8FB9D42A9A",
+            "iso_checksum": "00d8ae0f176f97625261e6ff11a3d4fe",
             "unmount": true
           },
           {
-            "device": "sata2",
+            "device": "sata1",
             "iso_file": "local:iso/virtio-win.iso",
             "iso_checksum": "3bbc69bdcf1d46f4ee0ddaf35c2656f3",
             "unmount": true
@@ -52,8 +52,6 @@
         "winrm_username": "vagrant",
         "winrm_password": "vagrant",
         "winrm_timeout": "4h",
-        "winrm_insecure": true,
-        "winrm_use_ssl": true,
         "qemu_agent": true,
         "unmount_iso": true,
         "template_name": "Windows10",
