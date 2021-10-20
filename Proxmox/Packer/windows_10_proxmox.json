@@ -37,13 +37,15 @@
         "additional_iso_files": [
           {
             "device": "ide3",
-            "iso_file": "local:iso/Autounattend_Win10.iso",
+            "iso_url": "./http/Autounattend_Win10.iso",
+            "iso_storage_pool": "local",
             "iso_checksum": "0c1c76c2ae3bf1c840256415ebba2db9",
             "unmount": true
           },
           {
             "device": "sata1",
-            "iso_file": "local:iso/virtio-win.iso",
+            "iso_url": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.208-1/virtio-win-0.1.208.iso",
+            "iso_storage_pool": "local",
             "iso_checksum": "3bbc69bdcf1d46f4ee0ddaf35c2656f3",
             "unmount": true
           }
