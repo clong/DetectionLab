@@ -3,6 +3,11 @@
 #Thanks to @MHaggis for this addition!
 #More information on BOTSv3 can be found at https://github.com/splunk/botsv3
 
+if [ "$EUID" -ne 0 ]; then 
+  echo "Please run as root"
+  exit 1
+fi
+
 /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/base64_11.tgz  -auth 'admin:changeme'
 /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/jellyfisher_010.tgz  -auth 'admin:changeme'
 /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/palo-alto-networks-add-on-for-splunk_620.tgz  -auth 'admin:changeme'    # /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/SA-ctf_scoreboard_admin-master.zip  -auth 'admin:changeme'

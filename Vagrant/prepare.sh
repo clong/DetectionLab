@@ -164,7 +164,7 @@ list_providers() {
   if [[ $VMWARE_WORKSTATION_PRESENT -eq 1 ]] && [[ $VAGRANT_VMWARE_DESKTOP_PLUGIN_PRESENT -eq 1 ]] && [[ $VAGRANT_VMWARE_UTILITY_PRESENT -eq 1 ]]; then
     (echo >&2 "${GOODTOGO} vmware_desktop")
   fi
-  if [[ $VBOX_PRESENT -eq 0 ]] && [[ $VMWARE_FUSION_PRESENT -eq 0 ]] && [[ $VMWARE_WORKSTATION -eq 0 ]]; then
+  if [[ $VBOX_PRESENT -eq 0 ]] && [[ $VMWARE_FUSION_PRESENT -eq 0 ]] && [[ $VMWARE_WORKSTATION_PRESENT -eq 0 ]]; then
     (echo >&2 "${ERROR} You need to install a provider such as VirtualBox or VMware Fusion/Workstation to build DetectionLab.")
     exit 1
   fi

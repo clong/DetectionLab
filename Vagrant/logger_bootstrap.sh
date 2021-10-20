@@ -14,9 +14,9 @@ fi
 
 # Source variables from logger_variables.sh
 # shellcheck disable=SC1091
-source /vagrant/logger_variables.sh 2>/dev/null || \
-source /home/vagrant/logger_variables.sh 2>/dev/null || \
-echo "Unable to locate logger_variables.sh"
+source /vagrant/logger_variables.sh 2>/dev/null ||
+  source /home/vagrant/logger_variables.sh 2>/dev/null ||
+  echo "Unable to locate logger_variables.sh"
 
 if [ -z "$MAXMIND_LICENSE" ]; then
   echo "Note: You have not entered a MaxMind API key in logger_variables.sh, so the ASNgen Splunk app may not work correctly."
@@ -28,25 +28,26 @@ echo "apt-fast apt-fast/maxdownloads string 10" | debconf-set-selections
 echo "apt-fast apt-fast/dlflag boolean true" | debconf-set-selections
 
 if ! grep 'mirrors.ubuntu.com/mirrors.txt' /etc/apt/sources.list; then
-  sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt bionic main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt bionic-security main restricted universe multiverse" /etc/apt/sources.list
+  sed -i "2ideb mirror://mirrors.ubuntu.com/mirrors.txt focal main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt focal-updates main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt focal-backports main restricted universe multiverse\ndeb mirror://mirrors.ubuntu.com/mirrors.txt focal-security main restricted universe multiverse" /etc/apt/sources.list
 fi
 
 apt_install_prerequisites() {
   echo "[$(date +%H:%M:%S)]: Adding apt repositories..."
   # Add repository for apt-fast
-  add-apt-repository -y ppa:apt-fast/stable
+  add-apt-repository -y -n ppa:apt-fast/stable 
   # Add repository for yq
-  add-apt-repository -y ppa:rmescandon/yq
+  add-apt-repository -y -n ppa:rmescandon/yq 
   # Add repository for suricata
-  add-apt-repository -y ppa:oisf/suricata-stable
+  add-apt-repository -y -n ppa:oisf/suricata-stable 
   # Install prerequisites and useful tools
   echo "[$(date +%H:%M:%S)]: Running apt-get clean..."
   apt-get clean
   echo "[$(date +%H:%M:%S)]: Running apt-get update..."
   apt-get -qq update
+  echo "[$(date +%H:%M:%S)]: Installing apt-fast..."
   apt-get -qq install -y apt-fast
-  echo "[$(date +%H:%M:%S)]: Running apt-fast install..."
-  apt-fast -qq install -y jq whois build-essential git unzip htop yq mysql-server redis-server python-pip
+  echo "[$(date +%H:%M:%S)]: Using apt-fast to install packages..."
+  apt-fast install -y jq whois build-essential git unzip htop yq mysql-server redis-server python3-pip libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev tomcat9 tomcat9-admin tomcat9-user tomcat9-common
 }
 
 modify_motd() {
@@ -62,7 +63,7 @@ modify_motd() {
 }
 
 test_prerequisites() {
-  for package in jq whois build-essential git unzip yq mysql-server redis-server python-pip; do
+  for package in jq whois build-essential git unzip yq mysql-server redis-server python3-pip; do
     echo "[$(date +%H:%M:%S)]: [TEST] Validating that $package is correctly installed..."
     # Loop through each package using dpkg
     if ! dpkg -S $package >/dev/null; then
@@ -179,9 +180,9 @@ install_splunk() {
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/sankey-diagram-custom-visualization_130.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/link-analysis-app-for-splunk_161.tgz -auth 'admin:changeme'
     /opt/splunk/bin/splunk install app /vagrant/resources/splunk_server/threathunting_1492.tgz -auth 'admin:changeme'
-    
+
     # Fix ASNGen App - https://github.com/doksu/TA-asngen/issues/18#issuecomment-685691630
-    echo 'python.version = python2' >> /opt/splunk/etc/apps/TA-asngen/default/commands.conf
+    echo 'python.version = python2' >>/opt/splunk/etc/apps/TA-asngen/default/commands.conf
 
     # Install the Maxmind license key for the ASNgen App if it was provided
     if [ -n "$MAXMIND_LICENSE" ]; then
@@ -192,7 +193,7 @@ install_splunk() {
 
     # Install a Splunk license if it was provided
     if [ -n "$BASE64_ENCODED_SPLUNK_LICENSE" ]; then
-      echo "$BASE64_ENCODED_SPLUNK_LICENSE" | base64 -d > /tmp/Splunk.License
+      echo "$BASE64_ENCODED_SPLUNK_LICENSE" | base64 -d >/tmp/Splunk.License
       /opt/splunk/bin/splunk add licenses /tmp/Splunk.License -auth 'admin:changeme'
       rm /tmp/Splunk.License
     fi
@@ -206,12 +207,14 @@ install_splunk() {
 
     # Add props.conf to Splunk Zeek TA to properly parse timestamp
     # and avoid grouping events as a single event
-    cp /vagrant/resources/splunk_server/zeek_ta_props.conf /opt/splunk/etc/apps/Splunk_TA_bro/local/props.conf
+    mkdir /opt/splunk/etc/apps/Splunk_TA_bro/local && cp /vagrant/resources/splunk_server/zeek_ta_props.conf /opt/splunk/etc/apps/Splunk_TA_bro/local/props.conf
 
     # Add custom Macro definitions for ThreatHunting App
     cp /vagrant/resources/splunk_server/macros.conf /opt/splunk/etc/apps/ThreatHunting/default/macros.conf
     # Fix some misc stuff
+    # shellcheck disable=SC2016
     sed -i 's/index=windows/`windows`/g' /opt/splunk/etc/apps/ThreatHunting/default/data/ui/views/computer_investigator.xml
+    # shellcheck disable=SC2016
     sed -i 's/$host$)/$host$*)/g' /opt/splunk/etc/apps/ThreatHunting/default/data/ui/views/computer_investigator.xml
     # This is probably horrible and may break some stuff, but I'm hoping it fixes more than it breaks
     find /opt/splunk/etc/apps/ThreatHunting -type f ! -path "/opt/splunk/etc/apps/ThreatHunting/default/props.conf" -exec sed -i -e 's/host_fqdn/ComputerName/g' {} \;
@@ -289,7 +292,7 @@ install_fleet_import_osquery_config() {
     mysql -uroot -pfleet -e "create database fleet;"
 
     # Always download the latest release of Fleet
-    curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' '  | head -1 | wget --progress=bar:force -i -
+    curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' ' | head -1 | wget --progress=bar:force -i -
     unzip fleet.zip -d fleet
     cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
     cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
@@ -360,17 +363,17 @@ install_zeek() {
   echo "[$(date +%H:%M:%S)]: Installing Zeek..."
   # Environment variables
   NODECFG=/opt/zeek/etc/node.cfg
-  if ! grep 'zeek' /etc/apt/sources.list.d/security:zeek.list; then
-    sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_18.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
+  if ! grep 'zeek' /etc/apt/sources.list.d/security:zeek.list > /dev/null; then
+    sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_20.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
   fi
-  wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_18.04/Release.key -O /tmp/Release.key
+  wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_20.04/Release.key -O /tmp/Release.key
   apt-key add - </tmp/Release.key &>/dev/null
   # Update APT repositories
   apt-get -qq -ym update
   # Install tools to build and configure Zeek
   apt-get -qq -ym install zeek crudini
   export PATH=$PATH:/opt/zeek/bin
-  pip install zkg==2.1.1
+  pip3 install zkg==2.1.1
   zkg refresh
   zkg autoconfig
   zkg install --force salesforce/ja3
@@ -408,16 +411,16 @@ install_zeek() {
 
   # Setup $CPUS numbers of Zeek workers
   # AWS only has a single interface (eth1), so don't monitor eth0 if we're in AWS
-  if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then 
-  # TL;DR of ^^^: if you can't reach the AWS metadata service, you're not running in AWS
-  # Therefore, it's ok to add this.
+  if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then
+    # TL;DR of ^^^: if you can't reach the AWS metadata service, you're not running in AWS
+    # Therefore, it's ok to add this.
     crudini --set $NODECFG worker-eth0 type worker
     crudini --set $NODECFG worker-eth0 host localhost
     crudini --set $NODECFG worker-eth0 interface eth0
     crudini --set $NODECFG worker-eth0 lb_method pf_ring
     crudini --set $NODECFG worker-eth0 lb_procs "$(nproc)"
   fi
-  
+
   crudini --set $NODECFG worker-eth1 type worker
   crudini --set $NODECFG worker-eth1 host localhost
   crudini --set $NODECFG worker-eth1 interface eth1
@@ -491,8 +494,8 @@ install_suricata() {
   cd /opt || exit 1
   git clone https://github.com/OISF/suricata-update.git
   cd /opt/suricata-update || exit 1
-  pip install pyyaml
-  python setup.py install
+  pip3 install pyyaml
+  python3 setup.py install
 
   cp /vagrant/resources/suricata/suricata.yaml /etc/suricata/suricata.yaml
   crudini --set --format=sh /etc/default/suricata '' iface eth1
@@ -561,29 +564,35 @@ test_suricata_prerequisites() {
 }
 
 install_guacamole() {
-  echo "[$(date +%H:%M:%S)]: Installing Guacamole..."
+  echo "[$(date +%H:%M:%S)]: Setting up Guacamole..."
   cd /opt || exit 1
-  apt-get -qq install -y libcairo2-dev libjpeg62-dev libpng-dev libossp-uuid-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libssh-dev tomcat8 tomcat8-admin tomcat8-user
-  wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/source/guacamole-server-1.0.0.tar.gz" -O guacamole-server-1.0.0.tar.gz
-  tar -xf guacamole-server-1.0.0.tar.gz && cd guacamole-server-1.0.0 || echo "[-] Unable to find the Guacamole folder."
-  ./configure &>/dev/null && make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
+  echo "[$(date +%H:%M:%S)]: Downloading Guacamole..."
+  wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/source/guacamole-server-1.3.0.tar.gz?action=download" -O guacamole-server-1.3.0.tar.gz
+  tar -xf guacamole-server-1.3.0.tar.gz && cd guacamole-server-1.3.0 || echo "[-] Unable to find the Guacamole folder."
+  echo "[$(date +%H:%M:%S)]: Configuring Guacamole and running 'make' and 'make install'..."
+  ./configure --with-init-dir=/etc/init.d && make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
   ldconfig
-  cd /var/lib/tomcat8/webapps || echo "[-] Unable to find the tomcat8/webapps folder."
-  wget --progress=bar:force "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/1.0.0/binary/guacamole-1.0.0.war" -O guacamole.war
+  cd /var/lib/tomcat9/webapps || echo "[-] Unable to find the tomcat9/webapps folder."
+  wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/binary/guacamole-1.3.0.war?action=download" -O guacamole.war
   mkdir /etc/guacamole
   mkdir /etc/guacamole/shares
-  sudo chmod 777 mkdir /etc/guacamole/shares
-  mkdir /usr/share/tomcat8/.guacamole
+  sudo chmod 777 /etc/guacamole/shares
+  mkdir /usr/share/tomcat9/.guacamole
   cp /vagrant/resources/guacamole/user-mapping.xml /etc/guacamole/
   cp /vagrant/resources/guacamole/guacamole.properties /etc/guacamole/
   cp /vagrant/resources/guacamole/guacd.service /lib/systemd/system
-  sudo ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat8/.guacamole/
-  sudo ln -s /etc/guacamole/user-mapping.xml /usr/share/tomcat8/.guacamole/
-  sudo ln -s /usr/local/lib/freerdp /usr/lib/x86_64-linux-gnu/
+  sudo ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat9/.guacamole/
+  sudo ln -s /etc/guacamole/user-mapping.xml /usr/share/tomcat9/.guacamole/
+  # Thank you Kifarunix: https://kifarunix.com/install-guacamole-on-debian-11/
+  useradd -M -d /var/lib/guacd/ -r -s /sbin/nologin -c "Guacd User" guacd
+  mkdir /var/lib/guacd
+  chown -R guacd: /var/lib/guacd
+  systemctl daemon-reload
   systemctl enable guacd
-  systemctl enable tomcat8
+  systemctl enable tomcat9
   systemctl start guacd
-  systemctl start tomcat8
+  systemctl start tomcat9
+  echo "[$(date +%H:%M:%S)]: Guacamole installation complete!"
 }
 
 postinstall_tasks() {
@@ -603,8 +612,8 @@ configure_splunk_inputs() {
   crudini --set /opt/splunk/etc/apps/search/local/props.conf suricata:json TRUNCATE 0
 
   # Fleet
-    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
-    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
+  /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
+  /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
 
   # Zeek
   mkdir -p /opt/splunk/etc/apps/Splunk_TA_bro/local && touch /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf

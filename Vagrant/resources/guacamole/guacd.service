@@ -21,7 +21,7 @@ Documentation=man:guacd(8)
 After=network.target
 
 [Service]
-User=daemon
+User=guacd
 ExecStart=/usr/local/sbin/guacd -f
 Restart=on-abnormal
 
