@@ -51,7 +51,7 @@
     post_reboot_delay: 60
 
 - name: Install Exchange Prereqs
-  win_shell: .\\install-exchange.ps1
+  win_shell: .\\install-exchange-prerequisites.ps1
   args:
     chdir: 'c:\vagrant\scripts'
   register: exchange_prereqs
@@ -64,15 +64,25 @@
     reboot_timeout: 600
     post_reboot_delay: 60
 
-- name: Download Exchange ISO and Mount It
-  win_shell: .\\install-exchange.ps1
-  args:
-    chdir: 'c:\vagrant\scripts'
-  register: download_exchange_iso
+- name: Make Exchange Directory
+  win_file:
+    path: 'C:\exchange2016'
+    state: directory
+
+- name: Download ISO
+  win_get_url:
+    url: 'https://download.microsoft.com/download/2/5/8/258D30CF-CA4C-433A-A618-FB7E6BCC4EEE/ExchangeServer2016-x64-cu12.iso'
+    dest: 'C:\exchange2016\ExchangeServer2016-x64-cu12.iso'
+
+- name: Ensure an ISO is mounted
+  win_disk_image:
+    image_path: 'C:\exchange2016\ExchangeServer2016-x64-cu12.iso'
+    state: present
+  register: disk_image_out
 
 - name: Prepare Schema
   win_package:
-    path: E:\Setup.exe
+    path: '{{ disk_image_out.mount_paths[0] }}Setup.exe'
     arguments: >-
       /IAcceptExchangeServerLicenseTerms
       /PrepareSchema
@@ -86,7 +96,7 @@
 
 - name: Prepare AD
   win_package:
-    path: E:\Setup.exe
+    path: '{{ disk_image_out.mount_paths[0] }}Setup.exe'
     arguments: >-
       /IAcceptExchangeServerLicenseTerms
       /PrepareAD
@@ -101,7 +111,7 @@
 
 - name: Install Exchange
   win_package:
-    path: E:\Setup.exe
+    path: '{{ disk_image_out.mount_paths[0] }}Setup.exe'
     arguments: >-
       /IAcceptExchangeServerLicenseTerms
       /Mode:Install

@@ -9,7 +9,7 @@ $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # Windows Defender should be disabled already by O&O ShutUp10 and the GPO
-If ($hostname -eq "win10") {
+If ($hostname -eq "win10" -And (Get-Service -Name WinDefend).StartType -ne 'Disabled' ) {
   # Adding Defender exclusions just in case
   Set-MpPreference -ExclusionPath "C:\Tools"
   Add-MpPreference -ExclusionPath "C:\Users\vagrant\AppData\Local\Temp"

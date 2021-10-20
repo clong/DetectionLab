@@ -131,3 +131,5 @@ chmod +x /opt/DetectionLab/build.sh
 sn=tmuxsession
 tmux new-session -s "$sn" -d
 tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab && ./build.sh && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html' Enter
+# tmux new-window -t "$sn:2" -n "exchange" -d
+# tmux send-keys -t "$sn:2" 'cd /opt/DetectionLab/Vagrant/Exchange && vagrant up' Enter
