@@ -37,8 +37,8 @@
         "additional_iso_files": [
           {
             "device": "ide3",
-            "iso_file": "local:iso/Autounattend.iso",
-            "iso_checksum": "00d8ae0f176f97625261e6ff11a3d4fe",
+            "iso_file": "local:iso/Autounattend_Win10.iso",
+            "iso_checksum": "0c1c76c2ae3bf1c840256415ebba2db9",
             "unmount": true
           },
           {
@@ -88,7 +88,7 @@
         "remote_path": "/tmp/script.bat",
         "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
         "scripts": [
-          "../../Packer/scripts/pin-powershell.bat",
+          "./scripts/pin-powershell-proxmox.bat",
           "../../Packer/scripts/compile-dotnet-assemblies.bat",
           "../../Packer/scripts/set-winrm-automatic.bat",
           "../../Packer/scripts/dis-updates.bat"
