@@ -88,7 +88,7 @@
         "remote_path": "/tmp/script.bat",
         "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
         "scripts": [
-          "./scripts/pin-powershell-proxmox.bat",
+          "./scripts/pin-powershell.bat",
           "../../Packer/scripts/compile-dotnet-assemblies.bat",
           "../../Packer/scripts/set-winrm-automatic.bat",
           "../../Packer/scripts/dis-updates.bat"
