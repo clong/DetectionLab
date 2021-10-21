@@ -23,7 +23,7 @@
           {
             "type": "sata",
             "disk_size": "60G",
-            "storage_pool": "local-lvm",
+            "storage_pool": "nvme-lvm",
             "storage_pool_type": "lvm",
             "cache_mode": "writeback",
             "format": "qcow2"
@@ -44,8 +44,7 @@
           },
           {
             "device": "sata1",
-            "iso_url": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.208-1/virtio-win-0.1.208.iso",
-            "iso_storage_pool": "local",
+            "iso_file": "local:iso/virtio-win.iso",
             "iso_checksum": "3bbc69bdcf1d46f4ee0ddaf35c2656f3",
             "unmount": true
           }
