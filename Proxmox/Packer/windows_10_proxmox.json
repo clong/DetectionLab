@@ -11,7 +11,7 @@
         "sockets": 1,
         "cores": 2,  
         "cpu_type": "kvm64",
-        "memory": 2048,
+        "memory": 4096,
         "os": "win10",
         "network_adapters": [
           {
@@ -21,18 +21,19 @@
         ],
         "disks": [
           {
-            "type": "sata",
-            "disk_size": "60G",
+            "type": "scsi",
+            "disk_size": "64G",
             "storage_pool": "nvme-lvm",
-            "storage_pool_type": "lvm",
+            "storage_pool_type": "lvm-thin",
             "cache_mode": "writeback",
-            "format": "qcow2"
+            "format": "raw"
           }
         ],
         "vga": {
           "type": "std",
           "memory": 256
         },
+        "scsi_controller": "virtio-scsi-pci",
         "iso_file": "local:iso/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
         "additional_iso_files": [
           {
