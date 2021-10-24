@@ -35,6 +35,8 @@
         },
         "scsi_controller": "virtio-scsi-pci",
         "iso_file": "local:iso/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
+        "boot_wait": "2m",
+        "boot": "order=scsi0;ide2",
         "additional_iso_files": [
           {
             "device": "ide3",

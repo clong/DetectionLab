@@ -35,6 +35,8 @@
         },
         "scsi_controller": "virtio-scsi-pci",
         "iso_file": "local:iso/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+        "boot_wait": "6m",
+        "boot": "order=scsi0;ide2",
         "additional_iso_files": [
           {
             "device": "ide3",
