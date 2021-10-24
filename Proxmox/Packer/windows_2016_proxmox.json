@@ -6,7 +6,7 @@
         "insecure_skip_tls_verify": true,
         "username": "{{ user `proxmox_username` }}",
         "password": "{{ user `proxmox_password` }}",
-        "vm_name": "Windows10",
+        "vm_name": "WindowsServer2016",
         "node": "{{user `proxmox_node`}}",
         "sockets": 1,
         "cores": 2,  
@@ -34,13 +34,13 @@
           "memory": 256
         },
         "scsi_controller": "virtio-scsi-pci",
-        "iso_file": "local:iso/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+        "iso_file": "local:iso/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
         "additional_iso_files": [
           {
             "device": "ide3",
-            "iso_url": "./http/Autounattend_Win10.iso",
+            "iso_url": "./http/Autounattend_Win2016.iso",
             "iso_storage_pool": "local",
-            "iso_checksum": "0c1c76c2ae3bf1c840256415ebba2db9",
+            "iso_checksum": "1f25aaff652c460bb30384747f8c56ec",
             "unmount": true
           },
           {
@@ -56,8 +56,8 @@
         "winrm_timeout": "4h",
         "qemu_agent": true,
         "unmount_iso": true,
-        "template_name": "Windows10",
-        "template_description": "Windows 10, generated on {{ isotime \"2006-01-02T15:04:05Z\" }}"
+        "template_name": "WindowsServer2016",
+        "template_description": "Windows Server 2016, generated on {{ isotime \"2006-01-02T15:04:05Z\" }}"
       }
     ],
     "provisioners": [
@@ -79,21 +79,15 @@
         "type": "windows-restart"
       },
       {
-        "type": "powershell",
-        "scripts": [
-          "../../Packer/scripts/set-powerplan.ps1",
-          "../../Packer/scripts/docker/disable-windows-defender.ps1"
-        ]
-      },
-      {
         "type": "windows-shell",
         "remote_path": "/tmp/script.bat",
         "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
         "scripts": [
           "./scripts/pin-powershell.bat",
-          "../../Packer/scripts/compile-dotnet-assemblies.bat",
           "../../Packer/scripts/set-winrm-automatic.bat",
-          "../../Packer/scripts/dis-updates.bat"
+          "../../Packer/scripts/compile-dotnet-assemblies.bat",
+          "../../Packer/scripts/uac-enable.bat",
+          "../../Packer/scripts/compact.bat"
       ]
     }
   ]
