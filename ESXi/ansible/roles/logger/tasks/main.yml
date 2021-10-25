@@ -538,7 +538,7 @@
 - name: Install Zeek Packages
   become: yes
   apt:
-    name: ['zeek', 'crudini', 'python-pip']
+    name: ['zeek', 'crudini', 'python3-pip']
     update_cache: yes
 
 - name: Install Zeek Continued
@@ -549,7 +549,7 @@
     # Environment variables
     NODECFG=/opt/zeek/etc/node.cfg
     export PATH=$PATH:/opt/zeek/bin
-    pip3 install zkg==2.1.1
+    pip3 install zkg
     zkg refresh
     zkg autoconfig
     zkg install --force salesforce/ja3
@@ -646,8 +646,7 @@
     systemctl start guacd
     systemctl start tomcat9
     echo "[$(date +%H:%M:%S)]: Guacamole installation complete!"
-    register: install_guacamole
-    failed_when: "'error' in install_guacamole.stderr"
+  register: install_guacamole
 
 - name: Postinstall Tasks
   args: 
