@@ -25,7 +25,7 @@ resource "esxi_guest" "logger" {
   numvcpus           = "2"
   resource_pool_name = "/"
   power              = "on"
-  clone_from_vm = "Ubuntu1804"
+  clone_from_vm = "Ubuntu2004"
 
     provisioner "remote-exec" {
     inline = [

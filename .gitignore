@@ -18,3 +18,4 @@ HyperV/.vagrant/*
 logger_variables.sh
 ESXi/Packer/variables.json
 .terraform.lock.hcl
+variables.json
