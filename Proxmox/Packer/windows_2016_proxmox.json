@@ -42,7 +42,7 @@
             "device": "ide3",
             "iso_url": "./http/Autounattend_Win2016.iso",
             "iso_storage_pool": "local",
-            "iso_checksum": "1f25aaff652c460bb30384747f8c56ec",
+            "iso_checksum": "5893b92cee842a9b32a57af964abdcc3",
             "unmount": true
           },
           {
