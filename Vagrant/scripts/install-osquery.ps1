@@ -22,7 +22,7 @@ If (-not ($service)) {
   }
   Else {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Adding Fleet to the hosts file"
-    Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.105    fleet"
+    Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.56.105    fleet"
   }
   ## Add Fleet secret and avoid BOM
   $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False

@@ -17,11 +17,11 @@ post_build_checks() {
   GUACAMOLE_CHECK=0
   # If the curl operation fails, we'll just leave the variable equal to 0
   # This is needed to prevent the script from exiting if the curl operation fails
-  SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk')
-  FLEET_CHECK=$(curl -ks -m 2 https://192.168.38.105:8412 | grep -c 'Fleet for osquery')
-  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.38.103 -m 2)
-  VELOCIRAPTOR_CHECK=$(curl -ks -m 2 https://192.168.38.105:9999 | grep -c 'app/index.html')
-  GUACAMOLE_CHECK=$(curl -ks -m 2 'http://192.168.38.105:8080/guacamole/#/' | grep -c 'Apache Software')
+  SPLUNK_CHECK=$(curl -ks -m 2 https://192.168.56.105:8000/en-US/account/login?return_to=%2Fen-US%2F | grep -c 'This browser is not supported by Splunk')
+  FLEET_CHECK=$(curl -ks -m 2 https://192.168.56.105:8412 | grep -c 'Fleet for osquery')
+  ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.56.103 -m 2)
+  VELOCIRAPTOR_CHECK=$(curl -ks -m 2 https://192.168.56.105:9999 | grep -c 'app/index.html')
+  GUACAMOLE_CHECK=$(curl -ks -m 2 'http://192.168.56.105:8080/guacamole/#/' | grep -c 'Apache Software')
   [[ $ATA_CHECK == 401 ]] && ATA_CHECK=1
   
   echo "[*] Verifying that Splunk is running and reachable..."

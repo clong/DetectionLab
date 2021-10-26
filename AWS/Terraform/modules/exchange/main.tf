@@ -55,7 +55,7 @@ resource "aws_instance" "exchange" {
 
   subnet_id              = var.subnet_id
   vpc_security_group_ids = var.security_group_id
-  private_ip             = "192.168.38.106"
+  private_ip             = "192.168.56.106"
 
   root_block_device {
     delete_on_termination = true

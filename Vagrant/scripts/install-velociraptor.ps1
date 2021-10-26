@@ -5,7 +5,7 @@ If (Select-String -Path "c:\windows\system32\drivers\etc\hosts" -Pattern "logger
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Hosts file already updated. Moving on."
 } Else {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Adding logger to the hosts file"
-  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.105    logger"
+  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.56.105    logger"
 }
 
 # Downloads and install the latest Velociraptor release

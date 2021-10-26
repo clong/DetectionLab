@@ -13,14 +13,14 @@ $name = (Get-NetIPAddress -AddressFamily IPv4 `
    ).InterfaceAlias
 if (!$name) {
   $name = (Get-NetIPAddress -AddressFamily IPv4 `
-     | Where-Object -FilterScript { ($_.IPAddress).StartsWith("192.168.38") } `
+     | Where-Object -FilterScript { ($_.IPAddress).StartsWith("192.168.56") } `
      ).InterfaceAlias
 }
 if ($name) {
   Write-Host "Set IP address to $ip of interface $name"
   & netsh.exe int ip set address $name static $ip 255.255.255.0 "$subnet.1"
   Write-Host "Set DNS server address to $dns of interface $name"
-  & netsh.exe interface ipv4 add dnsserver $name address=192.168.38.102 index=1
+  & netsh.exe interface ipv4 add dnsserver $name address=192.168.56.102 index=1
   if ($dns) {
     & netsh.exe interface ipv4 add dnsserver $name address=$dns index=2
   }
