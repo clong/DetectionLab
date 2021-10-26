@@ -42,7 +42,7 @@
             "device": "ide3",
             "iso_url": "./http/Autounattend_Win10.iso",
             "iso_storage_pool": "local",
-            "iso_checksum": "a64e9558afef8025b3852df1b1cd32f9",
+            "iso_checksum": "027d92f2076ab85158404f0ffcc01d27",
             "unmount": true
           },
           {
