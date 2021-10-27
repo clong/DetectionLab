@@ -2,7 +2,7 @@
     <authorize username="vagrant" password="vagrant">
         <connection name="logger">
             <protocol>ssh</protocol>
-            <param name="hostname">192.168.38.105</param>
+            <param name="hostname">192.168.56.105</param>
             <param name="port">22</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
@@ -10,7 +10,7 @@
 
         <connection name="wef">
             <protocol>rdp</protocol>
-            <param name="hostname">192.168.38.103</param>
+            <param name="hostname">192.168.56.103</param>
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
@@ -23,7 +23,7 @@
 
         <connection name="exchange">
             <protocol>rdp</protocol>
-            <param name="hostname">192.168.38.106</param>
+            <param name="hostname">192.168.56.106</param>
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
@@ -36,7 +36,7 @@
 
         <connection name="win10">
             <protocol>rdp</protocol>
-            <param name="hostname">192.168.38.104</param>
+            <param name="hostname">192.168.56.104</param>
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
@@ -49,7 +49,7 @@
 
         <connection name="dc">
             <protocol>rdp</protocol>
-            <param name="hostname">192.168.38.102</param>
+            <param name="hostname">192.168.56.102</param>
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
