@@ -62,7 +62,11 @@
                 "time.synchronize.shrink": "0",
                 "time.synchronize.tools.startup": "0",
                 "time.synchronize.tools.enable": "0",
-                "time.synchronize.resume.host": "0"
+                "time.synchronize.resume.host": "0",
+                "virtualhw.version": 13
+            },
+            "vmx_data_post": {
+                "ide0:0.present": "FALSE"
             },
             "vnc_disable_password": true,
             "vnc_port_min": 5900,
