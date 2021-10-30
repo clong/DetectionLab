@@ -14,11 +14,12 @@ resource "proxmox_vm_qemu" "logger" {
   desc = "logger"
   cores = "2"
   sockets = "1"
-  cpu = "host"
+  cpu = "kvm64"
   memory = "4096"
   scsihw = "virtio-scsi-pci"
   bootdisk = "scsi0"
   agent = 1
+  onboot = false
 
   disk {
     size = "64G"
@@ -33,12 +34,14 @@ resource "proxmox_vm_qemu" "logger" {
     model = "virtio"
     bridge = var.vm_network
     macaddr = "00:50:56:a3:b1:c2"
+    firewall = false
   }
 
   network {
     model = "virtio"
     bridge = var.hostonly_network
     macaddr = "00:50:56:a3:b1:c4"
+    firewall = false
   }
 
     connection {
@@ -64,11 +67,12 @@ resource "proxmox_vm_qemu" "dc" {
   desc = "dc"
   cores = "2"
   sockets = "1"
-  cpu = "host"
+  cpu = "kvm64"
   memory = "4096"
   scsihw = "virtio-scsi-pci"
   bootdisk = "scsi0"
   agent = 1
+  onboot = false
 
   disk {
     size = "64G"
@@ -83,12 +87,14 @@ resource "proxmox_vm_qemu" "dc" {
     model = "virtio"
     bridge = var.vm_network
     macaddr = "00:50:56:a1:b1:c2"
+    firewall = false
   }
 
   network {
     model = "virtio"
     bridge = var.hostonly_network
     macaddr = "00:50:56:a1:b1:c4"
+    firewall = false
   }
 }
 
@@ -100,11 +106,12 @@ resource "proxmox_vm_qemu" "wef" {
   desc = "wef"
   cores = "2"
   sockets = "1"
-  cpu = "host"
+  cpu = "kvm64"
   memory = "2048"
   scsihw = "virtio-scsi-pci"
   bootdisk = "scsi0"
   agent = 1
+  onboot = false
 
   disk {
     size = "64G"
@@ -119,12 +126,14 @@ resource "proxmox_vm_qemu" "wef" {
     model = "virtio"
     bridge = var.vm_network
     macaddr = "00:50:56:a1:b2:c2"
+    firewall = false
   }
 
   network {
     model = "virtio"
     bridge = var.hostonly_network
     macaddr = "00:50:56:a1:b4:c4"
+    firewall = false
   }
 }
 
@@ -136,11 +145,12 @@ resource "proxmox_vm_qemu" "win10" {
   desc = "win10"
   cores = "2"
   sockets = "1"
-  cpu = "host"
+  cpu = "kvm64"
   memory = "2048"
   scsihw = "virtio-scsi-pci"
   bootdisk = "scsi0"
   agent = 1
+  onboot = false
 
   disk {
     size = "64G"
@@ -155,11 +165,13 @@ resource "proxmox_vm_qemu" "win10" {
     model = "virtio"
     bridge = var.vm_network
     macaddr = "00:50:56:a2:b1:c2"
+    firewall = false
   }
 
   network {
     model = "virtio"
     bridge = var.hostonly_network
     macaddr = "00:50:56:a2:b1:c4"
+    firewall = false
   }
 }

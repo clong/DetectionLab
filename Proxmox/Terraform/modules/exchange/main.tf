@@ -15,11 +15,12 @@ resource "proxmox_vm_qemu" "exchange" {
   desc = "exchange"
   cores = "4"
   sockets = "1"
-  cpu = "host"
+  cpu = "kvm64"
   memory = "8192"
   scsihw = "virtio-scsi-pci"
   bootdisk = "scsi0"
   agent = 1
+  onboot = false
 
   disk {
     size = "64G"
@@ -34,11 +35,13 @@ resource "proxmox_vm_qemu" "exchange" {
     model = "virtio"
     bridge = var.vm_network
     macaddr = "00:50:56:a1:b2:c5"
+    firewall = false
   }
 
   network {
     model = "virtio"
     bridge = var.hostonly_network
     macaddr = "00:50:56:a1:b4:c5"
+    firewall = false
   }
 }
