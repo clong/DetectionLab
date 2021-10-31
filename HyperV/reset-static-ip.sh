@@ -10,8 +10,8 @@ network:
       match:
         macaddress: $MAC
       dhcp4: no
-      addresses: [192.168.38.105/24]
-      gateway4: 192.168.38.1
+      addresses: [192.168.56.105/24]
+      gateway4: 192.168.56.1
       nameservers:
         addresses: [8.8.8.8,8.8.4.4]
       set-name: eth1

@@ -33,17 +33,17 @@ function post_build_checks {
     if ((Get-NetAdapter | where {$_.name -eq "VMware Network Adapter VMnet2"}).ifIndex) {
       Write-Host '[*] Verifying vmnet2 interface has its IP address set correctly'
       $vmnet2idx=(Get-NetAdapter | where {$_.name -eq "VMware Network Adapter VMnet2"}).ifIndex
-      if ((get-netipaddress -AddressFamily IPv4 | where { $_.InterfaceIndex -eq $vmnet2idx }).IPAddress -ne "192.168.38.1") {
-        Write-Host '[!] Your vmnet2 network adapter is not set with a static IP address of 192.168.38.1' -ForegroundColor red
+      if ((get-netipaddress -AddressFamily IPv4 | where { $_.InterfaceIndex -eq $vmnet2idx }).IPAddress -ne "192.168.56.1") {
+        Write-Host '[!] Your vmnet2 network adapter is not set with a static IP address of 192.168.56.1' -ForegroundColor red
         Write-Host '[!] Please match your adapter settings to the screenshot shown here: https://github.com/clong/DetectionLab/issues/681#issuecomment-890442441' -ForegroundColor red
       }
       Else {
-        Write-Host '  ['$($checkmark)'] VMNet2 is correctly set to 192.168.38.1!' -ForegroundColor Green
+        Write-Host '  ['$($checkmark)'] VMNet2 is correctly set to 192.168.56.1!' -ForegroundColor Green
       }
     }
 
     Write-Host '[*] Verifying that Splunk is reachable...'
-    $SPLUNK_CHECK = download -URL 'https://192.168.38.105:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
+    $SPLUNK_CHECK = download -URL 'https://192.168.56.105:8000/en-US/account/login?return_to=%2Fen-US%2F' -PatternToMatch 'This browser is not supported by Splunk'
     if ($SPLUNK_CHECK -eq $false) {
         Write-Host '[!] Splunk was unreachable and may not have installed correctly.' -ForegroundColor red
     }
@@ -53,7 +53,7 @@ function post_build_checks {
     Write-Host ''
 
     Write-Host '[*] Verifying that Fleet is reachable...'
-    $FLEET_CHECK = download -URL 'https://192.168.38.105:8412' -PatternToMatch 'Fleet for osquery'
+    $FLEET_CHECK = download -URL 'https://192.168.56.105:8412' -PatternToMatch 'Fleet for osquery'
     if ($FLEET_CHECK -eq $false) {
         Write-Host '[!] Fleet was unreachable and may not have installed correctly.' -ForegroundColor red
     }
@@ -63,7 +63,7 @@ function post_build_checks {
     Write-Host ''
 
     Write-Host '[*] Verifying that Microsoft ATA is reachable...'
-    $ATA_CHECK = download -URL 'https://192.168.38.103' -SuccessOn401
+    $ATA_CHECK = download -URL 'https://192.168.56.103' -SuccessOn401
     if ($ATA_CHECK -eq $false) {
         Write-Host '[!] Microsoft ATA was unreachable and may not have installed correctly.' -ForegroundColor red
     }
@@ -73,7 +73,7 @@ function post_build_checks {
     Write-Host ''
 
     Write-Host '[*] Verifying that Velociraptor is reachable...'
-    $VELOCIRAPTOR_CHECK = download -URL 'https://192.168.38.105:9999' -SuccessOn401
+    $VELOCIRAPTOR_CHECK = download -URL 'https://192.168.56.105:9999' -SuccessOn401
     if ($VELOCIRAPTOR_CHECK -eq $false) {
         Write-Host '[!] Velociraptor was unreachable and may not have installed correctly.' -ForegroundColor red
     }
@@ -83,7 +83,7 @@ function post_build_checks {
     Write-Host ''
 
     Write-Host '[*] Verifying that Guacamole is reachable...'
-    $GUACAMOLE_CHECK = download -URL 'http://192.168.38.105:8080/guacamole' -PatternToMatch 'Apache Software'
+    $GUACAMOLE_CHECK = download -URL 'http://192.168.56.105:8080/guacamole' -PatternToMatch 'Apache Software'
     if ($GUACAMOLE_CHECK -eq $false) {
         Write-Host '[!] Guacamole was unreachable and may not have installed correctly.' -ForegroundColor red
     }

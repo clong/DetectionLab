@@ -98,21 +98,21 @@ fix_eth1_static_ip() {
   if ! grep 'interface "eth1"' /etc/dhcp/dhclient.conf; then
     echo -e 'interface "eth1" {
       send host-name = gethostname();
-      send dhcp-requested-address 192.168.38.105;
+      send dhcp-requested-address 192.168.56.105;
     }' >>/etc/dhcp/dhclient.conf
     netplan apply
   fi
 
   # Fix eth1 if the IP isn't set correctly
   ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
-  if [ "$ETH1_IP" != "192.168.38.105" ]; then
+  if [ "$ETH1_IP" != "192.168.56.105" ]; then
     echo "Incorrect IP Address settings detected. Attempting to fix."
     ifdown eth1
     ip addr flush dev eth1
     ifup eth1
     ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
-    if [ "$ETH1_IP" == "192.168.38.105" ]; then
-      echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.38.105"
+    if [ "$ETH1_IP" == "192.168.56.105" ]; then
+      echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.56.105"
     else
       echo "[$(date +%H:%M:%S)]: Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
       exit 1
@@ -319,7 +319,7 @@ install_fleet_import_osquery_config() {
       sleep 1
     done
 
-    fleetctl config set --address https://192.168.38.105:8412
+    fleetctl config set --address https://192.168.56.105:8412
     fleetctl config set --tls-skip-verify true
     fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
     fleetctl login --email admin@detectionlab.network --password 'admin123#'

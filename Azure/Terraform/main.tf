@@ -37,7 +37,7 @@ resource "azurerm_subnet" "detectionlab-subnet" {
   name                 = "DetectionLab-Subnet"
   resource_group_name  = azurerm_resource_group.detectionlab.name
   virtual_network_name = azurerm_virtual_network.detectionlab-network.name
-  address_prefixes       = ["192.168.38.0/24"]
+  address_prefixes       = ["192.168.56.0/24"]
 }
 
 resource "azurerm_network_security_group" "detectionlab-nsg" {
@@ -133,7 +133,7 @@ resource "azurerm_network_security_group" "detectionlab-nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = "192.168.38.0/24"
+    source_address_prefix      = "192.168.56.0/24"
     destination_address_prefix = "*"
   }
 
@@ -189,7 +189,7 @@ resource "azurerm_network_interface" "logger-nic" {
     name                          = "logger-NicConfiguration"
     subnet_id                     = azurerm_subnet.detectionlab-subnet.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = "192.168.38.105"
+    private_ip_address            = "192.168.56.105"
     public_ip_address_id          = azurerm_public_ip.logger-publicip.id
   }
 }
@@ -217,7 +217,7 @@ resource "azurerm_virtual_machine" "logger" {
   location = var.region
   resource_group_name  = azurerm_resource_group.detectionlab.name
   network_interface_ids = [azurerm_network_interface.logger-nic.id]
-  vm_size               = "Standard_D1_v2"
+  vm_size               = "Standard_DS1_v2"
 
   delete_os_disk_on_termination = true
 
@@ -230,8 +230,8 @@ resource "azurerm_virtual_machine" "logger" {
 
   storage_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
     version   = "latest"
   }
 
@@ -299,7 +299,7 @@ resource "azurerm_network_interface" "dc-nic" {
     name                          = "DC-NicConfiguration"
     subnet_id                     = azurerm_subnet.detectionlab-subnet.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = "192.168.38.102"
+    private_ip_address            = "192.168.56.102"
     public_ip_address_id          = azurerm_public_ip.dc-publicip.id
   }
 }
@@ -324,7 +324,7 @@ resource "azurerm_network_interface" "wef-nic" {
     name                          = "WEF-NicConfiguration"
     subnet_id                     = azurerm_subnet.detectionlab-subnet.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = "192.168.38.103"
+    private_ip_address            = "192.168.56.103"
     public_ip_address_id          = azurerm_public_ip.wef-publicip.id
   }
 }
@@ -349,7 +349,7 @@ resource "azurerm_network_interface" "win10-nic" {
     name                          = "myNicConfiguration"
     subnet_id                     = azurerm_subnet.detectionlab-subnet.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = "192.168.38.104"
+    private_ip_address            = "192.168.56.104"
     public_ip_address_id          = azurerm_public_ip.win10-publicip.id
   }
 }

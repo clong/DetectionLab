@@ -1,6 +1,8 @@
 {
   "builders": [
     {
+      "vnc_over_websocket": true,
+      "insecure_connection": true,
       "boot_wait": "2m",
       "communicator": "winrm",
       "disk_size": 61440,
@@ -92,4 +94,3 @@
     "autounattend": "../../Packer/answer_files/2016/Autounattend.xml"
   }
 }
-

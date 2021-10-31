@@ -69,6 +69,7 @@
     - wireshark
     - winpcap
     state: present
+    ignore_checksums: true
 
 
 

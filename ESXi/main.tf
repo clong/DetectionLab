@@ -25,7 +25,7 @@ resource "esxi_guest" "logger" {
   numvcpus           = "2"
   resource_pool_name = "/"
   power              = "on"
-  clone_from_vm = "Ubuntu1804"
+  clone_from_vm = "Ubuntu2004"
 
     provisioner "remote-exec" {
     inline = [
@@ -48,7 +48,7 @@ resource "esxi_guest" "logger" {
     mac_address     = "00:50:56:a3:b1:c2"
     nic_type        = "e1000"
   }
-  # This is the local network that will be used for 192.168.38.x addressing
+  # This is the local network that will be used for 192.168.56.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
     mac_address     = "00:50:56:a3:b1:c4"
@@ -83,7 +83,7 @@ resource "esxi_guest" "dc" {
     mac_address     = "00:50:56:a1:b1:c2"
     nic_type        = "e1000"
   }
-  # This is the local network that will be used for 192.168.38.x addressing
+  # This is the local network that will be used for 192.168.56.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
     mac_address     = "00:50:56:a1:b1:c4"
@@ -111,7 +111,7 @@ resource "esxi_guest" "wef" {
     mac_address     = "00:50:56:a1:b2:c2"
     nic_type        = "e1000"
   }
-  # This is the local network that will be used for 192.168.38.x addressing
+  # This is the local network that will be used for 192.168.56.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
     mac_address     = "00:50:56:a1:b4:c4"
@@ -139,7 +139,7 @@ resource "esxi_guest" "win10" {
     mac_address     = "00:50:56:a2:b1:c2"
     nic_type        = "e1000"
   }
-  # This is the local network that will be used for 192.168.38.x addressing
+  # This is the local network that will be used for 192.168.56.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
     mac_address     = "00:50:56:a2:b1:c4"

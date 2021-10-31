@@ -27,7 +27,7 @@
             ],
             "vnc_over_websocket": true,
             "insecure_connection": true,
-            "boot_wait": "10s",
+            "boot_wait": "5s",
             "cpus": "{{ user `cpus` }}",
             "disk_size": "{{user `disk_size`}}",
             "guest_os_type": "ubuntu-64",
@@ -50,7 +50,7 @@
             "skip_export": true,
             "tools_upload_flavor": "linux",
             "type": "vmware-iso",
-            "vm_name": "Ubuntu1804",
+            "vm_name": "Ubuntu2004",
             "vmx_data": {
                 "ethernet0.networkName": "{{user `esxi_network_with_dhcp_and_internet` }}",
                 "cpuid.coresPerSocket": "1",
@@ -62,7 +62,11 @@
                 "time.synchronize.shrink": "0",
                 "time.synchronize.tools.startup": "0",
                 "time.synchronize.tools.enable": "0",
-                "time.synchronize.resume.host": "0"
+                "time.synchronize.resume.host": "0",
+                "virtualhw.version": 13
+            },
+            "vmx_data_post": {
+                "ide0:0.present": "FALSE"
             },
             "vnc_disable_password": true,
             "vnc_port_min": 5900,
@@ -90,7 +94,7 @@
         }
     ],
     "variables": {
-        "box_basename": "ubuntu-18.04",
+        "box_basename": "ubuntu-20.04",
         "http_directory": "{{template_dir}}/http",
         "build_timestamp": "{{isotime \"20060102150405\"}}",
         "cpus": "2",
@@ -101,15 +105,15 @@
         "esxi_password": "",
         "headless": "false",
         "guest_additions_url": "",
-        "iso_checksum": "sha256:f5cbb8104348f0097a8e513b10173a07dbc6684595e331cb06f93f385d0aecf6",
-        "iso_name": "ubuntu-18.04.6-server-amd64.iso",
+        "iso_checksum": "sha256:f11bda2f2caed8f420802b59f382c25160b114ccc665dbac9c5046e7fceaced2",
+        "iso_name": "ubuntu-20.04.1-legacy-server-amd64.iso",
         "memory": "4096",
         "mirror": "http://cdimage.ubuntu.com",
-        "mirror_directory": "ubuntu/releases/18.04.6/release",
-        "name": "ubuntu-18.04",
+        "mirror_directory": "ubuntu-legacy-server/releases/20.04/release",
+        "name": "ubuntu-20.04",
         "no_proxy": "{{env `no_proxy`}}",
         "preseed_path": "preseed.cfg",
-        "template": "ubuntu-18.04-amd64",
+        "template": "ubuntu-20.04-amd64",
         "version": "TIMESTAMP"
     }
 }
