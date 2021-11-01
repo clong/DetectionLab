@@ -3,13 +3,13 @@ provider "proxmox" {
     pm_user = var.proxmox_api_user
     pm_password = var.proxmox_api_password
     pm_tls_insecure = true
-    pm_parallel = 4
+    pm_parallel = 1
 }
 
 resource "proxmox_vm_qemu" "logger" {
   name = "logger"
   target_node = var.proxmox_node
-  clone = "Ubuntu1804"
+  clone = "Ubuntu2004"
   full_clone = true
   desc = "logger"
   cores = "2"
@@ -30,6 +30,7 @@ resource "proxmox_vm_qemu" "logger" {
     discard = var.vm_disk_discard
   }
 
+  # This is the network that bridges your host machine with the Proxmox VM
   network {
     model = "virtio"
     bridge = var.vm_network
@@ -37,6 +38,7 @@ resource "proxmox_vm_qemu" "logger" {
     firewall = false
   }
 
+  # This is the local network that will be used for 192.168.56.x addressing
   network {
     model = "virtio"
     bridge = var.hostonly_network
@@ -83,6 +85,7 @@ resource "proxmox_vm_qemu" "dc" {
     discard = var.vm_disk_discard
   }
 
+  # This is the network that bridges your host machine with the Proxmox VM
   network {
     model = "virtio"
     bridge = var.vm_network
@@ -90,6 +93,7 @@ resource "proxmox_vm_qemu" "dc" {
     firewall = false
   }
 
+ # This is the local network that will be used for 192.168.56.x addressing
   network {
     model = "virtio"
     bridge = var.hostonly_network
@@ -122,6 +126,7 @@ resource "proxmox_vm_qemu" "wef" {
     discard = var.vm_disk_discard
   }
 
+  # This is the network that bridges your host machine with the Proxmox VM
   network {
     model = "virtio"
     bridge = var.vm_network
@@ -129,6 +134,7 @@ resource "proxmox_vm_qemu" "wef" {
     firewall = false
   }
 
+ # This is the local network that will be used for 192.168.56.x addressing
   network {
     model = "virtio"
     bridge = var.hostonly_network
@@ -161,6 +167,7 @@ resource "proxmox_vm_qemu" "win10" {
     discard = var.vm_disk_discard
   }
 
+  # This is the network that bridges your host machine with the Proxmox VM
   network {
     model = "virtio"
     bridge = var.vm_network
@@ -168,6 +175,7 @@ resource "proxmox_vm_qemu" "win10" {
     firewall = false
   }
 
+ # This is the local network that will be used for 192.168.56.x addressing
   network {
     model = "virtio"
     bridge = var.hostonly_network

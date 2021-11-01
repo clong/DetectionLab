@@ -31,6 +31,7 @@ resource "proxmox_vm_qemu" "exchange" {
     discard = var.vm_disk_discard
   }
 
+  # This is the network that bridges your host machine with the Proxmox VM
   network {
     model = "virtio"
     bridge = var.vm_network
@@ -38,6 +39,7 @@ resource "proxmox_vm_qemu" "exchange" {
     firewall = false
   }
 
+  # This is the local network that will be used for 192.168.56.x addressing
   network {
     model = "virtio"
     bridge = var.hostonly_network
