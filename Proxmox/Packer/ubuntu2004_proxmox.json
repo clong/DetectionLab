@@ -10,7 +10,7 @@
         "node": "{{user `proxmox_node`}}",
         "sockets": 1,
         "cores": 2,
-        "cpu_type": "kvm64",
+        "cpu_type": "host",
         "memory": 4096,
         "os": "l26",
         "network_adapters": [
