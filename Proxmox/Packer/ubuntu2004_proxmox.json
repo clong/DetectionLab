@@ -37,7 +37,7 @@
         "iso_file": "local:iso/ubuntu-20.04.1-legacy-server-amd64.iso",
         "iso_checksum": "f11bda2f2caed8f420802b59f382c25160b114ccc665dbac9c5046e7fceaced2",
         "http_directory": "{{template_dir}}/http",
-        "http_bind_address": "192.168.3.60",
+        "http_bind_address": "{{user `provisioning_machine_ip`}}",
         "boot_wait": "10s",
         "boot": "order=scsi0;ide2",
         "boot_command": [
