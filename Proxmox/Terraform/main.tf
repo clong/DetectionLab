@@ -3,7 +3,7 @@ provider "proxmox" {
     pm_user = var.proxmox_api_user
     pm_password = var.proxmox_api_password
     pm_tls_insecure = true
-    pm_parallel = 1
+    pm_parallel = 4
 }
 
 resource "proxmox_vm_qemu" "logger" {

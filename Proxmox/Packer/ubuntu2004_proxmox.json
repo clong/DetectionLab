@@ -83,13 +83,13 @@
           "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
           "expect_disconnect": true,
           "scripts": [ 
-              "{{template_dir}}/scripts/update.sh",
-              "{{template_dir}}/_common/motd.sh",
-              "{{template_dir}}/_common/sshd.sh",
-              "{{template_dir}}/scripts/networking.sh",
-              "{{template_dir}}/scripts/sudoers.sh",
-              "{{template_dir}}/scripts/vagrant.sh",
-              "{{template_dir}}/scripts/cleanup.sh"
+              "../../ESXi/Packer/scripts/update.sh",
+              "../../ESXi/Packer/_common/motd.sh",
+              "../../ESXi/Packer/_common/sshd.sh",
+              "../../ESXi/Packer/scripts/networking.sh",
+              "../../ESXi/Packer/scripts/sudoers.sh",
+              "../../ESXi/Packer/scripts/vagrant.sh",
+              "../../ESXi/Packer/scripts/cleanup.sh"
           ]
       }
     ]
