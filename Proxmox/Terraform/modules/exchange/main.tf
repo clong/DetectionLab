@@ -15,7 +15,7 @@ resource "proxmox_vm_qemu" "exchange" {
   desc = "exchange"
   cores = "4"
   sockets = "1"
-  cpu = "kvm64"
+  cpu = "host"
   memory = "8192"
   scsihw = "virtio-scsi-pci"
   bootdisk = "scsi0"
