@@ -8,3 +8,8 @@ private_key_path = "/home/user/.ssh/id_logger"
 # Replace the IP address below with the IP address(es) you'll be using
 # to connect to DetectionLab
 ip_whitelist = ["1.2.3.4/32"] 
+# Uncomment the following lines and add your key if you want to use Azure Log Analytics and Azure Sentinel
+/*
+workspaceKey                = "YOURWORKSPACEKEY"
+workspaceID                 = "YOURWORKSPACEID"
+*/

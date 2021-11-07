@@ -286,6 +286,28 @@ resource "azurerm_virtual_machine" "logger" {
     role = "logger"
   }
 }
+# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
+/*
+resource "azurerm_virtual_machine_extension" "mmaagent-logger" {
+  name                 = "${azurerm_virtual_machine.logger.name}-mma"
+  virtual_machine_id   = azurerm_virtual_machine.logger.id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "OmsAgentForLinux"
+  type_handler_version = "1.13"
+  auto_upgrade_minor_version = "true"
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${var.workspaceId}"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+   {
+      "workspaceKey": "${var.workspaceKey}"
+   }
+PROTECTED_SETTINGS
+}
+*/
 
 # https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples/virtual-machines/vm-joined-to-active-directory
 
@@ -420,6 +442,28 @@ resource "azurerm_virtual_machine" "dc" {
     role = "dc"
   }
 }
+# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
+/*
+resource "azurerm_virtual_machine_extension" "dc" {
+  name                 = "${azurerm_virtual_machine.dc.name}-mma"
+  virtual_machine_id   = azurerm_virtual_machine.dc.id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "MicrosoftMonitoringAgent"
+  type_handler_version = "1.0"
+  auto_upgrade_minor_version = "true"
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${var.workspaceId}"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+   {
+      "workspaceKey": "${var.workspaceKey}"
+   }
+PROTECTED_SETTINGS
+}
+*/
 
 resource "azurerm_virtual_machine" "wef" {
   name = "wef.windomain.local"
@@ -477,6 +521,29 @@ resource "azurerm_virtual_machine" "wef" {
     role = "wef"
   }
 }
+
+# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
+/*
+resource "azurerm_virtual_machine_extension" "mmaagent-Wef" {
+  name                 = "${azurerm_virtual_machine.wef.name}-mma"
+  virtual_machine_id   = azurerm_virtual_machine.wef.id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "MicrosoftMonitoringAgent"
+  type_handler_version = "1.0"
+  auto_upgrade_minor_version = "true"
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${var.workspaceId}"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+   {
+      "workspaceKey": "${var.workspaceKey}"
+   }
+PROTECTED_SETTINGS
+}
+*/
 
 resource "azurerm_virtual_machine" "win10" {
   name = "win10.windomain.local"
@@ -559,3 +626,26 @@ resource "null_resource" "inventory-creation" {
     command = "echo '${data.template_file.inventory.rendered}' > ../Ansible/inventory.yml"
   }
 }
+
+# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
+/*
+resource "azurerm_virtual_machine_extension" "mmaagent-Win10" {
+  name                 = "${azurerm_virtual_machine.win10.name}-mma"
+  virtual_machine_id   = azurerm_virtual_machine.win10.id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "MicrosoftMonitoringAgent"
+  type_handler_version = "1.0"
+  auto_upgrade_minor_version = "true"
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${var.workspaceId}"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+   {
+      "workspaceKey": "${var.workspaceKey}"
+   }
+PROTECTED_SETTINGS
+}
+*/
