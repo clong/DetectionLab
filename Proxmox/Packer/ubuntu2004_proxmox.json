@@ -34,7 +34,8 @@
           "memory": 32
         },
         "scsi_controller": "virtio-scsi-pci",
-        "iso_file": "local:iso/ubuntu-20.04.1-legacy-server-amd64.iso",
+        "iso_url": "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso",
+        "iso_storage_pool": "local",
         "iso_checksum": "f11bda2f2caed8f420802b59f382c25160b114ccc665dbac9c5046e7fceaced2",
         "http_directory": "{{template_dir}}/http",
         "http_bind_address": "{{user `provisioning_machine_ip`}}",

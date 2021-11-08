@@ -5,7 +5,7 @@
 #  Instead, create a terrform.tfvars file to override them.
 
 variable "proxmox_api_url" {
-  default = "https://192.168.3.234:8006/api2/json"
+  default = "https://192.168.2.234:8006/api2/json"
 }
 
 variable "proxmox_node" {

@@ -34,7 +34,9 @@
           "memory": 256
         },
         "scsi_controller": "virtio-scsi-pci",
-        "iso_file": "local:iso/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
+        "iso_url": "https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
+        "iso_storage_pool": "local",
+        "iso_checksum": "70721288BBCDFE3239D8F8C0FAE55F1F",
         "boot_wait": "2m",
         "boot": "order=scsi0;ide2",
         "additional_iso_files": [
@@ -47,7 +49,8 @@
           },
           {
             "device": "sata0",
-            "iso_file": "local:iso/virtio-win.iso",
+            "iso_url": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso",
+            "iso_storage_pool": "local",
             "iso_checksum": "3bbc69bdcf1d46f4ee0ddaf35c2656f3",
             "unmount": true
           }
