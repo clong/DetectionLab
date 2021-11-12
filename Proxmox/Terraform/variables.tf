@@ -5,11 +5,11 @@
 #  Instead, create a terrform.tfvars file to override them.
 
 variable "proxmox_api_url" {
-  default = "https://192.168.2.234:8006/api2/json"
+  default = "https://192.168.1.1:8006/api2/json"
 }
 
 variable "proxmox_node" {
-  default = "pve4"
+  default = "pve"
 }
 
 variable "proxmox_api_user" {
@@ -20,7 +20,7 @@ variable "proxmox_api_password" { # Unspecified will prompt
 }
 
 variable "vm_disk" {
-  default = "nvme-lvm"
+  default = "local-lvm"
 }
 
 variable "vm_disk_discard" {

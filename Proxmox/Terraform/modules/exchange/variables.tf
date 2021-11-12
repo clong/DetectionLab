@@ -1,9 +1,9 @@
 variable "proxmox_node" {
-  default = "pve4"
+  default = "pve"
 }
 
 variable "vm_disk" {
-  default = "nvme-lvm"
+  default = "local-lvm"
 }
 
 variable "vm_disk_discard" {

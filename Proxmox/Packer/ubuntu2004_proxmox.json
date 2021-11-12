@@ -23,7 +23,7 @@
           {
             "type": "scsi",
             "disk_size": "64G",
-            "storage_pool": "nvme-lvm",
+            "storage_pool": "local-lvm",
             "storage_pool_type": "lvm-thin",
             "cache_mode": "writeback",
             "format": "raw"
