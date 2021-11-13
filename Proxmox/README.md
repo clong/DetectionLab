@@ -41,3 +41,7 @@ Note: Run the following commands as a root user or with sudo
 7. Install Terraform and Packer by downloading the 64-bit Linux binaries and moving them to /usr/local/bin
 8. From “DetectionLab/Proxmox/Ansible” directory, run: “ansible –version” and ensure that the config file used is “DetectionLab/Proxmox/Ansible/ansible.cfg”. If not, implement the Ansible “world-writtable directory” fix by going to running: “chmod o-w .” from “DetectionLab/Proxmox/Ansible” directory.
 
+# Future Work
+
+1. Exchange provisioning is not yet supported.
+2. Implement automated installation of the Spice Guest Tools. For now you can install these manually in your Windows VMs: https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe
