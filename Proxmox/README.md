@@ -21,6 +21,6 @@
 3. **(1 Minute)** Once the Packer builds finish, verify that you now see Windows10, WindowsServer2016, and Ubuntu2004 in your Proxmox console.  
 4. **(5 Minutes)** In DetectionLab/Proxmox/Terraform, create a terraform.tfvars file (RECOMMENDED) to override the default variables listed in variables.tf.  
 5. **(25 Minutes)** From DetectionLab/Proxmox, run **terraform init**. The Proxmox Terraform provider should install automatically during this step.  
-6. Running **terraform apply** should then prompt us to create the logger, dc, wef, and win10 instances. Once finished, you should see the Terraform outputs with instance IP addresses which will be needed in the next steps.  
+6. Running **terraform apply** should then prompt us to create the logger, dc, wef, and win10 instances. Once finished, you should see the Terraform output with IP addresses of your VMs.  
 7. Once Terraform has finished bringing the hosts online, change your directory to DetectionLab/Proxmox/Ansible.  
-8. 
+8. **(1 Minute)** Edit DetectionLab/Proxmox/Ansible/inventory.yml and replace the IP Addresses with the respective IP Addresses of your Proxmox VMs. At times, the Terraform output is unable to derive the IP address of hosts, so you may have to log into the Proxmox console to find that information and then enter the IP addresses into inventory.yml
