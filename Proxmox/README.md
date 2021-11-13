@@ -16,7 +16,7 @@
 - PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_2016_proxmox.json
 - PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json ubuntu2004_proxmox.json
 
-These commands can be run in parallel from three separate terminal sessions.
+  These commands can be run in parallel from three separate terminal sessions.
 
 3. **(1 Minute)** Once the Packer builds finish, verify that you now see Windows10, WindowsServer2016, and Ubuntu2004 in your Proxmox console.  
 4. **(5 Minutes)** In DetectionLab/Proxmox/Terraform, create a terraform.tfvars file (RECOMMENDED) to override the default variables listed in variables.tf.  
