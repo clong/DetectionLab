@@ -12,11 +12,13 @@
 
 1. **(5 Minutes)** Edit the variables in DetectionLab/Proxmox/Packer/variables.json to match your Proxmox configuration. The esxi_network_with_dhcp_and_internet variable refers to any Proxmox network that will be able to provide DHCP and internet access to the VM while it’s being built in Packer. The provisioning_machine_ip variable refers to the IP address of your provisioning host.  
 2. **(45 Minutes)** From the DetectionLab/Proxmox/Packer directory, run:
-  - PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_10_proxmox.json
-  - PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_2016_proxmox.json
-  - PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json ubuntu2004_proxmox.json
+- PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_10_proxmox.json
+- PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_2016_proxmox.json
+- PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json ubuntu2004_proxmox.json
 
   These commands can be run in parallel from three separate terminal sessions.
 
 3. **(1 Minute)** Once the Packer builds finish, verify that you now see Windows10, WindowsServer2016, and Ubuntu2004 in your Proxmox console.  
 4. **(5 Minutes)** In DetectionLab/Proxmox/Terraform, create a terraform.tfvars file (RECOMMENDED) to override the default variables listed in variables.tf.  
+5. **(25 Minutes)** From DetectionLab/Proxmox, run **terraform init**. The Proxmox Terraform provider should install automatically during this step.  
+6. Running **terraform apply** should then prompt us to create the logger, dc, wef, and win10 instances.  
