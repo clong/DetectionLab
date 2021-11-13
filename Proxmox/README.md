@@ -1,7 +1,7 @@
 # Prereqs (~30-60 minutes)
 
-Have an ESXi instance version 6 or higher. VSphere is NOT required.  
-Terraform version 0.13 or higher is required as it provides support for installing Terraform providers directly from the Terraform Registry.
+1. Have an Proxmox VE server installed. This implementation was built and tested on Proxmox 7.x but may work with older versions of Proxmox.  
+2. Terraform version 0.13 or higher is required as it provides support for installing Terraform providers directly from the Terraform Registry.  
 
 The ESXi Terraform Provider built by https://github.com/josenk/terraform-provider-esxi is required, but will be installed automatically during a later step.
 Your ESXi instance must have at least two separate networks - one that is accessible from your current machine and has internet connectivity and a HostOnly network to allow the VMs to communicate over a private network. The network that provides DHCP and internet connectivity must also be reachable from the host that is running Terraform - ensure your firewall is configured to allow this.
