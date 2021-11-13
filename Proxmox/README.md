@@ -10,4 +10,11 @@
 
 # Steps
 
-1. **(5 Minutes)** Edit the variables in DetectionLab/Proxmox/Packer/variables.json to match your Proxmox configuration. The esxi_network_with_dhcp_and_internet variable refers to any ESXi network that will be able to provide DHCP and internet access to the VM while it’s being built in Packer. This is usually VM Network.
+1. **(5 Minutes)** Edit the variables in DetectionLab/Proxmox/Packer/variables.json to match your Proxmox configuration. The esxi_network_with_dhcp_and_internet variable refers to any Proxmox network that will be able to provide DHCP and internet access to the VM while it’s being built in Packer. The provisioning_machine_ip variable refers to the IP address of your provisioning host.  
+2. **(45 Minutes)** From the DetectionLab/Proxmox/Packer directory, run:
+- PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_10_proxmox.json
+- PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json windows_2016_proxmox.json
+- PACKER_CACHE_DIR=../../Packer/packer_cache packer build -var-file variables.json ubuntu2004_proxmox.json
+
+These commands can be run in parallel from three separate terminal sessions.
+
