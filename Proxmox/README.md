@@ -34,4 +34,10 @@ Note: Run the following commands as a root user or with sudo
 
 1. In Windows 10 install WSL (version 1 or 2)
 2. Install Ubuntu 18.04 app from the Microsoft Store
-3. 
+3. Update repositories and upgrade the distro: apt update && upgrade
+4. Ensure you will install the most recent Ansible version: apt-add-repository –yes –update ppa:ansible/ansible
+5. Install the following packages: apt install python python-pip ansible unzip sshpass libffi-dev libssl-dev
+6. Install PyWinRM using: pip install pywinrm
+7. Install Terraform and Packer by downloading the 64-bit Linux binaries and moving them to /usr/local/bin
+8. From “DetectionLab/Proxmox/Ansible” directory, run: “ansible –version” and ensure that the config file used is “DetectionLab/Proxmox/Ansible/ansible.cfg”. If not, implement the Ansible “world-writtable directory” fix by going to running: “chmod o-w .” from “DetectionLab/Proxmox/Ansible” directory.
+
