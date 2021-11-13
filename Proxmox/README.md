@@ -30,4 +30,8 @@
 
 # Configuring Windows 10 with WSL as a Provisioning Host
 
+Note: Run the following commands as a root user or with sudo
 
+1. In Windows 10 install WSL (version 1 or 2)
+2. Install Ubuntu 18.04 app from the Microsoft Store
+3. 
