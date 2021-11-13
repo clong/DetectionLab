@@ -24,3 +24,10 @@
 6. Running **terraform apply** should then prompt us to create the logger, dc, wef, and win10 instances. Once finished, you should see the Terraform output with IP addresses of your VMs.  
 7. Once Terraform has finished bringing the hosts online, change your directory to DetectionLab/Proxmox/Ansible.  
 8. **(1 Minute)** Edit DetectionLab/Proxmox/Ansible/inventory.yml and replace the IP Addresses with the respective IP Addresses of your Proxmox VMs. At times, the Terraform output is unable to derive the IP address of hosts, so you may have to log into the Proxmox console to find that information and then enter the IP addresses into inventory.yml
+9. **(3 Minute)** Before running any Ansible playbooks, I highly recommend taking snapshots of all your VMs! If anything goes wrong with provisioning, you can simply restore the snapshot and easily debug the issue.
+10. **(30 Minutes)** Run **ansible-playbook -v detectionlab.yml**. This will provision the hosts one by one using Ansible. If you’d like to provision each host individually in parallel, you can use **ansible-playbook -v detectionlab.yml –tags “[logger|dc|wef|win10]”** and run each in a separate terminal tab.
+11. If all goes well, you should see the play recap without any errors.
+
+# Configuring Windows 10 with WSL as a Provisioning Host
+
+
