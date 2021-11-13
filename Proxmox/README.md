@@ -44,4 +44,4 @@ Note: Run the following commands as a root user or with sudo
 # Future Work
 
 1. Exchange provisioning is not yet supported.
-2. Implement automated installation of the Spice Guest Tools. For now you can install these manually in your Windows VMs: https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe
+2. Implement automated deployment of the Spice Guest Tools. For now you can install these manually in your Windows VMs: https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe
