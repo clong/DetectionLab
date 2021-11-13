@@ -1,6 +1,6 @@
 # Prereqs (~30-60 minutes)
 
-Have an ESXi instance version 6 or higher. VSphere is NOT required.
+Have an ESXi instance version 6 or higher. VSphere is NOT required.<br />
 Terraform version 0.13 or higher is required as it provides support for installing Terraform providers directly from the Terraform Registry.
 
 The ESXi Terraform Provider built by https://github.com/josenk/terraform-provider-esxi is required, but will be installed automatically during a later step.
