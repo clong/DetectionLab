@@ -40,3 +40,16 @@ variable "external_dns_servers" {
   type        = list(string)
   default     = ["8.8.8.8"]
 }
+
+variable "workspaceKey" {
+  description = "WorkspaceKey of the Log Analytics workspace"
+  type        = string
+  default     = ""
+}
+
+variable "workspaceId" {
+  description = "WorkspaceID of the log Analytics workspace"
+  type        = string
+  default     = ""
+}
+

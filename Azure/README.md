@@ -9,11 +9,20 @@
 5. Make sure you've pulled down the most recent changes from the DetectionLab git repo
 6. Please note that the default credentials before provisioning are `vagrant:Vagrant123` due to the windows SKU/AMI password complexity requirements!
 
+## **(OptionalAzureSentinelConfiguration)** Using Azure Analytics Workspace (LAW) and Azure Sentinel directly
+### Prereqs
+0. You need to have a Log Analytics Workspace already connected to your Azure Sentinel 
+1. You need to have your Data Connectors already enabled (https://docs.microsoft.com/en-us/azure/sentinel/quickstart-onboard#connect-data-sources)
+3. Follow the **OptionalAzureSentinelConfiguration** steps
+
 ## Steps
 ### Terraform
 1. **(5 Minutes)** - Configure the `terraform.tfvars` file
    1. Copy the file at `/DetectionLab/Azure/Terraform/terraform.tfvars.example` to `/DetectionLab/Azure/Terraform/terraform.tfvars`
    2. In the newly copied terraform.tfvars, provide a value for each variable.
+   3. **OptionalAzureSentinelConfiguration**
+      1. Uncomment and provide a value for the LAW variables in the `terraform.tfvars` (Go to the `agentsManagement` blade of the LAW.)
+      2. Uncomment the `/* ... */` in the `main.tf` related to the provisionning of the Microsoft Monitoring Agent (MMA) on the VMs (search for `# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel`)
 
 2. **(5 Minutes)** - Authenticate to Azure using `az`
    1. Run `az login`. This should bring up a browser that asks you to sign into your Azure account.

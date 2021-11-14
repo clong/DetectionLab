@@ -286,6 +286,28 @@ resource "azurerm_virtual_machine" "logger" {
     role = "logger"
   }
 }
+# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
+/*
+resource "azurerm_virtual_machine_extension" "mmaagent-logger" {
+  name                 = "${azurerm_virtual_machine.logger.name}-mma"
+  virtual_machine_id   = azurerm_virtual_machine.logger.id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "OmsAgentForLinux"
+  type_handler_version = "1.13"
+  auto_upgrade_minor_version = "true"
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${var.workspaceId}"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+   {
+      "workspaceKey": "${var.workspaceKey}"
+   }
+PROTECTED_SETTINGS
+}
+*/
 
 # https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples/virtual-machines/vm-joined-to-active-directory
 
@@ -420,6 +442,28 @@ resource "azurerm_virtual_machine" "dc" {
     role = "dc"
   }
 }
+# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
+/*
+resource "azurerm_virtual_machine_extension" "dc" {
+  name                 = "${azurerm_virtual_machine.dc.name}-mma"
+  virtual_machine_id   = azurerm_virtual_machine.dc.id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "MicrosoftMonitoringAgent"
+  type_handler_version = "1.0"
+  auto_upgrade_minor_version = "true"
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${var.workspaceId}"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+   {
+      "workspaceKey": "${var.workspaceKey}"
+   }
+PROTECTED_SETTINGS
+}
+*/
 
 resource "azurerm_virtual_machine" "wef" {
   name = "wef.windomain.local"
@@ -478,6 +522,29 @@ resource "azurerm_virtual_machine" "wef" {
   }
 }
 
+# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
+/*
+resource "azurerm_virtual_machine_extension" "mmaagent-Wef" {
+  name                 = "${azurerm_virtual_machine.wef.name}-mma"
+  virtual_machine_id   = azurerm_virtual_machine.wef.id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "MicrosoftMonitoringAgent"
+  type_handler_version = "1.0"
+  auto_upgrade_minor_version = "true"
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${var.workspaceId}"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+   {
+      "workspaceKey": "${var.workspaceKey}"
+   }
+PROTECTED_SETTINGS
+}
+*/
+
 resource "azurerm_virtual_machine" "win10" {
   name = "win10.windomain.local"
   location = var.region
@@ -534,3 +601,51 @@ resource "azurerm_virtual_machine" "win10" {
     role = "win10"
   }
 }
+
+# Creation of the Ansible Inventory
+data "template_file" "inventory" {
+  template = "${file("../Ansible/inventory.tmpl")}"
+  depends_on = [
+    azurerm_public_ip.dc-publicip,
+    azurerm_public_ip.wef-publicip,
+    azurerm_public_ip.win10-publicip
+  ]
+  
+  vars = {
+    dc_public_ip = azurerm_public_ip.dc-publicip.ip_address
+    wef_public_ip = azurerm_public_ip.wef-publicip.ip_address
+    win10_public_ip = azurerm_public_ip.win10-publicip.ip_address
+  }
+}
+
+resource "null_resource" "inventory-creation" {
+  triggers = {
+    template_rendered = "${data.template_file.inventory.rendered}"
+  }
+  provisioner "local-exec" {
+    command = "echo '${data.template_file.inventory.rendered}' > ../Ansible/inventory.yml"
+  }
+}
+
+# Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
+/*
+resource "azurerm_virtual_machine_extension" "mmaagent-Win10" {
+  name                 = "${azurerm_virtual_machine.win10.name}-mma"
+  virtual_machine_id   = azurerm_virtual_machine.win10.id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "MicrosoftMonitoringAgent"
+  type_handler_version = "1.0"
+  auto_upgrade_minor_version = "true"
+
+  settings = <<SETTINGS
+    {
+      "workspaceId": "${var.workspaceId}"
+    }
+SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+   {
+      "workspaceKey": "${var.workspaceKey}"
+   }
+PROTECTED_SETTINGS
+}
+*/
