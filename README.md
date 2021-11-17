@@ -16,8 +16,8 @@ DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to 
 All of the infrastructure, building, and testing of DetectionLab is currently funded by myself in my spare time. If you find this project useful, feel free to buy me a coffee using one of the buttons below!
 
 [![GitHub Sponsor](https://img.shields.io/badge/GitHub-Sponsor-red.svg)](https://github.com/sponsors/clong)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme2/clong0)
-[![Donate](https://img.shields.io/badge/Donate-Crypto-blue.svg)](https://commerce.coinbase.com/checkout/838ac7a2-7b9d-4d40-b475-fd1015fdaacd)
+
+[![GitHub One-Time Payment](https://img.shields.io/badge/GitHub-One--Time%20Sponsor-red)](https://github.com/sponsors/clong?frequency=one-time) [$5](https://github.com/login?return_to=%2Fsponsors%2Fclong%2Fsponsorships%3Ftier_id%3D89561) | [$20](https://github.com/login?return_to=%2Fsponsors%2Fclong%2Fsponsorships%3Ftier_id%3D89562) | [$100](https://github.com/login?return_to=%2Fsponsors%2Fclong%2Fsponsorships%3Ftier_id%3D97537)
 
 ## Purpose
 This lab has been designed with defenders in mind. Its primary purpose is to allow the user to quickly build a Windows domain that comes pre-loaded with security tooling and some best practices when it comes to system logging configurations. It can easily be modified to fit most needs or expanded to include additional hosts.
@@ -54,6 +54,7 @@ to ensure your system passes the prerequisite checks for building DetectionLab.
 * [ESXi via Terraform & Ansible](https://www.detectionlab.network/deployment/esxi/)
 * [HyperV](https://www.detectionlab.network/deployment/hyperv/)
 * [LibVirt](https://www.detectionlab.network/deployment/libvirt/)
+* [Proxmox](https://www.detectionlab.network/deployment/proxmox/)
 
 ---
 
@@ -107,7 +108,7 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES)
 
 # DetectionLab Sponsors
-#### Last updated: 07/09/2021
+#### Last updated: 11/16/2021
 I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
 
 ### Diamond Sponsors:
@@ -122,13 +123,12 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [OutpostSecurity](https://github.com/OutpostSecurity)
 
 ### Premium Sponsors:
-* [mikeesparza](https://github.com/mikeesparza)
 * [dlee35](https://github.com/dlee35)
 * [chrissanders](https://github.com/chrissanders)
 * [jaredhaight](https://github.com/jaredhaight)
 * [iamfuntime](https://github.com/iamfuntime)
 * [Luct0r](https://github.com/Luct0r)
-* [secdev-01](https://github.com/secdev-01)
+* +1 private sponsor
 
 ### Standard Sponsors:
 * [braimee](https://github.com/braimee)
@@ -138,4 +138,4 @@ I would like to extend thanks to the following sponsors for funding DetectionLab
 * [ealaney](https://github.com/ealaney)
 * [elreydetoda](https://github.com/elreydetoda)
 * [DevBits1702](https://github.com/DevBits1702)
-* +1 private sponsor
+* +2 private sponsors
