@@ -18,4 +18,7 @@ HyperV/.vagrant/*
 logger_variables.sh
 ESXi/Packer/variables.json
 .terraform.lock.hcl
+Proxmox/Packer/packer_cache/*
+Proxmox/Packer/variables.json
+Proxmox/Packer/downloaded_additional_iso_path_?/*
 variables.json

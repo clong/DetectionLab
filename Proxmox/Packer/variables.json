@@ -1,0 +1,8 @@
+{
+	"proxmox_host": "192.168.1.1",
+	"proxmox_node": "pve",
+	"proxmox_username": "root@pam",
+	"proxmox_password": "",
+	"proxmox_network_with_dhcp_and_internet": "vmbr0",
+	"provisioning_machine_ip": ""
+}
