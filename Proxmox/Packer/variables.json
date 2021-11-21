@@ -4,5 +4,6 @@
 	"proxmox_username": "root@pam",
 	"proxmox_password": "",
 	"proxmox_network_with_dhcp_and_internet": "vmbr0",
+	"proxmox_storage_pool": "local-lvm",
 	"provisioning_machine_ip": ""
 }
