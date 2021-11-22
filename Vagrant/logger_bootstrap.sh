@@ -107,10 +107,10 @@ fix_eth1_static_ip() {
   ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
   if [ "$ETH1_IP" != "192.168.56.105" ]; then
     echo "Incorrect IP Address settings detected. Attempting to fix."
-    ifdown eth1
+    ip link set dev eth1 down
     ip addr flush dev eth1
-    ifup eth1
-    ETH1_IP=$(ifconfig eth1 | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1)
+    ip link set dev eth1 up
+    ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
     if [ "$ETH1_IP" == "192.168.56.105" ]; then
       echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.56.105"
     else
