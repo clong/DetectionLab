@@ -3,7 +3,8 @@
       {
         "type": "proxmox",
         "proxmox_url": "https://{{user `proxmox_host`}}:8006/api2/json",
-        "insecure_skip_tls_verify": true,
+        "insecure_skip_tls_verify": "{{user `proxmox_skip_tls_verify`}}",
+        "pool": "{{user `proxmox_vm_pool`}}",
         "username": "{{user `proxmox_username`}}",
         "password": "{{user `proxmox_password`}}",
         "vm_name": "Ubuntu2004",
@@ -23,8 +24,8 @@
           {
             "type": "scsi",
             "disk_size": "64G",
-            "storage_pool": "local-lvm",
-            "storage_pool_type": "lvm-thin",
+            "storage_pool": "{{user `proxmox_disk_storage_pool`}}",
+            "storage_pool_type": "{{user `proxmox_disk_storage_type`}}",
             "cache_mode": "writeback",
             "format": "raw"
           }
@@ -35,7 +36,7 @@
         },
         "scsi_controller": "virtio-scsi-pci",
         "iso_url": "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso",
-        "iso_storage_pool": "local",
+        "iso_storage_pool": "{{user `proxmox_iso_storage_pool`}}",
         "iso_checksum": "f11bda2f2caed8f420802b59f382c25160b114ccc665dbac9c5046e7fceaced2",
         "http_directory": "{{template_dir}}/http",
         "http_bind_address": "{{user `provisioning_machine_ip`}}",
