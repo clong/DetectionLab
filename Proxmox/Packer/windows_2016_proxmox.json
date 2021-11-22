@@ -24,7 +24,7 @@
             "type": "scsi",
             "disk_size": "64G",
             "storage_pool": "{{ user `proxmox_storage_pool` }}",
-            "storage_pool_type": "lvm-thin",
+            "storage_pool_type": "{{ user `proxmox_storage_pool_type` }}",
             "cache_mode": "writeback",
             "format": "raw"
           }
