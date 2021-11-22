@@ -3,7 +3,8 @@
       {
         "type":"proxmox",
         "proxmox_url":  "https://{{user `proxmox_host`}}:8006/api2/json",
-        "insecure_skip_tls_verify": true,
+        "insecure_skip_tls_verify": "{{user `proxmox_skip_tls_verify`}}",
+        "pool": "{{user `proxmox_vm_pool`}}",
         "username": "{{ user `proxmox_username` }}",
         "password": "{{ user `proxmox_password` }}",
         "vm_name": "WindowsServer2016",
@@ -23,8 +24,8 @@
           {
             "type": "scsi",
             "disk_size": "64G",
-            "storage_pool": "local-lvm",
-            "storage_pool_type": "lvm-thin",
+            "storage_pool": "{{user `proxmox_disk_storage_pool`}}",
+            "storage_pool_type": "{{user `proxmox_disk_storage_type`}}",
             "cache_mode": "writeback",
             "format": "raw"
           }
@@ -35,7 +36,7 @@
         },
         "scsi_controller": "virtio-scsi-pci",
         "iso_url": "https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
-        "iso_storage_pool": "local",
+        "iso_storage_pool": "{{user `proxmox_iso_storage_pool`}}",
         "iso_checksum": "70721288BBCDFE3239D8F8C0FAE55F1F",
         "boot_wait": "2m",
         "boot": "order=scsi0;ide2",
@@ -43,14 +44,14 @@
           {
             "device": "ide3",
             "iso_url": "./http/Autounattend_Win2016.iso",
-            "iso_storage_pool": "local",
+            "iso_storage_pool": "{{user `proxmox_iso_storage_pool`}}",
             "iso_checksum": "5119e02471003d3f7da335f6cc45a244",
             "unmount": true
           },
           {
             "device": "sata0",
             "iso_url": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso",
-            "iso_storage_pool": "local",
+            "iso_storage_pool": "{{user `proxmox_iso_storage_pool`}}",
             "iso_checksum": "3bbc69bdcf1d46f4ee0ddaf35c2656f3",
             "unmount": true
           }
