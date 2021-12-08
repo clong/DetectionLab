@@ -29,3 +29,16 @@ output "win10_interfaces" {
 output "win10_ips" {
   value = esxi_guest.win10.ip_address
 }
+
+resource "local_file" "AnsibleInventory" {
+ content = templatefile("./inventory.tmpl",
+ {
+  dc_ip = esxi_guest.dc.ip_address,
+  logger_ip = esxi_guest.logger.ip_address,
+  wef_ip = esxi_guest.workstation1.ip_address,
+  win10_ip = esxi_guest.workstation2.ip_address,
+ }
+ )
+ filename = "./ansible/inventory.yml"
+}
+
