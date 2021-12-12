@@ -35,8 +35,9 @@ resource "local_file" "AnsibleInventory" {
  {
   dc_ip = esxi_guest.dc.ip_address,
   logger_ip = esxi_guest.logger.ip_address,
-  wef_ip = esxi_guest.workstation1.ip_address,
-  win10_ip = esxi_guest.workstation2.ip_address,
+  wef_ip = esxi_guest.win10.ip_address,
+  win10_ip = esxi_guest.wef.ip_address,
+  exchange_ip = esxi_guest.exchange.ip_address
  }
  )
  filename = "./ansible/inventory.yml"
