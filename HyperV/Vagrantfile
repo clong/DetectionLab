@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
     end
 
   config.vm.define "logger" do |cfg|
-    cfg.vm.box = "bento/ubuntu-18.04"
+    cfg.vm.box = "bento/ubuntu-20.04"
     cfg.vm.hostname = "logger"
     cfg.vm.boot_timeout = 600
     cfg.vm.provision :shell, path: "fix-eth0-static-ip.sh"
@@ -73,7 +73,7 @@ Vagrant.configure("2") do |config|
     end
 
     cfg.vm.provision "reload"
-    cfg.vm.provision "shell", path: "hyperv-set-static-ip.ps1", privileged: true, args: "-ip 192.168.38.102 -dns 8.8.8.8"
+    cfg.vm.provision "shell", path: "hyperv-set-static-ip.ps1", privileged: true, args: "-ip 192.168.56.102 -dns 8.8.8.8"
     cfg.vm.provision "shell", path: "../Vagrant/scripts/provision.ps1", privileged: true
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "../Vagrant/scripts/provision.ps1", privileged: true
@@ -135,7 +135,7 @@ Vagrant.configure("2") do |config|
     end
 
     cfg.vm.provision "reload"
-    cfg.vm.provision "shell", path: "hyperv-set-static-ip.ps1", privileged: true, args: "-ip 192.168.38.103 -dns 8.8.8.8"
+    cfg.vm.provision "shell", path: "hyperv-set-static-ip.ps1", privileged: true, args: "-ip 192.168.56.103 -dns 8.8.8.8"
     cfg.vm.provision "shell", path: "../Vagrant/scripts/provision.ps1", privileged: true
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "../Vagrant/scripts/provision.ps1", privileged: true
@@ -196,7 +196,7 @@ Vagrant.configure("2") do |config|
     end
 
     cfg.vm.provision "reload"
-    cfg.vm.provision "shell", path: "hyperv-set-static-ip.ps1", privileged: true, args: "-ip 192.168.38.104 -dns 8.8.8.8"
+    cfg.vm.provision "shell", path: "hyperv-set-static-ip.ps1", privileged: true, args: "-ip 192.168.56.104 -dns 8.8.8.8"
     cfg.vm.provision "shell", path: "../Vagrant/scripts/MakeWindows10GreatAgain.ps1", privileged: true
     cfg.vm.provision "shell", path: "../Vagrant/scripts/provision.ps1", privileged: true
     cfg.vm.provision "reload"

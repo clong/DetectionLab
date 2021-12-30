@@ -95,7 +95,7 @@ build_vagrant_hosts() {
   done
   ### This code is absolutely terrible. Fix it at some point when I'm less lazy
   for HOST in logger dc wef win10; do
-    if [ "$HOST" -eq "logger" ]; then
+    if [[ "$HOST" == "logger" ]]; then
       if grep 'logger: OK' "$DL_DIR/Vagrant/vagrant_up_$HOST.log" > /dev/null; then
         (echo >&2 "[$(date +%H:%M:%S)]: $HOST was built successfully!")
       else
@@ -131,3 +131,5 @@ chmod +x /opt/DetectionLab/build.sh
 sn=tmuxsession
 tmux new-session -s "$sn" -d
 tmux send-keys -t "$sn:0" 'cd /opt/DetectionLab && ./build.sh && echo "success" > /var/www/html/index.html || echo "failed" > /var/www/html/index.html' Enter
+# tmux new-window -t "$sn:2" -n "exchange" -d
+# tmux send-keys -t "$sn:2" 'cd /opt/DetectionLab/Vagrant/Exchange && vagrant up' Enter

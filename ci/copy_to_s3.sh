@@ -2,6 +2,12 @@
 
 # This script is used to prepare DetectionLab to be imported as VM in AWS
 
+if ! which aws > /dev/null; then
+  apt-get install -y python-pip
+  pip install awscli --upgrade --user
+  cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
+fi
+
 # Configure credentials for awscli
 aws configure set aws_access_key_id $AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
@@ -12,7 +18,7 @@ EXCHANGE_EXISTS=0
 
 cd /opt/DetectionLab/Vagrant || exit 1
 echo "Clearing out Splunk indexes"
-ssh -o StrictHostKeyChecking=no -i /opt/DetectionLab/Vagrant/.vagrant/machines/logger/virtualbox/private_key vagrant@192.168.38.105 'sudo /opt/splunk/bin/splunk stop && sudo /opt/splunk/bin/splunk clean eventdata -f'
+ssh -o StrictHostKeyChecking=no -i /opt/DetectionLab/Vagrant/.vagrant/machines/logger/virtualbox/private_key vagrant@192.168.56.105 'sudo /opt/splunk/bin/splunk stop && sudo /opt/splunk/bin/splunk clean eventdata -f'
 
 echo "Running WinRM Commands to open WinRM on the firewall..."
 for host in dc wef win10;

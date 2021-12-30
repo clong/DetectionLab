@@ -2,16 +2,16 @@
 
 # Hardcode IP addresses in the HOSTS file
 If ($env:COMPUTERNAME -eq "DC") {
-  Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'
-  Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.104    win10.windomain.local'
+  Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.56.103    wef.windomain.local'
+  Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.56.104    win10.windomain.local'
 }
 Else {
-  Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    dc.windomain.local'
-  Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.102    windomain.local'
+  Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.56.102    dc.windomain.local'
+  Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.56.102    windomain.local'
 }
 
 # Keep renewing the IP address until the domain controller is set as a DNS server
-while (!(Get-DNSClientServerAddress | Where-Object { $_.ServerAddresses -eq "192.168.38.102" })) { 
+while (!(Get-DNSClientServerAddress | Where-Object { $_.ServerAddresses -eq "192.168.56.102" })) { 
   write-host "Waiting to receive the correct DNS settings from DHCP..."; 
   start-sleep 5; 
   ipconfig /renew

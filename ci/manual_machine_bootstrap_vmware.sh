@@ -13,9 +13,9 @@ apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apa
 pip install awscli --upgrade --user
 cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
 
-wget -O VMware-Workstation-Full-16.1.2-17966106.x86_64.bundle "https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-16.1.2-17966106.x86_64.bundle"
-chmod +x VMware-Workstation-Full-16.1.2-17966106.x86_64.bundle
-sudo sh VMware-Workstation-Full-16.1.2-17966106.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
+wget -O VMware-Workstation-Full-16.2.0-18760230.x86_64.bundle "https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-16.2.0-18760230.x86_64.bundle"
+chmod +x VMware-Workstation-Full-16.2.0-18760230.x86_64.bundle
+sudo sh VMware-Workstation-Full-16.2.0-18760230.x86_64.bundle --console --required --eulas-agreed --set-setting vmware-workstation serialNumber $SERIALNUMBER
 
 # Set up firewall
 ufw allow ssh

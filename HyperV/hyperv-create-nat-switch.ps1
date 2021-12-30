@@ -1,8 +1,8 @@
 # See: https://www.petri.com/using-nat-virtual-switch-hyper-v
 
-$NATHostIP = "192.168.38.1"
+$NATHostIP = "192.168.56.1"
 $NATNetPrefixLength = 24
-$NATNet = "192.168.38.0/$NATNetPrefixLength"
+$NATNet = "192.168.56.0/$NATNetPrefixLength"
 $NATNetName = "NATNetwork"
 $NATSwitchName = "NATSwitch"
 $NATSwitchNameAlias = "vEthernet ($NATSwitchName)"

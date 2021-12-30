@@ -7,9 +7,9 @@ Vagrant.configure("2") do |config|
     cfg.winrm.basic_auth_only = true
     cfg.winrm.timeout = 300
     cfg.winrm.retry_limit = 20
-    cfg.vm.network :private_network, ip: "192.168.38.106", gateway: "192.168.38.1", dns: "192.168.38.102"
+    cfg.vm.network :private_network, ip: "192.168.56.106", gateway: "192.168.56.1", dns: "192.168.56.102"
 
-    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.38.106 -dns 8.8.8.8 -gateway 192.168.38.1" 
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: true, args: "-ip 192.168.56.106 -dns 8.8.8.8 -gateway 192.168.56.1" 
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
@@ -23,7 +23,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-velociraptor.ps1", privileged: false 
-    cfg.vm.provision "shell", path: "scripts/install-exchange.ps1", privileged: true
+    cfg.vm.provision "shell", path: "scripts/install-exchange-prerequisites.ps1", privileged: true
     cfg.vm.provision "reload"
     cfg.vm.provision "shell", path: "scripts/install-exchange.ps1", privileged: true 
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false

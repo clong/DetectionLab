@@ -3,7 +3,7 @@ terraform {
   required_providers {                                                                                                                                                                                              
     esxi = {                                                                                                                                                                                                        
       source = "josenk/esxi"                                                                                                                                                                                        
-      version = "1.8.0"                                                                                                                                                                                             
+      version = "1.8.2"                                                                                                                                                                                             
     }
   }
 }
@@ -26,7 +26,7 @@ resource "esxi_guest" "exchange" {
     mac_address     = "00:50:56:a1:b2:c5"
     nic_type        = "e1000"
   }
-  # This is the local network that will be used for 192.168.38.x addressing
+  # This is the local network that will be used for 192.168.56.x addressing
   network_interfaces {
     virtual_network = var.hostonly_network
     mac_address     = "00:50:56:a1:b4:c5"

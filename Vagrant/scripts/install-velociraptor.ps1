@@ -5,7 +5,7 @@ If (Select-String -Path "c:\windows\system32\drivers\etc\hosts" -Pattern "logger
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Hosts file already updated. Moving on."
 } Else {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Adding logger to the hosts file"
-  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.38.105    logger"
+  Add-Content "c:\windows\system32\drivers\etc\hosts" "        192.168.56.105    logger"
 }
 
 # Downloads and install the latest Velociraptor release
@@ -15,10 +15,7 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Velocir
 # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
 $ProgressPreference = 'SilentlyContinue'
 $tag = (Invoke-WebRequest "https://api.github.com/repos/Velocidex/velociraptor/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
-# Workaround hardcoded URL until this issue gets fixed: https://github.com/Velocidex/velociraptor/issues/528
-# Clean this up later
-# (iwr "https://github.com/Velocidex/velociraptor/releases/latest" -usebasicparsing).links | select-object -ExpandProperty href | select-string "windows-amd64.msi"
-$velociraptorDownloadUrl = "https://github.com/Velocidex/velociraptor/releases/download/v0.5.8/velociraptor-v0.5.8-windows-amd64.msi"
+$velociraptorDownloadUrl = "https://github.com" + ((Invoke-WebRequest "https://github.com/Velocidex/velociraptor/releases/latest" -UseBasicParsing).links | Select-Object -ExpandProperty href | Select-String "windows-amd64.msi$" | Select-Object -First 1)
 $velociraptorMSIPath = 'C:\Users\vagrant\AppData\Local\Temp\velociraptor.msi'
 $velociraptorLogFile = 'c:\Users\vagrant\AppData\Local\Temp\velociraptor_install.log'
 If (-not (Test-Path $velociraptorLogFile)) {

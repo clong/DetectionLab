@@ -2,50 +2,119 @@
     <authorize username="vagrant" password="vagrant">
         <connection name="logger">
             <protocol>ssh</protocol>
-            <param name="hostname">192.168.38.105</param>
+            <param name="hostname">192.168.56.105</param>
             <param name="port">22</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
         </connection>
 
-        <connection name="wef">
+        <connection name="WEF">
             <protocol>rdp</protocol>
-            <param name="hostname">192.168.38.103</param>
+            <param name="hostname">192.168.56.103</param>
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/wef</param>
             <param name="security">nla</param>
             <param name="ignore-cert">true</param>
         </connection>
 
-        <connection name="exchange">
+        <connection name="WEF - Domain User">
             <protocol>rdp</protocol>
-            <param name="hostname">192.168.38.106</param>
+            <param name="hostname">192.168.56.103</param>
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
+            <param name="domain">windomain</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/wef</param>
             <param name="security">nla</param>
             <param name="ignore-cert">true</param>
         </connection>
 
-        <connection name="win10">
+        <connection name="EXCHANGE">
             <protocol>rdp</protocol>
-            <param name="hostname">192.168.38.104</param>
+            <param name="hostname">192.168.56.106</param>
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/exchange</param>
             <param name="security">nla</param>
             <param name="ignore-cert">true</param>
         </connection>
 
-        <connection name="dc">
+        <connection name="EXCHANGE - Domain User">
             <protocol>rdp</protocol>
-            <param name="hostname">192.168.38.102</param>
+            <param name="hostname">192.168.56.106</param>
             <param name="port">3389</param>
             <param name="username">vagrant</param>
             <param name="password">vagrant</param>
+            <param name="domain">windomain</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/exchange</param>
             <param name="security">nla</param>
             <param name="ignore-cert">true</param>
         </connection>
+
+        <connection name="WIN10">
+            <protocol>rdp</protocol>
+            <param name="hostname">192.168.56.104</param>
+            <param name="port">3389</param>
+            <param name="username">vagrant</param>
+            <param name="password">vagrant</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/win10</param>
+            <param name="security">nla</param>
+            <param name="ignore-cert">true</param>
+        </connection>
+
+        <connection name="WIN10 - Domain User">
+            <protocol>rdp</protocol>
+            <param name="hostname">192.168.56.104</param>
+            <param name="port">3389</param>
+            <param name="username">vagrant</param>
+            <param name="password">vagrant</param>
+            <param name="domain">windomain</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/win10</param>
+            <param name="security">nla</param>
+            <param name="ignore-cert">true</param>
+        </connection>
+
+        <connection name="DC">
+            <protocol>rdp</protocol>
+            <param name="hostname">192.168.56.102</param>
+            <param name="port">3389</param>
+            <param name="username">vagrant</param>
+            <param name="password">vagrant</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/dc</param>
+            <param name="security">nla</param>
+            <param name="ignore-cert">true</param>
+        </connection>
+
+        <connection name="DC - Domain Admin">
+            <protocol>rdp</protocol>
+            <param name="hostname">192.168.56.102</param>
+            <param name="port">3389</param>
+            <param name="username">administrator</param>
+            <param name="password">vagrant</param>
+            <param name="domain">windomain</param>
+            <param name="create-drive-path">true</param>
+            <param name="enable-drive">true</param>
+            <param name="drive-path">/etc/guacamole/shares/dc</param>
+            <param name="security">nla</param>
+            <param name="ignore-cert">true</param>
+        </connection>
+
     </authorize>
 </user-mapping>

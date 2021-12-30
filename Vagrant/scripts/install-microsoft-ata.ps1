@@ -89,7 +89,7 @@ Invoke-Command -computername dc -Credential (new-object pscredential("windomain\
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [$env:computername] Installing the ATA Lightweight gateway on DC..."
 
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [$env:computername] Adding wef.windomain.local to hosts file..."
-    Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.38.103    wef.windomain.local'
+    Add-Content 'c:\\windows\\system32\\drivers\\etc\\hosts' '        192.168.56.103    wef.windomain.local'
 
     # Enable web requests to endpoints with invalid SSL certs (like self-signed certs)
     If (-not("SSLValidator" -as [type])) {

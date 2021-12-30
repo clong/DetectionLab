@@ -1,6 +1,8 @@
 {
   "builders": [
     {
+      "vnc_over_websocket": true,
+      "insecure_connection": true,
       "boot_wait": "6m",
       "boot_command": "",
       "communicator": "winrm",
@@ -52,9 +54,9 @@
         "time.synchronize.tools.enable": "0",
         "time.synchronize.resume.host": "0"
       },
-    "winrm_username": "vagrant",
-    "winrm_password": "vagrant",
-    "winrm_timeout": "4h"
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h"
     }
   ],
   "provisioners": [
@@ -105,4 +107,3 @@
     "autounattend": "../../Packer/answer_files/10/Autounattend.xml"
   }
 }
-
