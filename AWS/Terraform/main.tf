@@ -195,7 +195,9 @@ resource "aws_instance" "logger" {
       "sudo systemctl stop guacd",
       "sudo useradd -M -d /var/lib/guacd/ -r -s /sbin/nologin -c 'Guacd User' guacd",
       "sudo mkdir /var/lib/guacd && sudo chown -R guacd: /var/lib/guacd && sudo sed -i 's/daemon/guacd/' /lib/systemd/system/guacd.service",
-      "sudo systemctl daemon-reload && sudo systemctl start guacd"
+      "sudo sed -i 's/192.168.38/192.168.56/g' /etc/guacamole/user-mapping.xml",
+      "sudo sed -i 's/192.168.38/192.168.56/g' /etc/netplan/50-vagrant.yaml.vmimport",
+      "sudo systemctl daemon-reload && sudo systemctl start guacd && sudo systemctl restart tomcat9"
     ]
 
     connection {

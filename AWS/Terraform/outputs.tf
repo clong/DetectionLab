@@ -41,14 +41,3 @@ output "guacamole_url" {
 output "velociraptor_url" {
   value = local.velociraptor_url
 }
-
-// Delete the comment block below (/* and */) to enable Exchange outputs
-/* 
-output "exchange_public_ip" {
-  value = module.exchange.exchange_public_ip
-}
-
-output "exchange_url" {
-  value = module.exchange.exchange_url
-}
-*/
