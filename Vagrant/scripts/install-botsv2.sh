@@ -45,3 +45,4 @@ tar zxvf /opt/botsv2_data_set_attack_only.tgz -C /opt/splunk/etc/apps/
 ## FULL DATASET COMMENT BLOCK ENDS ###
 
 echo "BOTSv2 Installation complete!"
+## line ending bug fixes
