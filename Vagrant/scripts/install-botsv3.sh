@@ -52,3 +52,4 @@ echo "[$(date +%H:%M:%S)]: Restarting Splunk..."
 /opt/splunk/bin/splunk restart
 
 echo "BOTSv3 Installation complete!"
+# line ending fixes
