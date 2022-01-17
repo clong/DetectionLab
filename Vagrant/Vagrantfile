@@ -208,8 +208,8 @@ Vagrant.configure("2") do |config|
       v.vmx["displayname"] = "win10.windomain.local"
       v.vmx["gui.fullscreenatpoweron"] = "FALSE"
       v.vmx["gui.viewModeAtPowerOn"] = "windowed"
-      v.memory = 2048
-      v.cpus = 1
+      v.memory = 3072
+      v.cpus = 2
       v.gui = true
     end
 
@@ -217,8 +217,8 @@ Vagrant.configure("2") do |config|
       vb.gui = true
       vb.name = "win10.windomain.local"
       vb.default_nic_type = "82545EM"
-      vb.customize ["modifyvm", :id, "--memory", 2048]
-      vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--memory", 3072]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
       vb.customize ["modifyvm", :id, "--vram", "32"]
       vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -230,7 +230,7 @@ Vagrant.configure("2") do |config|
       lv.input :type => "tablet", :bus => "usb"
       override.vm.box = "../Boxes/windows_10_libvirt.box"
       lv.video_vram = 32768
-      lv.memory = 2048
+      lv.memory = 3072
       lv.cpus = 2
       override.vm.synced_folder '.', '/', type: 'winrm' 
     end
