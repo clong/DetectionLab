@@ -52,7 +52,7 @@
             "device": "sata0",
             "iso_url": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso",
             "iso_storage_pool": "{{user `proxmox_iso_storage_pool`}}",
-            "iso_checksum": "3bbc69bdcf1d46f4ee0ddaf35c2656f3",
+            "iso_checksum": "14e5276177a1fb87d3707db8aaaee0f9",
             "unmount": true
           }
         ],
