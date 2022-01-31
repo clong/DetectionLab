@@ -78,6 +78,7 @@ If (-not (Test-Path $badbloodRepoPath)) {
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Invoke-AtomicRedTeam and atomic tests..."
 If (-not (Test-Path "C:\Tools\AtomicRedTeam")) {
   Install-PackageProvider -Name NuGet -Force
+  Install-Module -Name powershell-yaml -Force
   IEX (IWR 'https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicredteam.ps1' -UseBasicParsing);
   Install-AtomicRedTeam -getAtomics -InstallPath "c:\Tools\AtomicRedTeam"
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Updating Profile.ps1 to import the Invoke-AtomicRedTeam module..."
