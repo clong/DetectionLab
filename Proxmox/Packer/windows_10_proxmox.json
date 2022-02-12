@@ -99,7 +99,8 @@
           "{{template_dir}}/scripts/pin-powershell-cdrom.bat",
           "../../Packer/scripts/compile-dotnet-assemblies.bat",
           "../../Packer/scripts/set-winrm-automatic.bat",
-          "../../Packer/scripts/dis-updates.bat"
+          "../../Packer/scripts/dis-updates.bat",
+          "{{template_dir}}/scripts/sysprep-cdrom.bat"
       ]
     }
   ]

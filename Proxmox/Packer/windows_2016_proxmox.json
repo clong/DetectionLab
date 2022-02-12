@@ -93,7 +93,8 @@
           "../../Packer/scripts/set-winrm-automatic.bat",
           "../../Packer/scripts/compile-dotnet-assemblies.bat",
           "../../Packer/scripts/uac-enable.bat",
-          "../../Packer/scripts/compact.bat"
+          "../../Packer/scripts/compact.bat",
+          "{{template_dir}}/scripts/sysprep-cdrom.bat"
       ]
     }
   ]
