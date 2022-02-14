@@ -1,4 +1,3 @@
 net stop tiledatamodelsvc
-echo "I am shutting down"
+echo "Preparing for Sysprep"
 c:\windows\system32\sysprep\sysprep.exe /generalize /mode:vm /oobe /unattend:E:\unattend.xml
-shutdown /s
