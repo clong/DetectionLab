@@ -45,12 +45,12 @@
             "device": "ide3",
             "iso_url": "./http/Autounattend_Win10.iso",
             "iso_storage_pool": "{{user `proxmox_iso_storage_pool`}}",
-            "iso_checksum": "027d92f2076ab85158404f0ffcc01d27",
+            "iso_checksum": "e9c3840f120c22ea5e4259fffed0b824",
             "unmount": true
           },
           {
             "device": "sata0",
-            "iso_url": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso",
+            "iso_url": "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.215-2/virtio-win.iso",
             "iso_storage_pool": "{{user `proxmox_iso_storage_pool`}}",
             "iso_checksum": "14e5276177a1fb87d3707db8aaaee0f9",
             "unmount": true
@@ -99,7 +99,8 @@
           "{{template_dir}}/scripts/pin-powershell-cdrom.bat",
           "../../Packer/scripts/compile-dotnet-assemblies.bat",
           "../../Packer/scripts/set-winrm-automatic.bat",
-          "../../Packer/scripts/dis-updates.bat"
+          "../../Packer/scripts/dis-updates.bat",
+          "{{template_dir}}/scripts/sysprep-cdrom.bat"
       ]
     }
   ]
