@@ -16,11 +16,14 @@ jobs:
       - run: terraform fmt -check
 
   hold:
-    machine: true
+    machine:
+      image: ubuntu-2004:202201-02
     steps:
       - run: echo "This build requires approval to continue..."
   build:
-    machine: true
+    machine:
+      image: ubuntu-2004:202201-02
+      
     working_directory: ~/repo
     steps:
       - checkout
