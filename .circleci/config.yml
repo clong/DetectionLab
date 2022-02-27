@@ -179,7 +179,7 @@ workflows:
       - build
     triggers:
       - schedule:
-          cron: "0 0 * * 0"
+          cron: "0 2 * * 0"
           filters:
             branches:
               # Automatically re-build the contents of master once per week
