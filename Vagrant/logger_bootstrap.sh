@@ -294,7 +294,8 @@ install_fleet_import_osquery_config() {
     # Always download the latest release of Fleet and Fleetctl
     curl -s https://github.com/fleetdm/fleet/releases | grep _linux.tar.gz | grep href | grep -v orbit | grep -v fleetctl | cut -d '"' -f 2 | head -1 | sed 's#^#https://github.com#g'  | wget --progress=bar:force -i -
     curl -s https://github.com/fleetdm/fleet/releases | grep _linux.tar.gz | grep href | grep fleetctl | cut -d '"' -f 2 | head -1 | sed 's#^#https://github.com#g' | wget --progress=bar:force -i -
-    unzip fleet.zip -d fleet
+    tar -xvf fleet_*.tar.gz
+    tar -xvf fleetctl_*.tar.gz
     cp fleetctl_*/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
     cp fleet_*/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
 
