@@ -291,11 +291,12 @@ install_fleet_import_osquery_config() {
     mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'fleet';"
     mysql -uroot -pfleet -e "create database fleet;"
 
-    # Always download the latest release of Fleet
-    curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' ' | head -1 | wget --progress=bar:force -i -
+    # Always download the latest release of Fleet and Fleetctl
+    curl -s https://github.com/fleetdm/fleet/releases | grep _linux.tar.gz | grep href | grep -v orbit | grep -v fleetctl | cut -d '"' -f 2 | head -1 | sed 's#^#https://github.com#g'  | wget --progress=bar:force -i -
+    curl -s https://github.com/fleetdm/fleet/releases | grep _linux.tar.gz | grep href | grep fleetctl | cut -d '"' -f 2 | head -1 | sed 's#^#https://github.com#g' | wget --progress=bar:force -i -
     unzip fleet.zip -d fleet
-    cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
-    cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
+    cp fleetctl_*/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
+    cp fleet_*/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
 
     # Prepare the DB
     fleet prepare db --mysql_address=127.0.0.1:3306 --mysql_database=fleet --mysql_username=root --mysql_password=fleet
