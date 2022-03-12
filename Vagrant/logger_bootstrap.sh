@@ -323,7 +323,7 @@ install_fleet_import_osquery_config() {
 
     fleetctl config set --address https://192.168.56.105:8412
     fleetctl config set --tls-skip-verify true
-    fleetctl setup --email admin@detectionlab.network --username admin --password 'admin123#' --org-name DetectionLab
+    fleetctl setup --email admin@detectionlab.network --name admin --password 'admin123#' --org-name DetectionLab
     fleetctl login --email admin@detectionlab.network --password 'admin123#'
 
     # Set the enrollment secret to match what we deploy to Windows hosts
@@ -340,10 +340,10 @@ install_fleet_import_osquery_config() {
 
     # Don't log osquery INFO messages
     # Fix snapshot event formatting
-    fleetctl get options >/tmp/options.yaml
-    /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.enroll_secret' 'enrollmentsecret'
-    /usr/bin/yq w -i /tmp/options.yaml 'spec.config.options.logger_snapshot_event_type' 'true'
-    fleetctl apply -f /tmp/options.yaml
+    fleetctl get config >/tmp/config.yaml
+    /usr/bin/yq eval -i '.spec.agent_options.config.options.enroll_secret = "enrollmentsecret"' /tmp/config.yaml
+    /usr/bin/yq eval -i '.spec.agent_options.config.options.logger_snapshot_event_type = true' /tmp/config.yaml
+    fleetctl apply -f /tmp/config.yaml
 
     # Use fleetctl to import YAML files
     fleetctl apply -f osquery-configuration/Fleet/Endpoints/MacOS/osquery.yaml
