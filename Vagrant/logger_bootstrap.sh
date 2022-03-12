@@ -277,7 +277,7 @@ install_fleet_import_osquery_config() {
   if [ -f "/opt/fleet" ]; then
     echo "[$(date +%H:%M:%S)]: Fleet is already installed"
   else
-    cd /opt || exit 1
+    cd /opt && mkdir /opt/fleet || exit 1
 
     echo "[$(date +%H:%M:%S)]: Installing Fleet..."
     if ! grep 'fleet' /etc/hosts; then
