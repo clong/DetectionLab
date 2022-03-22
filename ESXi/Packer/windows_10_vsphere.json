@@ -1,0 +1,110 @@
+{
+  "builders": [
+    {
+      "insecure_connection": true,
+      "datastore": "{{user `vcenter_datastore`}}",
+      "cluster": "{{user `vsphere_cluster`}}",
+      "username": "{{user `vcenter_username`}}",
+      "password": "{{user `vcenter_password`}}",
+      "vcenter_server": "{{user `vcenter_server`}}",
+      "boot_wait": "6m",
+      "boot_command": "",
+      "communicator": "winrm",
+      "disk_controller_type": "lsilogic-sas",
+      "storage": [
+        {
+          "disk_size": 61440
+        }
+      ],
+      "floppy_files": [
+        "{{user `autounattend`}}",
+        "../../Packer/scripts/vmtools.cmd",
+        "../../Packer/floppy/WindowsPowershell.lnk",
+        "../../Packer/floppy/PinTo10.exe",
+        "../../Packer/scripts/fixnetwork.ps1",
+        "../../Packer/scripts/rearm-windows.ps1",
+        "../../Packer/scripts/disable-screensaver.ps1",
+        "../../Packer/scripts/disable-winrm.ps1",
+        "../../Packer/scripts/enable-winrm.ps1",
+        "../../Packer/scripts/microsoft-updates.bat",
+        "../../Packer/scripts/win-updates.ps1",
+        "../../Packer/scripts/unattend.xml",
+        "../../Packer/scripts/sysprep.bat"
+      ],
+      "guest_os_type": "windows9_64Guest",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_paths": [
+        "{{user `vmware_tools_path`}}"
+      ],
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "shutdown_timeout": "2h",
+      "shutdown_command": "a:/sysprep.bat",
+      "type": "vsphere-iso",
+      "vm_name": "detectionlab-windows-10",
+      "RAM": 2048,
+      "CPUs": 2,
+      "network_adapters": [
+        {
+          "network": "{{user `vcenter_network_with_dhcp_and_internet` }}",
+          "network_card": "e1000e"
+        }
+      ],
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h",
+      "content_library_destination" : {
+          "library": "vRA",
+          "ovf": true,
+          "destroy": true
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "windows-shell",
+      "remote_path": "/tmp/script.bat",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../../Packer/scripts/enable-rdp.bat"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "../../Packer/scripts/debloat-windows.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "../../Packer/scripts/set-powerplan.ps1",
+        "../../Packer/scripts/docker/disable-windows-defender.ps1"
+      ]
+    },
+    {
+      "type": "windows-shell",
+      "remote_path": "/tmp/script.bat",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../../Packer/scripts/pin-powershell.bat",
+        "../../Packer/scripts/compile-dotnet-assemblies.bat",
+        "../../Packer/scripts/set-winrm-automatic.bat",
+        "../../Packer/scripts/dis-updates.bat"
+      ]
+    }
+  ],
+  "variables": {
+    "vcenter_datastore": "",
+    "vcenter_server": "",
+    "vcenter_username": "",
+    "vcenter_password": "",
+    "vsphere_cluster": "",
+    "vmware_tools_path": "",
+    "iso_checksum": "sha256:ab4862ba7d1644c27f27516d24cb21e6b39234eb3301e5f1fb365a78b22f79b3",
+    "iso_url": "https://software-download.microsoft.com/download/pr/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+    "autounattend": "../../Packer/answer_files/10_vsphere/Autounattend.xml"
+  }
+}

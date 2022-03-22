@@ -1,0 +1,99 @@
+{
+  "builders": [
+    {
+      "insecure_connection": true,
+      "boot_wait": "2m",
+      "communicator": "winrm",
+      "disk_controller_type": "lsilogic-sas",
+      "storage": [
+        {
+          "disk_size": 61440
+        }
+      ],
+      "floppy_files": [
+        "{{user `autounattend`}}",
+        "../../Packer/scripts/vmtools.cmd",
+        "../../Packer/floppy/WindowsPowershell.lnk",
+        "../../Packer/floppy/PinTo10.exe",
+        "../../Packer/scripts/unattend.xml",
+        "../../Packer/scripts/sysprep.bat",
+        "../../Packer/scripts/disable-screensaver.ps1",
+        "../../Packer/scripts/disable-winrm.ps1",
+        "../../Packer/scripts/enable-winrm.ps1",
+        "../../Packer/scripts/microsoft-updates.bat",
+        "../../Packer/scripts/win-updates.ps1"
+      ],
+      "guest_os_type": "windows8Server64Guest",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_paths": [
+        "{{user `vmware_tools_path`}}"
+      ],
+      "shutdown_timeout": "2h",
+      "shutdown_command": "a:/sysprep.bat",
+      "datastore": "{{user `vcenter_datastore`}}",
+      "cluster": "{{user `vsphere_cluster`}}",
+      "username": "{{user `vcenter_username`}}",
+      "password": "{{user `vcenter_password`}}",
+      "vcenter_server": "{{user `vcenter_server`}}",
+      "type": "vsphere-iso",
+      "vm_name": "detectionlab-windows-server-2016",
+      "RAM": 4096,
+      "CPUs": 2,
+      "network_adapters": [
+        {
+          "network": "{{user `vcenter_network_with_dhcp_and_internet` }}",
+          "network_card": "e1000e"
+        }
+      ],
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h",
+      "content_library_destination" : {
+          "library": "vRA",
+          "ovf": true,
+          "destroy": true
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "windows-shell",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../../Packer/scripts/enable-rdp.bat"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "../../Packer/scripts/debloat-windows.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "windows-shell",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../../Packer/scripts/pin-powershell.bat",
+        "../../Packer/scripts/set-winrm-automatic.bat",
+        "../../Packer/scripts/compile-dotnet-assemblies.bat",
+        "../../Packer/scripts/uac-enable.bat",
+        "../../Packer/scripts/compact.bat"
+      ]
+    }
+  ],
+  "variables": {
+    "vcenter_datastore": "",
+    "vcenter_server": "",
+    "vcenter_username": "",
+    "vcenter_password": "",
+    "vsphere_cluster": "",
+    "vmware_tools_path": "",
+    "iso_url": "https://software-download.microsoft.com/download/pr/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO",
+    "iso_checksum": "md5:70721288BBCDFE3239D8F8C0FAE55F1F",
+    "autounattend": "../../Packer/answer_files/2016_vsphere/Autounattend.xml"
+  }
+}
