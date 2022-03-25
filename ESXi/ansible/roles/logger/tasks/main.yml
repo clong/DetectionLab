@@ -321,10 +321,13 @@
       mysql -uroot -pfleet -e "create database fleet;"
 
       # Always download the latest release of Fleet
-      curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'https://github.com' | grep "/fleet.zip" | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' '  | head -1 | wget --progress=bar:force -i -
-      unzip fleet.zip -d fleet
-      cp fleet/linux/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
-      cp fleet/linux/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
+      curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'browser_download_url' | grep 'fleet_' | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' '  | head -1 | wget --progress=bar:force -i - -O fleet.tar.gz
+      curl -s https://api.github.com/repos/fleetdm/fleet/releases | grep 'browser_download_url' | grep 'fleetctl_' | cut -d ':' -f 2,3 | tr -d '"' | tr -d ' '  | head -1 | wget --progress=bar:force -i - -O fleetctl.tar.gz
+      mkdir -p fleet
+      tar -xzf fleetctl.tar.gz -C fleet --strip-components 1
+      tar -xzf fleet.tar.gz -C fleet --strip-components 1
+      cp fleet/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
+      cp fleet/fleet /usr/local/bin/fleet && chmod +x /usr/local/bin/fleet
 
       # Prepare the DB
       fleet prepare db --mysql_address=127.0.0.1:3306 --mysql_database=fleet --mysql_username=root --mysql_password=fleet
