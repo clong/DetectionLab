@@ -274,7 +274,7 @@ download_palantir_osquery_config() {
 }
 
 install_fleet_import_osquery_config() {
-  if [ -f "/opt/fleet" ]; then
+  if [ -d "/opt/fleet" ]; then
     echo "[$(date +%H:%M:%S)]: Fleet is already installed"
   else
     cd /opt && mkdir /opt/fleet || exit 1
