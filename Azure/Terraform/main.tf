@@ -604,28 +604,15 @@ resource "azurerm_virtual_machine" "win10" {
 }
 
 # Creation of the Ansible Inventory
-data "template_file" "inventory" {
-  template = "${file("../Ansible/inventory.tmpl")}"
-  depends_on = [
-    azurerm_public_ip.dc-publicip,
-    azurerm_public_ip.wef-publicip,
-    azurerm_public_ip.win10-publicip
-  ]
-  
-  vars = {
-    dc_public_ip = azurerm_public_ip.dc-publicip.ip_address
-    wef_public_ip = azurerm_public_ip.wef-publicip.ip_address
-    win10_public_ip = azurerm_public_ip.win10-publicip.ip_address
-  }
-}
-
-resource "null_resource" "inventory-creation" {
-  triggers = {
-    template_rendered = "${data.template_file.inventory.rendered}"
-  }
-  provisioner "local-exec" {
-    command = "echo '${data.template_file.inventory.rendered}' > ../Ansible/inventory.yml"
-  }
+resource "local_file" "inventory" {
+    content = templatefile("../Ansible/inventory.tmpl",
+      {
+        dc_public_ip = azurerm_public_ip.dc-publicip.ip_address
+        wef_public_ip = azurerm_public_ip.wef-publicip.ip_address
+        win10_public_ip = azurerm_public_ip.win10-publicip.ip_address
+      }
+    )
+    filename = "../Ansible/inventory.yml"
 }
 
 # Uncomment the following lines if you want to use Azure Log Analytics and Azure Sentinel
