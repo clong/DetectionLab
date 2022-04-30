@@ -50,18 +50,6 @@ apt_install_prerequisites() {
   apt-fast install -y jq whois build-essential git unzip htop yq mysql-server redis-server python3-pip libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev libavcodec-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libvncserver-dev libtelnet-dev libssl-dev libvorbis-dev libwebp-dev tomcat9 tomcat9-admin tomcat9-user tomcat9-common
 }
 
-modify_motd() {
-  echo "[$(date +%H:%M:%S)]: Updating the MOTD..."
-  # Force color terminal
-  sed -i 's/#force_color_prompt=yes/force_color_prompt=yes/g' /root/.bashrc
-  sed -i 's/#force_color_prompt=yes/force_color_prompt=yes/g' /home/vagrant/.bashrc
-  # Remove some stock Ubuntu MOTD content
-  chmod -x /etc/update-motd.d/10-help-text
-  # Copy the DetectionLab MOTD
-  cp /vagrant/resources/logger/20-detectionlab /etc/update-motd.d/
-  chmod +x /etc/update-motd.d/20-detectionlab
-}
-
 test_prerequisites() {
   for package in jq whois build-essential git unzip yq mysql-server redis-server python3-pip; do
     echo "[$(date +%H:%M:%S)]: [TEST] Validating that $package is correctly installed..."
@@ -632,7 +620,6 @@ configure_splunk_inputs() {
 
 main() {
   apt_install_prerequisites
-  modify_motd
   test_prerequisites
   fix_eth1_static_ip
   install_splunk
