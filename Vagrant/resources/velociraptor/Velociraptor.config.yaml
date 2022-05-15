@@ -1,8 +1,9 @@
 version:
   name: velociraptor
-  version: 0.6.1
-  commit: 58295e70
-  build_time: "2021-09-09T12:14:06+10:00"
+  version: 0.6.4-2
+  commit: b6c5764a
+  build_time: "2022-05-08T23:09:48+10:00"
+  compiler: go1.18.1
 Client:
   server_urls:
   - https://logger:9000/
@@ -42,9 +43,10 @@ Client:
     install_path: /usr/local/sbin/velociraptor
   version:
     name: velociraptor
-    version: 0.6.1
-    commit: 58295e70
-    build_time: "2021-09-09T12:14:06+10:00"
+    version: 0.6.4-2
+    commit: b6c5764a
+    build_time: "2022-05-08T23:09:48+10:00"
+    compiler: go1.18.1
   use_self_signed_ssl: true
   pinned_server_name: VelociraptorServer
   max_upload_size: 5242880

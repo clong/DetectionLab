@@ -187,17 +187,13 @@ resource "aws_instance" "logger" {
       "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
       "sudo chmod +x /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
       "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
-      "sudo yq d -i /etc/suricata/suricata.yaml af-packet[1]", 
+      "sudo yq -i 'del(af-packet[1])' /etc/suricata/suricata.yaml", 
       "sudo sed -i '1s/^/\\%YAML 1.1\\n---\\n/g' /etc/suricata/suricata.yaml",
       "sudo cp /opt/DetectionLab/Vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service && sudo systemctl daemon-reload && sudo service fleet restart",
       "sudo service suricata restart",
       "sudo /opt/DetectionLab/Vagrant/logger_bootstrap.sh splunk_only",
       "sudo systemctl stop guacd",
-      "sudo useradd -M -d /var/lib/guacd/ -r -s /sbin/nologin -c 'Guacd User' guacd",
-      "sudo mkdir /var/lib/guacd && sudo chown -R guacd: /var/lib/guacd && sudo sed -i 's/daemon/guacd/' /lib/systemd/system/guacd.service",
-      "sudo sed -i 's/192.168.38/192.168.56/g' /etc/guacamole/user-mapping.xml",
-      "sudo sed -i 's/192.168.38/192.168.56/g' /etc/netplan/50-vagrant.yaml.vmimport",
-      "sudo systemctl daemon-reload && sudo systemctl start guacd && sudo systemctl restart tomcat9"
+      "sudo systemctl start guacd && sudo systemctl restart tomcat9"
     ]
 
     connection {

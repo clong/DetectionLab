@@ -35,33 +35,6 @@
             <param name="ignore-cert">true</param>
         </connection>
 
-        <connection name="EXCHANGE">
-            <protocol>rdp</protocol>
-            <param name="hostname">192.168.56.106</param>
-            <param name="port">3389</param>
-            <param name="username">vagrant</param>
-            <param name="password">vagrant</param>
-            <param name="create-drive-path">true</param>
-            <param name="enable-drive">true</param>
-            <param name="drive-path">/etc/guacamole/shares/exchange</param>
-            <param name="security">nla</param>
-            <param name="ignore-cert">true</param>
-        </connection>
-
-        <connection name="EXCHANGE - Domain User">
-            <protocol>rdp</protocol>
-            <param name="hostname">192.168.56.106</param>
-            <param name="port">3389</param>
-            <param name="username">vagrant</param>
-            <param name="password">vagrant</param>
-            <param name="domain">windomain</param>
-            <param name="create-drive-path">true</param>
-            <param name="enable-drive">true</param>
-            <param name="drive-path">/etc/guacamole/shares/exchange</param>
-            <param name="security">nla</param>
-            <param name="ignore-cert">true</param>
-        </connection>
-
         <connection name="WIN10">
             <protocol>rdp</protocol>
             <param name="hostname">192.168.56.104</param>
