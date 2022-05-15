@@ -1,5 +1,9 @@
 # Purpose: Installs velociraptor on the host
 
+param (
+  [switch]$Update
+)
+
 # Add a hosts entry to avoid DNS issues
 If (Select-String -Path "c:\windows\system32\drivers\etc\hosts" -Pattern "logger") {
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Hosts file already updated. Moving on."
@@ -14,11 +18,13 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Velocir
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
 $ProgressPreference = 'SilentlyContinue'
-$tag = (Invoke-WebRequest "https://api.github.com/repos/Velocidex/velociraptor/releases" -UseBasicParsing | ConvertFrom-Json)[0].tag_name
 $velociraptorDownloadUrl = "https://github.com" + ((Invoke-WebRequest "https://github.com/Velocidex/velociraptor/releases/latest" -UseBasicParsing).links | Select-Object -ExpandProperty href | Select-String "windows-amd64.msi$" | Select-Object -First 1)
 $velociraptorMSIPath = 'C:\Users\vagrant\AppData\Local\Temp\velociraptor.msi'
 $velociraptorLogFile = 'c:\Users\vagrant\AppData\Local\Temp\velociraptor_install.log'
-If (-not (Test-Path $velociraptorLogFile)) {
+If (-not(Test-Path $velociraptorLogFile) -or ($Update -eq $true)) {
+  if ($Update -eq $true) {
+    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) The update flag was set. Attempting to update..."
+  }
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Downloading Velociraptor..."
   Invoke-WebRequest -Uri "$velociraptorDownloadUrl" -OutFile $velociraptorMSIPath
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Velociraptor..."
