@@ -1,0 +1,9 @@
+{
+    "vcenter_server": "",
+    "vcenter_datastore": "",
+    "vcenter_username": "",
+    "vcenter_password": "",
+    "vcenter_network_with_dhcp_and_internet": "",
+    "vsphere_cluster": "",
+    "vmware_tools_path": ""
+}
