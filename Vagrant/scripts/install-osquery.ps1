@@ -26,7 +26,7 @@ If (-not ($service)) {
   }
   ## Add Fleet secret and avoid BOM
   $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-  [System.IO.File]::WriteAllLines("c:\Program Files\osquery\fleet_secret.txt", "enrollmentsecret", $Utf8NoBomEncoding)
+  [System.IO.File]::WriteAllLines("c:\Program Files\osquery\fleet_secret.txt", "enrollmentsecretenrollmentsecret", $Utf8NoBomEncoding)
   ## Change TLS server hostname in the flags file
   (Get-Content $flagfile) -replace 'tls.endpoint.server.com', 'fleet:8412' | Set-Content $flagfile
   ## Change path to secrets in the flags file

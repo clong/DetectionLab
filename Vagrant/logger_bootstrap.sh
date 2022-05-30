@@ -327,8 +327,11 @@ install_fleet_import_osquery_config() {
     fleetctl login --email admin@detectionlab.network --password 'Fl33tpassword!'
 
     # Set the enrollment secret to match what we deploy to Windows hosts
-    mysql -uroot --password=fleet -e 'use fleet; update enroll_secrets set secret = "enrollmentsecret";'
-    echo "Updated enrollment secret"
+    if mysql -uroot --password=fleet -e 'use fleet; INSERT INTO enroll_secrets(created_at, secret, team_id) VALUES ("2022-05-30 21:20:23", "enrollmentsecretenrollmentsecret", NULL);'; then
+      echo "Updated enrollment secret"
+    else
+      echo "Error adding the custom enrollment secret. This is going to cause problems with agent enrollment."
+    fi
 
     # Change the query invervals to reflect a lab environment
     # Every hour -> Every 3 minutes
@@ -341,7 +344,7 @@ install_fleet_import_osquery_config() {
     # Don't log osquery INFO messages
     # Fix snapshot event formatting
     fleetctl get config >/tmp/config.yaml
-    /usr/bin/yq eval -i '.spec.agent_options.config.options.enroll_secret = "enrollmentsecret"' /tmp/config.yaml
+    /usr/bin/yq eval -i '.spec.agent_options.config.options.enroll_secret = "enrollmentsecretenrollmentsecret"' /tmp/config.yaml
     /usr/bin/yq eval -i '.spec.agent_options.config.options.logger_snapshot_event_type = true' /tmp/config.yaml
     fleetctl apply -f /tmp/config.yaml
 
