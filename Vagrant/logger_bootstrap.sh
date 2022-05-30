@@ -323,8 +323,8 @@ install_fleet_import_osquery_config() {
 
     fleetctl config set --address https://192.168.56.105:8412
     fleetctl config set --tls-skip-verify true
-    fleetctl setup --email admin@detectionlab.network --name admin --password 'admin123#' --org-name DetectionLab
-    fleetctl login --email admin@detectionlab.network --password 'admin123#'
+    fleetctl setup --email admin@detectionlab.network --name admin --password 'Fl33tpassword!' --org-name DetectionLab
+    fleetctl login --email admin@detectionlab.network --password 'Fl33tpassword!'
 
     # Set the enrollment secret to match what we deploy to Windows hosts
     mysql -uroot --password=fleet -e 'use fleet; update enroll_secrets set secret = "enrollmentsecret";'
