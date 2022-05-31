@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+# shellcheck disable=SC1091,SC2129
 
 # This is the script that is used to provision the logger host
 
@@ -8,9 +9,13 @@ if ! curl -s 169.254.169.254 --connect-timeout 2 >/dev/null; then
   netplan apply
 fi
 
-if grep '127.0.0.53' /etc/resolv.conf; then
-  sed -i 's/nameserver 127.0.0.53/nameserver 8.8.8.8/g' /etc/resolv.conf && chattr +i /etc/resolv.conf
-fi
+# Kill systemd-resolvd, just use plain ol' /etc/resolv.conf
+systemctl disable systemd-resolved
+systemctl stop systemd-resolved
+rm /etc/resolv.conf
+echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
+echo 'nameserver 8.8.4.4' >> /etc/resolv.conf
+echo 'nameserver 192.168.56.102' >> /etc/resolv.conf
 
 # Source variables from logger_variables.sh
 # shellcheck disable=SC1091
