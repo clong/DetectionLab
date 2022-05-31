@@ -3,7 +3,7 @@ terraform {
   required_providers {                                                                                                                                                                                              
     esxi = {                                                                                                                                                                                                        
       source = "josenk/esxi"                                                                                                                                                                                        
-      version = "1.9.0"
+      version = "1.10.2"
     }
   }
 }
