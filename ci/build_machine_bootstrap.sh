@@ -34,8 +34,8 @@ ufw --force enable
 echo "[$(date +%H:%M:%S)]: Installing Vagrant..."
 mkdir /opt/vagrant
 cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.18/vagrant_2.2.18_x86_64.deb
-dpkg -i vagrant_2.2.18_x86_64.deb
+wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.19/vagrant_2.2.19_x86_64.deb
+dpkg -i vagrant_2.2.19_x86_64.deb
 echo "[$(date +%H:%M:%S)]: Installing vagrant-reload plugin..."
 vagrant plugin install vagrant-reload
 
