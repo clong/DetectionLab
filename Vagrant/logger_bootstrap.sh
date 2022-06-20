@@ -266,6 +266,9 @@ display.page.home.dashboardId = /servicesNS/nobody/search/data/ui/views/logger_d
     /opt/splunk/bin/splunk restart
     /opt/splunk/bin/splunk enable boot-start
   fi
+  # Include Splunk and Zeek in the PATH
+  echo export PATH="$PATH:/opt/splunk/bin:/opt/zeek/bin" >>~/.bashrc
+  echo "export SPLUNK_HOME=/opt/splunk" >>~/.bashrc
 }
 
 download_palantir_osquery_config() {
@@ -364,8 +367,6 @@ install_fleet_import_osquery_config() {
     # Files must exist before splunk will add a monitor
     touch /var/log/fleet/osquery_result
     touch /var/log/fleet/osquery_status
-    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_result" -index osquery -sourcetype 'osquery:json' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
-    /opt/splunk/bin/splunk add monitor "/var/log/fleet/osquery_status" -index osquery-status -sourcetype 'osquery:status' -auth 'admin:changeme' --accept-license --answer-yes --no-prompt
   fi
 }
 
@@ -373,10 +374,10 @@ install_zeek() {
   echo "[$(date +%H:%M:%S)]: Installing Zeek..."
   # Environment variables
   NODECFG=/opt/zeek/etc/node.cfg
-  if ! grep 'zeek' /etc/apt/sources.list.d/security:zeek.list > /dev/null; then
+  if ! grep 'zeek' /etc/apt/sources.list.d/security:zeek.list &> /dev/null; then
     sh -c "echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_20.04/ /' > /etc/apt/sources.list.d/security:zeek.list"
   fi
-  wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_20.04/Release.key -O /tmp/Release.key
+  wget -nv https://download.opensuse.org/repositories/security:zeek/xUbuntu_20.04/Release.key -O /tmp/Release.key 
   apt-key add - </tmp/Release.key &>/dev/null
   # Update APT repositories
   apt-get -qq -ym update
@@ -442,18 +443,6 @@ install_zeek() {
   systemctl enable zeek
   systemctl start zeek
 
-  # Configure the Splunk inputs
-  mkdir -p /opt/splunk/etc/apps/Splunk_TA_bro/local && touch /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf
-  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager index zeek
-  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager sourcetype zeek:json
-  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager whitelist '.*\.log$'
-  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager blacklist '.*(communication|stderr)\.log$'
-  crudini --set /opt/splunk/etc/apps/Splunk_TA_bro/local/inputs.conf monitor:///opt/zeek/spool/manager disabled 0
-
-  # Ensure permissions are correct and restart splunk
-  chown -R splunk:splunk /opt/splunk/etc/apps/Splunk_TA_bro
-  /opt/splunk/bin/splunk restart
-
   # Verify that Zeek is running
   if ! pgrep -f zeek >/dev/null; then
     echo "Zeek attempted to start but is not running. Exiting"
@@ -515,14 +504,6 @@ install_suricata() {
   echo re:protocol-command-decode >>/etc/suricata/disable.conf
   # enable et-open and attackdetection sources
   suricata-update enable-source et/open
-  suricata-update enable-source ptresearch/attackdetection
-
-  # Configure the Splunk inputs
-  crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata index suricata
-  crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata sourcetype suricata:json
-  crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata whitelist 'eve.json'
-  crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata disabled 0
-  crudini --set /opt/splunk/etc/apps/search/local/props.conf suricata:json TRUNCATE 0
 
   # Update suricata and restart
   suricata-update
@@ -606,14 +587,12 @@ install_guacamole() {
 }
 
 postinstall_tasks() {
-  # Include Splunk and Zeek in the PATH
-  echo export PATH="$PATH:/opt/splunk/bin:/opt/zeek/bin" >>~/.bashrc
-  echo "export SPLUNK_HOME=/opt/splunk" >>~/.bashrc
   # Ping DetectionLab server for usage statistics
   curl -s -A "DetectionLab-logger" "https:/ping.detectionlab.network/logger" || echo "Unable to connect to ping.detectionlab.network"
 }
 
 configure_splunk_inputs() {
+  echo "[$(date +%H:%M:%S)]: Configuring Splunk Inputs..."
   # Suricata
   crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata index suricata
   crudini --set /opt/splunk/etc/apps/search/local/inputs.conf monitor:///var/log/suricata sourcetype suricata:json
@@ -650,6 +629,7 @@ main() {
   install_suricata
   install_zeek
   install_guacamole
+  configure_splunk_inputs
   postinstall_tasks
 }
 

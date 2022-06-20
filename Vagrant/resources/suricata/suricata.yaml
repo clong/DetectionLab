@@ -149,7 +149,7 @@ app-layer:
       ja3-fingerprints: yes
     dcerpc:
       enabled: yes
-    ftp:
+    smb:
       enabled: yes
       detection-ports:
         dp: 139, 445
@@ -198,6 +198,27 @@ app-layer:
     dhcp:
       enabled: yes
     sip:
+      enabled: no
+    ftp:
+      enabled: yes
+      detection-ports:
+        dp: 21
+    ssh:
+      enabled: yes
+    smtp:
+      enabled: yes
+    rfb:
+      enabled: yes
+    mqtt:
+      enabled: no
+    rdp:
+      enabled: yes
+    http2:
+      enabled: yes
+    imap:
+      enabled: yes
+      detection-ports:
+        dp: 143,993
 asn1-max-frames: 256
 host-mode: auto
 unix-command:
