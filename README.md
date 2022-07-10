@@ -108,34 +108,32 @@ A sizable percentage of this code was borrowed and adapted from [Stefan Scherer]
 * [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES)
 
 # DetectionLab Sponsors
-#### Last updated: 11/16/2021
+#### Last updated: 07/10/2022
 I would like to extend thanks to the following sponsors for funding DetectionLab development. If you are interested in becoming a sponsor, please visit the [sponsors page](https://github.com/sponsors/clong).
 
 ### Diamond Sponsors:
 * [Veramine](https://github.com/veramine)
 * [Thinkst](https://github.com/ThinkstAppliedResearch)
-* [kungskal](https://github.com/kungskal)
-* [CyDefUnicorn](https://github.com/CyDefUnicorn)
 * [olliencc](https://github.com/olliencc)
 * [snaplabsio](https://github.com/snaplabsio)
 * [0x0lolbin](https://github.com/0x0lolbin)
 * [materaj2](https://github.com/materaj2)
 * [OutpostSecurity](https://github.com/OutpostSecurity)
+* [knotnet](https://github.com/knotnet)
 
 ### Premium Sponsors:
 * [dlee35](https://github.com/dlee35)
 * [chrissanders](https://github.com/chrissanders)
-* [jaredhaight](https://github.com/jaredhaight)
 * [iamfuntime](https://github.com/iamfuntime)
 * [Luct0r](https://github.com/Luct0r)
-* +1 private sponsor
+* +2 private sponsors
 
 ### Standard Sponsors:
 * [braimee](https://github.com/braimee)
 * [defensivedepth](https://github.com/defensivedepth)
-* [kafkaesqu3](https://github.com/kafkaesqu3)
 * [mdtro](https://github.com/mdtro)
 * [ealaney](https://github.com/ealaney)
 * [elreydetoda](https://github.com/elreydetoda)
 * [DevBits1702](https://github.com/DevBits1702)
+* [0xcarpetman](https://github.com/0xcarpetman)
 * +2 private sponsors
