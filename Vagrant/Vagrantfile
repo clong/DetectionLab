@@ -235,4 +235,49 @@ Vagrant.configure("2") do |config|
       override.vm.synced_folder '.', '/', type: 'winrm' 
     end
   end
+
+  config.vm.define "kali", autostart: false do |cfg|
+    cfg.vm.box = "kalilinux/rolling"
+    cfg.vm.hostname = "kali"
+    cfg.vm.network :private_network, ip: "192.168.56.106", gateway: "192.168.56.1", dns: "192.168.56.102"
+    cfg.vm.network "forwarded_port", guest: 9392, host: 9392
+    cfg.vm.provider "vmware_desktop" do |v, override|
+      v.vmx["displayname"] = "kali"
+      v.vmx["virtualhw.version"] = 16
+      v.memory = 4096
+      v.cpus = 2
+      v.gui = true
+    end
+
+    cfg.vm.provider "virtualbox" do |vb, override|
+      vb.gui = true
+      vb.name = "kali"
+      vb.customize ["modifyvm", :id, "--memory", 4096]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
+      vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+    end
+
+    cfg.vm.provider "libvirt" do |lv, override|
+      lv.graphics_type = "vnc"
+      lv.video_type = "vga"
+      lv.input :type => "tablet", :bus => "usb"
+      lv.video_vram = 32768
+      lv.memory = 4096
+      lv.cpus = 2
+      # This is required for Vagrant to properly configure the network interfaces.
+      # See https://github.com/clong/DetectionLab/wiki/LibVirt-Support for more information
+      lv.management_network_name = "VagrantMgmt"
+      lv.management_network_address = "192.168.123.0/24"
+      lv.management_network_mode = "none"
+      lv.cpu_mode = "host-passthrough"
+      # Which storage pool path to use. Default to /var/lib/libvirt/images or ~/.local/share/libvirt/images depending on if you are running a system or user QEMU/KVM session.
+      #libvirt.storage_pool_path = '/media/storage_nvme/system_session_vm_pool'
+      lv.storage_pool_name = 'default'
+      override.vm.synced_folder './', '/vagrant', type: 'rsync'
+    end
+  end
 end
