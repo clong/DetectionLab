@@ -366,7 +366,7 @@
     fi
   register: install_fleet
   changed_when: "'Updated enrollment secret' in install_fleet.stdout"
-  failed_when: "'error' in install_splunk.stderr"
+  failed_when: "'error' in install_fleet.stderr"
   
 - name: Download Palantir Osquery Config
   args: 
