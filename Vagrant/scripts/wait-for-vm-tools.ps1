@@ -10,11 +10,11 @@ While ($tries -lt 10) {
     } Else {
         If ($vbox_service.length -gt 0) {
           Write-Host "Found Virtualbox Guest Additions!"
-          $service = VBoxService
+          $service = "VBoxService"
         }
         If ($vmware_service.length -gt 0) {
           Write-Host "Found VMware Tools!"
-          $service = VMTools
+          $service = "VMTools"
         }
         If((get-service -name $service).Status -ne "Running") {
             Write-Host "Waiting for the service to start" 
