@@ -1,15 +1,7 @@
-variable "region" {
-  default = "us-west-1"
-}
-
-variable "profile" {
-  default = "terraform"
-}
-
 variable "custom-tags" {
-  type = map(string)
+  type        = map(string)
   description = "Optional mapping for additional tags to apply to all related AWS resources"
-  default = {}
+  default     = {}
 }
 
 variable "instance_name_prefix" {
@@ -20,12 +12,6 @@ variable "instance_name_prefix" {
 variable "availability_zone" {
   description = "https://www.terraform.io/docs/providers/aws/d/availability_zone.html"
   default     = ""
-}
-
-variable "shared_credentials_file" {
-  description = "Path to your AWS credentials file"
-  type        = string
-  default     = "/home/username/.aws/credentials"
 }
 
 variable "public_key_name" {

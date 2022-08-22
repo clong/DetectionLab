@@ -1,5 +1,5 @@
 output "region" {
-  value = var.region
+  value = data.aws_region.current.name
 }
 
 output "logger_public_ip" {
