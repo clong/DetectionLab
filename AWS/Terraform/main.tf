@@ -166,7 +166,7 @@ resource "aws_key_pair" "auth" {
 
 resource "aws_instance" "logger" {
   instance_type = "t3.medium"
-  ami           = coalesce(var.logger_ami, data.aws_ami.logger_ami.image_id)
+  ami           = coalesce(var.logger_ami, element(concat(data.aws_ami.logger_ami.*.image_id, list("")), 0))
 
   tags = tomap({ "Name" = "${var.instance_name_prefix}logger" })
 
@@ -235,7 +235,7 @@ resource "aws_instance" "dc" {
   }
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(var.dc_ami, data.aws_ami.dc_ami.image_id)
+  ami = coalesce(var.dc_ami, element(concat(data.aws_ami.dc_ami.*.image_id, list("")), 0))
 
   tags = tomap({ "Name" = "${var.instance_name_prefix}dc.windomain.local" })
 
@@ -279,7 +279,7 @@ resource "aws_instance" "wef" {
   }
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(var.wef_ami, data.aws_ami.wef_ami.image_id)
+  ami = coalesce(var.wef_ami, element(concat(data.aws_ami.wef_ami.*.image_id, list("")), 0))
 
   tags = tomap({ "Name" = "${var.instance_name_prefix}wef.windomain.local" })
 
@@ -323,7 +323,7 @@ resource "aws_instance" "win10" {
   }
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(var.win10_ami, data.aws_ami.win10_ami.image_id)
+  ami = coalesce(var.win10_ami, element(concat(data.aws_ami.win10_ami.*.image_id, list("")), 0))
 
   tags = tomap({ "Name" = "${var.instance_name_prefix}win10.windomain.local" })
 
