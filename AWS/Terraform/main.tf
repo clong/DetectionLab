@@ -212,7 +212,7 @@ resource "aws_instance" "dc" {
   ]
 
   provisioner "file" {
-    source      = "${module.path}/scripts/bootstrap.ps1"
+    source      = "${path.module}/scripts/bootstrap.ps1"
     destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
@@ -256,7 +256,7 @@ resource "aws_instance" "wef" {
   ]
 
   provisioner "file" {
-    source      = "${module.path}/scripts/bootstrap.ps1"
+    source      = "${path.module}/scripts/bootstrap.ps1"
     destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
@@ -300,7 +300,7 @@ resource "aws_instance" "win10" {
   ]
 
   provisioner "file" {
-    source      = "${module.path}/scripts/bootstrap.ps1"
+    source      = "${path.module}/scripts/bootstrap.ps1"
     destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
