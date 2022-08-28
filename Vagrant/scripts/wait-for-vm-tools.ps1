@@ -17,7 +17,7 @@ While ($tries -lt 10) {
           $service = "VMTools"
         }
         If((get-service -name $service).Status -ne "Running") {
-            Write-Host "Waiting for the service to start" 
+            Write-Host "Waiting for the $service service to start" 
             Start-Sleep 5
         } Else {
             Write-Host "$service started successfully!"
