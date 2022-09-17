@@ -6,10 +6,12 @@ export DEBIAN_FRONTEND=noninteractive
 export SERIALNUMBER="SECRET"
 
 sed -i 's#http://archive.ubuntu.com#http://us.archive.ubuntu.com#g' /etc/apt/sources.list
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
 # Install VMWare Workstation 15
 apt-get update
-apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apache2 ubuntu-desktop python-pip libxtst6
+apt-get install -y linux-headers-"$(uname -r)" build-essential unzip git ufw apache2 ubuntu-desktop python-pip libxtst6 vagrant
 pip install awscli --upgrade --user
 cp /root/.local/bin/aws /usr/local/bin/aws && chmod +x /usr/local/bin/aws
 
@@ -24,11 +26,6 @@ ufw --force enable
 
 git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab
 
-# Install Vagrant
-mkdir /opt/vagrant
-cd /opt/vagrant || exit 1
-wget --progress=bar:force https://releases.hashicorp.com/vagrant/2.2.19/vagrant_2.2.19_x86_64.deb
-dpkg -i vagrant_2.2.19_x86_64.deb
 # Disable IPv6 - may help with the vagrant-reload plugin: https://github.com/hashicorp/vagrant/issues/8795#issuecomment-468945063
 echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf > /dev/null

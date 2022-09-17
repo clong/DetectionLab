@@ -116,6 +116,7 @@ fix_eth1_static_ip() {
       echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.56.105"
     else
       echo "[$(date +%H:%M:%S)]: Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
+      echo "[$(date +%H:%M:%S)]: eth1's current IP address is $ETH1_IP"
       exit 1
     fi
   fi
@@ -296,8 +297,8 @@ install_fleet_import_osquery_config() {
     mysql -uroot -pfleet -e "create database fleet;"
 
     # Always download the latest release of Fleet and Fleetctl
-    curl -s https://github.com/fleetdm/fleet/releases | grep _linux.tar.gz | grep href | grep -v orbit | grep -v fleetctl | cut -d '"' -f 2 | head -1 | sed 's#^#https://github.com#g'  | wget --progress=bar:force -i -
-    curl -s https://github.com/fleetdm/fleet/releases | grep _linux.tar.gz | grep href | grep fleetctl | cut -d '"' -f 2 | head -1 | sed 's#^#https://github.com#g' | wget --progress=bar:force -i -
+    curl -s https://api.github.com/repos/fleetdm/fleet/releases/latest | jq '.assets[] | select(.name|match("linux.tar.gz$")) | .browser_download_url' | sed 's/"//g' | grep fleetctl  | wget --progress=bar:force -i -
+    curl -s https://api.github.com/repos/fleetdm/fleet/releases/latest | jq '.assets[] | select(.name|match("linux.tar.gz$")) | .browser_download_url' | sed 's/"//g' | grep fleet | grep -v fleetctl | wget --progress=bar:force -i -
     tar -xvf fleet_*.tar.gz
     tar -xvf fleetctl_*.tar.gz
     cp fleetctl_*/fleetctl /usr/local/bin/fleetctl && chmod +x /usr/local/bin/fleetctl
@@ -454,7 +455,7 @@ install_velociraptor() {
     mkdir /opt/velociraptor
   fi
   echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
-  LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
+  LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/ | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
   echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
   echo "[$(date +%H:%M:%S)]: Attempting to download..."
   wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"

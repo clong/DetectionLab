@@ -47,12 +47,6 @@
     post_reboot_delay: 60
   when: wef_join_domain.changed
 
-- name: Download Microsoft ATA
-  win_get_url:
-    url: http://download.microsoft.com/download/4/9/1/491394D1-3F28-4261-ABC6-C836A301290E/ATA1.9.iso
-    dest: "C:\\Users\\vagrant\\AppData\\Local\\Temp\\Microsoft ATA 1.9.iso"
-    timeout: 3600
-
 - name: Check if DetectionLab Clear Event Logs has been done
   win_stat:
     path: 'c:\Windows\.detectionlab_clear_done'

@@ -144,7 +144,6 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/configure-pslogstranscriptsshare.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-autorunstowineventlog.ps1", privileged: false
     cfg.vm.provision "shell", inline: "Set-SmbServerConfiguration -AuditSmb1Access $true -Force", privileged: false
-    cfg.vm.provision "shell", path: "scripts/install-microsoft-ata.ps1", privileged: false
     cfg.vm.provision "shell", inline: "Write-Host 'WEF Provisioning Complete!'", privileged: false
 
     cfg.vm.provider "vmware_desktop" do |v, override|

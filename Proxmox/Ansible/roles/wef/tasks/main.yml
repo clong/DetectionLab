@@ -52,12 +52,6 @@
     reboot_timeout: 600
     post_reboot_delay: 60
 
-- name: Download Microsoft ATA
-  win_get_url:
-    url: http://download.microsoft.com/download/4/9/1/491394D1-3F28-4261-ABC6-C836A301290E/ATA1.9.iso
-    dest: "C:\\Users\\vagrant\\AppData\\Local\\Temp\\Microsoft ATA 1.9.iso"
-    timeout: 3600
-
 - name: Clear Event Logs
   win_shell: "wevtutil el | Select-String -notmatch \"Microsoft-Windows-LiveId\" | Foreach-Object {wevtutil cl \"$_\"}"
 

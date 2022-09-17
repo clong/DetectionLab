@@ -30,12 +30,6 @@ If ($physicalMemory -lt 8000000000) {
     Write-Host "It is STRONGLY recommended that you provide this host with 8GB+ of memory before continuing or it is highly likely that it will run out of memory while installing Exchange."
 }
 
-# If we're installing Exchange, we can remove the ATA ISO
-if (Test-Path "C:\Microsoft ATA 1.9.iso") {
-    Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Removing the ATA ISO to save space"
-    Remove-Item -Path "C:\Microsoft ATA 1.9.iso"
-}
-
 # Gotta temporarily re-enable these services
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) [+] Temporarily re-enabling TrustedInstaller and Windows Update services..."
 Set-Service TrustedInstaller -StartupType Automatic
