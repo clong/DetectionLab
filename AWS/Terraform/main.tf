@@ -1,20 +1,20 @@
 # Specify the provider and access details
 provider "aws" {
-  shared_credentials_file = var.shared_credentials_file
-  region                  = var.region
-  profile                 = var.profile
+  default_tags {
+    tags = tomap(var.custom-tags)
+  }
 }
+
+data "aws_region" "current" {}
 
 # Create a VPC to launch our instances into
 resource "aws_vpc" "default" {
   cidr_block = "192.168.0.0/16"
-  tags = var.custom-tags
 }
 
 # Create an internet gateway to give our subnet access to the outside world
 resource "aws_internet_gateway" "default" {
   vpc_id = aws_vpc.default.id
-  tags = var.custom-tags
 }
 
 # Grant the VPC internet access on its main route table
@@ -30,7 +30,6 @@ resource "aws_subnet" "default" {
   cidr_block              = "192.168.56.0/24"
   availability_zone       = var.availability_zone
   map_public_ip_on_launch = true
-  tags = var.custom-tags
 }
 
 # Adjust VPC DNS settings to not conflict with lab
@@ -38,7 +37,6 @@ resource "aws_vpc_dhcp_options" "default" {
   domain_name          = "windomain.local"
   domain_name_servers  = concat(["192.168.56.102"], var.external_dns_servers)
   netbios_name_servers = ["192.168.56.102"]
-  tags = var.custom-tags
 }
 
 resource "aws_vpc_dhcp_options_association" "default" {
@@ -51,7 +49,6 @@ resource "aws_security_group" "logger" {
   name        = "logger_security_group"
   description = "DetectionLab: Security Group for the logger host"
   vpc_id      = aws_vpc.default.id
-  tags = var.custom-tags
 
   # SSH access
   ingress {
@@ -92,7 +89,7 @@ resource "aws_security_group" "logger" {
   }
 
   # Velociraptor access
-    ingress {
+  ingress {
     from_port   = 9999
     to_port     = 9999
     protocol    = "tcp"
@@ -120,7 +117,6 @@ resource "aws_security_group" "windows" {
   name        = "windows_security_group"
   description = "DetectionLab: Security group for the Windows hosts"
   vpc_id      = aws_vpc.default.id
-  tags = var.custom-tags
 
   # RDP
   ingress {
@@ -170,11 +166,9 @@ resource "aws_key_pair" "auth" {
 
 resource "aws_instance" "logger" {
   instance_type = "t3.medium"
-  ami           = coalesce(var.logger_ami, data.aws_ami.logger_ami.image_id)
+  ami           = coalesce(var.logger_ami, element(concat(data.aws_ami.logger_ami.*.image_id, [""]), 0))
 
-  tags = merge(var.custom-tags, tomap(
-    {"Name" = "${var.instance_name_prefix}logger"}
-  ))
+  tags = tomap({ "Name" = "${var.instance_name_prefix}logger" })
 
   subnet_id              = aws_subnet.default.id
   vpc_security_group_ids = [aws_security_group.logger.id]
@@ -197,16 +191,16 @@ resource "aws_instance" "logger" {
     ]
 
     connection {
-      host        = coalesce(self.public_ip, self.private_ip)
-      type        = "ssh"
-      user        = "vagrant"
-      password    = "vagrant"
+      host     = coalesce(self.public_ip, self.private_ip)
+      type     = "ssh"
+      user     = "vagrant"
+      password = "vagrant"
     }
   }
 
   root_block_device {
     delete_on_termination = true
-    volume_size           = 64 
+    volume_size           = 64
   }
 }
 
@@ -218,7 +212,7 @@ resource "aws_instance" "dc" {
   ]
 
   provisioner "file" {
-    source      = "scripts/bootstrap.ps1"
+    source      = "${path.module}/scripts/bootstrap.ps1"
     destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
@@ -241,11 +235,9 @@ resource "aws_instance" "dc" {
   }
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(var.dc_ami, data.aws_ami.dc_ami.image_id)
+  ami = coalesce(var.dc_ami, element(concat(data.aws_ami.dc_ami.*.image_id, [""]), 0))
 
-  tags = merge(var.custom-tags, tomap(
-    {"Name" = "${var.instance_name_prefix}dc.windomain.local"}
-  ))
+  tags = tomap({ "Name" = "${var.instance_name_prefix}dc.windomain.local" })
 
   subnet_id              = aws_subnet.default.id
   vpc_security_group_ids = [aws_security_group.windows.id]
@@ -258,13 +250,13 @@ resource "aws_instance" "dc" {
 
 resource "aws_instance" "wef" {
   instance_type = "t3.medium"
-    depends_on = [
+  depends_on = [
     aws_vpc_dhcp_options.default,
     aws_vpc_dhcp_options_association.default
   ]
 
   provisioner "file" {
-    source      = "scripts/bootstrap.ps1"
+    source      = "${path.module}/scripts/bootstrap.ps1"
     destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
@@ -287,11 +279,9 @@ resource "aws_instance" "wef" {
   }
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(var.wef_ami, data.aws_ami.wef_ami.image_id)
+  ami = coalesce(var.wef_ami, element(concat(data.aws_ami.wef_ami.*.image_id, [""]), 0))
 
-  tags = merge(var.custom-tags, tomap(
-    {"Name" = "${var.instance_name_prefix}wef.windomain.local"}
-  ))
+  tags = tomap({ "Name" = "${var.instance_name_prefix}wef.windomain.local" })
 
   subnet_id              = aws_subnet.default.id
   vpc_security_group_ids = [aws_security_group.windows.id]
@@ -304,13 +294,13 @@ resource "aws_instance" "wef" {
 
 resource "aws_instance" "win10" {
   instance_type = "t2.large"
-    depends_on = [
+  depends_on = [
     aws_vpc_dhcp_options.default,
     aws_vpc_dhcp_options_association.default
   ]
 
   provisioner "file" {
-    source      = "scripts/bootstrap.ps1"
+    source      = "${path.module}/scripts/bootstrap.ps1"
     destination = "C:\\Temp\\bootstrap.ps1"
 
     connection {
@@ -333,11 +323,9 @@ resource "aws_instance" "win10" {
   }
 
   # Uses the local variable if external data source resolution fails
-  ami = coalesce(var.win10_ami, data.aws_ami.win10_ami.image_id)
+  ami = coalesce(var.win10_ami, element(concat(data.aws_ami.win10_ami.*.image_id, [""]), 0))
 
-  tags = merge(var.custom-tags, tomap(
-    {"Name" = "${var.instance_name_prefix}win10.windomain.local"}
-  ))
+  tags = tomap({ "Name" = "${var.instance_name_prefix}win10.windomain.local" })
 
   subnet_id              = aws_subnet.default.id
   vpc_security_group_ids = [aws_security_group.windows.id]

@@ -1,15 +1,7 @@
-variable "region" {
-  default = "us-west-1"
-}
-
-variable "profile" {
-  default = "terraform"
-}
-
 variable "custom-tags" {
-  type = map(string)
+  type        = map(string)
   description = "Optional mapping for additional tags to apply to all related AWS resources"
-  default = {}
+  default     = {}
 }
 
 variable "instance_name_prefix" {
@@ -20,12 +12,6 @@ variable "instance_name_prefix" {
 variable "availability_zone" {
   description = "https://www.terraform.io/docs/providers/aws/d/availability_zone.html"
   default     = ""
-}
-
-variable "shared_credentials_file" {
-  description = "Path to your AWS credentials file"
-  type        = string
-  default     = "/home/username/.aws/credentials"
 }
 
 variable "public_key_name" {
@@ -59,6 +45,7 @@ variable "external_dns_servers" {
 
 # Use Data Sources to resolve the AMI-ID for the Ubuntu 20.04 AMI
 data "aws_ami" "logger_ami" {
+  count  = var.logger_ami == "" ? 1 : 0
   owners = ["505638924199"]
 
   filter {
@@ -69,6 +56,7 @@ data "aws_ami" "logger_ami" {
 
 # Use Data Sources to resolve the AMI-ID for the pre-built DC host
 data "aws_ami" "dc_ami" {
+  count  = var.dc_ami == "" ? 1 : 0
   owners = ["505638924199"]
 
   filter {
@@ -79,6 +67,7 @@ data "aws_ami" "dc_ami" {
 
 # Use Data Sources to resolve the AMI-ID for the pre-built WEF host
 data "aws_ami" "wef_ami" {
+  count       = var.wef_ami == "" ? 1 : 0
   owners      = ["505638924199"]
   most_recent = true
 
@@ -90,6 +79,7 @@ data "aws_ami" "wef_ami" {
 
 # Use Data Sources to resolve the AMI-ID for the pre-built Win10 host
 data "aws_ami" "win10_ami" {
+  count       = var.win10_ami == "" ? 1 : 0
   owners      = ["505638924199"]
   most_recent = true
 
