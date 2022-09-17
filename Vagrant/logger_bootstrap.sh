@@ -116,6 +116,7 @@ fix_eth1_static_ip() {
       echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.56.105"
     else
       echo "[$(date +%H:%M:%S)]: Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
+      echo "[$(date +%H:%M:%S)]: eth1's current IP address is $ETH1_IP"
       exit 1
     fi
   fi
@@ -454,7 +455,7 @@ install_velociraptor() {
     mkdir /opt/velociraptor
   fi
   echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
-  LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/latest | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
+  LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/ | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
   echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
   echo "[$(date +%H:%M:%S)]: Attempting to download..."
   wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"

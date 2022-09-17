@@ -38,14 +38,6 @@ post_build_checks() {
   else
     (echo >&2 "${GOODTOGO} Fleet is running and reachable.")
   fi
-
-  echo ""
-  echo "[*] Verifying that Microsoft ATA is running and reachable..."
-  if [ "$ATA_CHECK" -lt 1 ]; then
-    (echo >&2 "${ERROR} Warning: Microsoft ATA was unreachable and may not have installed correctly.")
-  else
-    (echo >&2 "${GOODTOGO} Microsoft ATA is running and reachable.")
-  fi
   
   echo ""
   echo "[*] Verifying that the Velociraptor service is running and reachable..."

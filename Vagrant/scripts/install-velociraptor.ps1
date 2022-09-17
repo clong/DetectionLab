@@ -18,7 +18,7 @@ Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Determining latest release of Velocir
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 # Disabling the progress bar speeds up IWR https://github.com/PowerShell/PowerShell/issues/2138
 $ProgressPreference = 'SilentlyContinue'
-$velociraptorDownloadUrl = "https://github.com" + ((Invoke-WebRequest "https://github.com/Velocidex/velociraptor/releases/latest" -UseBasicParsing).links | Select-Object -ExpandProperty href | Select-String "windows-amd64.msi$" | Select-Object -First 1)
+$velociraptorDownloadUrl = "https://github.com" + ((Invoke-WebRequest "https://github.com/Velocidex/velociraptor/releases" -UseBasicParsing).links | Select-Object -ExpandProperty href | Select-String "windows-amd64.msi$" | Select-Object -First 1)
 $velociraptorMSIPath = 'C:\Users\vagrant\AppData\Local\Temp\velociraptor.msi'
 $velociraptorLogFile = 'c:\Users\vagrant\AppData\Local\Temp\velociraptor_install.log'
 If (-not(Test-Path $velociraptorLogFile) -or ($Update -eq $true)) {
