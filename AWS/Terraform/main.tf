@@ -187,7 +187,7 @@ resource "aws_instance" "logger" {
       "sudo git clone https://github.com/clong/DetectionLab.git /opt/DetectionLab",
       "sudo chmod +x /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
       "sudo sed -i 's#/vagrant/resources#/opt/DetectionLab/Vagrant/resources#g' /opt/DetectionLab/Vagrant/logger_bootstrap.sh",
-      "sudo yq -i 'del(af-packet[1])' /etc/suricata/suricata.yaml", 
+      "sudo yq eval -i 'del(.af-packet[1])' /etc/suricata/suricata.yaml", 
       "sudo sed -i '1s/^/\\%YAML 1.1\\n---\\n/g' /etc/suricata/suricata.yaml",
       "sudo cp /opt/DetectionLab/Vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service && sudo systemctl daemon-reload && sudo service fleet restart",
       "sudo service suricata restart",
