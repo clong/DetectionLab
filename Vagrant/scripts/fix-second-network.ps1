@@ -17,7 +17,6 @@ if ( (Get-NetAdapter | Select-Object -First 1 | Select-Object -ExpandProperty In
     if ($dns2) {
       & netsh.exe interface ipv4 add dnsserver "$name" address=$dns2 index=2
     }
-    }
   } else {
     Write-Error "Could not find a interface with subnet $subnet.xx"
   }
