@@ -186,6 +186,7 @@ resource "aws_instance" "logger" {
       "sudo cp /opt/DetectionLab/Vagrant/resources/fleet/fleet.service /etc/systemd/system/fleet.service && sudo systemctl daemon-reload && sudo service fleet restart",
       "sudo service suricata restart",
       "sudo /opt/DetectionLab/Vagrant/logger_bootstrap.sh splunk_only",
+      "sudo /opt/DetectionLab/Vagrant/logger_bootstrap.sh velociraptor_only",
       "sudo systemctl stop guacd",
       "sudo systemctl start guacd && sudo systemctl restart tomcat9"
     ]

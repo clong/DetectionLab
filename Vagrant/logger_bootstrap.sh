@@ -452,7 +452,7 @@ install_zeek() {
 install_velociraptor() {
   echo "[$(date +%H:%M:%S)]: Installing Velociraptor..."
   if [ ! -d "/opt/velociraptor" ]; then
-    mkdir /opt/velociraptor
+    mkdir /opt/velociraptor || echo "Dir already exists"
   fi
   echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
   LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/ | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
@@ -635,6 +635,10 @@ main() {
 splunk_only() {
   install_splunk
   configure_splunk_inputs
+}
+
+velociraptor_only() {
+  install_velociraptor
 }
 
 # Allow custom modes via CLI args
