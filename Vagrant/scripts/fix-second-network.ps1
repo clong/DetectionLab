@@ -1,5 +1,5 @@
 # Source: https://github.com/StefanScherer/adfs2
-param ([String] $ip, [String] $dns, [String] $gateway)
+param ([String] $ip, [String] $dns, [String] $gateway, [String] $dns2)
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Running fix-second-network.ps1..."
 
@@ -15,6 +15,9 @@ if ( (Get-NetAdapter | Select-Object -First 1 | Select-Object -ExpandProperty In
     if ($dns) {
       Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Set DNS server address to $dns of interface $name"
       & netsh.exe interface ipv4 add dnsserver "$name" address=$dns index=1
+    }
+    if ($dns2) {
+      & netsh.exe interface ipv4 add dnsserver "$name" address=$dns2 index=2
     }
   } else {
     Write-Error "Could not find a interface with subnet $subnet.xx"
@@ -49,6 +52,9 @@ if ($name) {
   if ($dns) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Set DNS server address to $dns of interface $name"
     & netsh.exe interface ipv4 add dnsserver "$name" address=$dns index=1
+  }
+  if ($dns2) {
+    & netsh.exe interface ipv4 add dnsserver "$name" address=$dns2 index=2
   }
 } else {
   Write-Error "$('[{0:HH:mm}]' -f (Get-Date)) Could not find a interface with subnet $subnet.xx"

@@ -24,7 +24,8 @@ If (!(Test-Path $ProfilePath)) {
 Try {
   curl -userAgent "DetectionLab-$box" "https://ping.detectionlab.network/$box" -UseBasicParsing | out-null
 } Catch {
-  Write-Host "Unable to connect to ping.detectionlab.network"
+  Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Unable to connect to ping.detectionlab.network"
+  Write-Host $_.Exception.Message
 }
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disabling IPv6 on all network adatpers..."

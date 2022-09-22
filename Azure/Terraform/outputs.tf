@@ -18,10 +18,6 @@ output "win10_public_ip" {
   value = azurerm_public_ip.win10-publicip.ip_address 
 }
 
-output "ata_url" {
-  value = local.ata_url
-}
-
 output "fleet_url" {
   value = local.fleet_url
 }

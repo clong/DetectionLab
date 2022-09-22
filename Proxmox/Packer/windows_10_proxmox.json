@@ -35,9 +35,9 @@
           "memory": 256
         },
         "scsi_controller": "virtio-scsi-pci",
-        "iso_url": "https://software-download.microsoft.com/download/pr/18362.30.190401-1528.19h1_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+        "iso_url": "https://software-download.microsoft.com/download/pr/18363.418.191007-0143.19h2_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
         "iso_storage_pool": "{{user `proxmox_iso_storage_pool`}}",
-        "iso_checksum": "ab4862ba7d1644c27f27516d24cb21e6b39234eb3301e5f1fb365a78b22f79b3",
+        "iso_checksum": "9ef81b6a101afd57b2dbfa44d5c8f7bc94ff45b51b82c5a1f9267ce2e63e9f53",
         "boot_wait": "6m",
         "boot": "order=scsi0;ide2",
         "additional_iso_files": [
