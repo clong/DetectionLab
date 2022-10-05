@@ -7,7 +7,7 @@ $box = $box.ComputerName.ToString().ToLower()
 
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Setting timezone to UTC..."
 c:\windows\system32\tzutil.exe /s "UTC"
- 
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Checking if Windows evaluation is expiring soon or expired..."
 . c:\vagrant\scripts\fix-windows-expiration.ps1
 
@@ -19,13 +19,6 @@ If (!(Test-Path $ProfilePath)) {
     Add-Content -Path $ProfilePath -Value "$ProgressPreference = 'SilentlyContinue'"
   }
 }
-
-# Increase the metric for the internal (192.168.56.x) interface
-# See https://github.com/clong/DetectionLab/issues/801#issuecomment-1262832852 for context
-Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Lowering the interface metric (increasing priority) for the interface with the 192.168.56.x address" 
-$index = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object -FilterScript { ($_.IPAddress).StartsWith("192.168.56.") }).InterfaceIndex
-Set-NetIPInterface -InterfaceIndex $index -InterfaceMetric 15
-Get-NetIPInterface
 
 # Ping DetectionLab server for usage statistics
 Try {
@@ -42,11 +35,16 @@ Get-NetAdapterBinding -ComponentID ms_tcpip6
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" /v DisabledComponents /t REG_DWORD /d 255 /f
 
 if ($env:COMPUTERNAME -imatch 'vagrant') {
+
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Hostname is still the original one, skip provisioning for reboot..."
+
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing bginfo..."
   . c:\vagrant\scripts\install-bginfo.ps1
+
 } elseif ((gwmi win32_computersystem).partofdomain -eq $false) {
+
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Current domain is set to 'workgroup'. Time to join the domain!"
+
   if (!(Test-Path 'c:\Program Files\sysinternals\bginfo.exe')) {
     Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing bginfo..."
     . c:\vagrant\scripts\install-bginfo.ps1
