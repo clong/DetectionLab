@@ -1,10 +1,10 @@
-if not exist "C:\Windows\Temp\7z2102-x64.msi" (
-  powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object System.Net.WebClient).DownloadFile('https://www.7-zip.org/a/7z2102-x64.msi', 'C:\Windows\Temp\7z2102-x64.msi')" <NUL
+if not exist "C:\Windows\Temp\7z2201-x64.msi" (
+  powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object System.Net.WebClient).DownloadFile('https://www.7-zip.org/a/7z2201-x64.msi', 'C:\Windows\Temp\7z2201-x64.msi')" <NUL
 )
-if not exist "C:\Windows\Temp\7z2102-x64.msi" (
-  powershell -Command "Start-Sleep 5; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object System.Net.WebClient).DownloadFile('https://www.7-zip.org/a/7z2102-x64.msi', 'C:\Windows\Temp\7z2102-x64.msi')" <NUL
+if not exist "C:\Windows\Temp\7z2201-x64.msi" (
+  powershell -Command "Start-Sleep 5; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object System.Net.WebClient).DownloadFile('https://www.7-zip.org/a/7z2201-x64.msi', 'C:\Windows\Temp\7z2201-x64.msi')" <NUL
 )
-msiexec /qb /i C:\Windows\Temp\7z2102-x64.msi
+msiexec /qb /i C:\Windows\Temp\7z2201-x64.msi
 
 if "%PACKER_BUILDER_TYPE%" equ "vmware-iso" goto :vmware
 if "%PACKER_BUILDER_TYPE%" equ "virtualbox-iso" goto :virtualbox
@@ -48,4 +48,4 @@ rd /S /Q "C:\Windows\Temp\virtualbox"
 goto :done
 
 :done
-msiexec /qb /x C:\Windows\Temp\7z2102-x64.msi
+msiexec /qb /x C:\Windows\Temp\7z2201-x64.msi
