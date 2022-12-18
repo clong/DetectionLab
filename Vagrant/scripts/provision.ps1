@@ -28,7 +28,7 @@ Try {
   Write-Host $_.Exception.Message
 }
 
-Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disabling IPv6 on all network adatpers..."
+Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Disabling IPv6 on all network adapters..."
 Get-NetAdapterBinding -ComponentID ms_tcpip6 | ForEach-Object {Disable-NetAdapterBinding -Name $_.Name -ComponentID ms_tcpip6}
 Get-NetAdapterBinding -ComponentID ms_tcpip6 
 # https://support.microsoft.com/en-gb/help/929852/guidance-for-configuring-ipv6-in-windows-for-advanced-users
