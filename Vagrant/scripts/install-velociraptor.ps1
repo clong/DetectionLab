@@ -32,7 +32,7 @@ If (-not(Test-Path $velociraptorLogFile) -or ($Update -eq $true)) {
   Invoke-WebRequest -Uri "$velociraptorDownloadUrl" -OutFile $velociraptorMSIPath
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Installing Velociraptor..."
   Start-Process C:\Windows\System32\msiexec.exe -ArgumentList "/i $velociraptorMSIPath /quiet /qn /norestart /log $velociraptorLogFile" -wait
-  Copy-Item "c:\vagrant\resources\velociraptor\Velociraptor.config.yaml" "C:\Program Files\Velociraptor"
+  Copy-Item "c:\vagrant\resources\velociraptor\Velociraptor.config.yaml" "C:\Program Files\Velociraptor\client.config.yaml"
   Restart-Service Velociraptor
   Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Velociraptor successfully installed!"
 } Else {
