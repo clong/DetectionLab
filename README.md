@@ -10,15 +10,6 @@ DetectionLab is tested weekly on Saturdays via a scheduled CircleCI workflow to 
 ![Maintenance](https://img.shields.io/maintenance/no/2023.svg?style=flat-square)
 [![GitHub last commit](https://img.shields.io/github/last-commit/clong/DetectionLab.svg?style=flat-square)](https://github.com/clong/DetectionLab/commit/master)
 [![Twitter](https://img.shields.io/twitter/follow/DetectionLab.svg?style=social)](https://twitter.com/DetectionLab)
-[![Slack](https://img.shields.io/badge/Slack-DetectionLab-blue)](https://join.slack.com/t/detectionlab/shared_invite/zt-mv1qnw9f-3qo2ZrB0IbIKhvinfsgYhg)
-
-#### Donate to the project:
-
-All of the infrastructure, building, and testing of DetectionLab is currently funded by myself in my spare time. If you find this project useful, feel free to buy me a coffee using one of the buttons below!
-
-[![GitHub Sponsor](https://img.shields.io/badge/GitHub-Sponsor-red.svg)](https://github.com/sponsors/clong)
-
-[![GitHub One-Time Payment](https://img.shields.io/badge/GitHub-One--Time%20Sponsor-red)](https://github.com/sponsors/clong?frequency=one-time) [$5](https://github.com/login?return_to=%2Fsponsors%2Fclong%2Fsponsorships%3Ftier_id%3D89561) | [$20](https://github.com/login?return_to=%2Fsponsors%2Fclong%2Fsponsorships%3Ftier_id%3D89562) | [$100](https://github.com/login?return_to=%2Fsponsors%2Fclong%2Fsponsorships%3Ftier_id%3D97537)
 
 ## Purpose
 This lab has been designed with defenders in mind. Its primary purpose is to allow the user to quickly build a Windows domain that comes pre-loaded with security tooling and some best practices when it comes to system logging configurations. It can easily be modified to fit most needs or expanded to include additional hosts.
