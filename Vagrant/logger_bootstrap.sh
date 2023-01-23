@@ -585,11 +585,6 @@ install_guacamole() {
   echo "[$(date +%H:%M:%S)]: Guacamole installation complete!"
 }
 
-postinstall_tasks() {
-  # Ping DetectionLab server for usage statistics
-  curl -s -A "DetectionLab-logger" "https:/ping.detectionlab.network/logger" || echo "Unable to connect to ping.detectionlab.network"
-}
-
 configure_splunk_inputs() {
   echo "[$(date +%H:%M:%S)]: Configuring Splunk Inputs..."
   # Suricata
@@ -629,7 +624,6 @@ main() {
   install_zeek
   install_guacamole
   configure_splunk_inputs
-  postinstall_tasks
 }
 
 splunk_only() {
