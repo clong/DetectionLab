@@ -65,6 +65,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/download_palantir_wef.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-redteam.ps1", privileged: false
+    cfg.vm.provision "file", source: "files/choco-winpcap", destination: "choco-winpcap"
     cfg.vm.provision "shell", path: "scripts/install-choco-extras.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
@@ -137,6 +138,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-redteam.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-evtx-attack-samples.ps1", privileged: false
+    cfg.vm.provision "file", source: "files/choco-winpcap", destination: "choco-winpcap"
     cfg.vm.provision "shell", path: "scripts/install-choco-extras.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
@@ -196,6 +198,7 @@ Vagrant.configure("2") do |config|
     cfg.vm.provision "shell", inline: 'wevtutil el | Select-String -notmatch "Microsoft-Windows-LiveId" | Foreach-Object {wevtutil cl "$_"}', privileged: false
     cfg.vm.provision "shell", path: "scripts/install-utilities.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-redteam.ps1", privileged: false
+    cfg.vm.provision "file", source: "files/choco-winpcap", destination: "choco-winpcap"
     cfg.vm.provision "shell", path: "scripts/install-choco-extras.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-osquery.ps1", privileged: false
     cfg.vm.provision "shell", path: "scripts/install-sysinternals.ps1", privileged: false
