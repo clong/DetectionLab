@@ -375,7 +375,7 @@ install_zeek() {
   # Update APT repositories
   apt-get -qq -ym update
   # Install tools to build and configure Zeek
-  apt-get -qq -ym install zeek crudini
+  apt-get -qq -ym install zeek-lts crudini
   export PATH=$PATH:/opt/zeek/bin
   pip3 install zkg==2.1.1
   zkg refresh
