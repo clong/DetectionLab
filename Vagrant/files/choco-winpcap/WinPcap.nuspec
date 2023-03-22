@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>WinPcap</id>
+    <version>4.1.3.20161116</version>
+    <title>WinPcap</title>
+    <authors>NetGroup, CACE Technologies</authors>
+    <owners>chocolatey</owners>
+    <licenseUrl>http://www.winpcap.org/misc/copyright.htm</licenseUrl>
+    <projectUrl>http://www.winpcap.org/</projectUrl>
+    <iconUrl>https://cdn.rawgit.com/chocolatey/chocolatey-coreteampackages/b689d60fd7922e46e600536569805cc1785b6bf1/icons/winpcap.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>WinPcap is the industry-standard tool for link-layer network access in Windows environments: it allows applications to capture and transmit network packets bypassing the protocol stack, and has additional useful features, including kernel-level packet filtering, a network statistics engine and support for remote packet capture.
+
+## Notes
+
+- This package uses an Autohotkey script for unattended as vendor removed silent installation options.</description>
+    <releaseNotes>https://www.winpcap.org/misc/changelog.htm</releaseNotes>
+    <copyright>NetGroup, Politecnico di Torino (Italy). CACE Technologies, Davis (California).</copyright>
+    <tags>driver foss packet capture network admin</tags>
+    <packageSourceUrl>https://github.com/chocolatey/chocolatey-coreteampackages/tree/master/automatic/winpcap</packageSourceUrl>
+    <docsUrl>https://www.winpcap.org/docs/default.htm</docsUrl>
+    <dependencies>
+      <dependency id="autohotkey.portable" version="[1.1.36.02,2.0)" />
+      <dependency id="chocolatey-core.extension" version="1.0" />
+    </dependencies>
+  </metadata>
+</package>

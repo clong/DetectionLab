@@ -94,15 +94,9 @@ fix_eth1_static_ip() {
       return 0
     fi
   fi
-  # There's a fun issue where dhclient keeps messing with eth1 despite the fact
-  # that eth1 has a static IP set. We workaround this by setting a static DHCP lease.
-  if ! grep 'interface "eth1"' /etc/dhcp/dhclient.conf; then
-    echo -e 'interface "eth1" {
-      send host-name = gethostname();
-      send dhcp-requested-address 192.168.56.105;
-    }' >>/etc/dhcp/dhclient.conf
-    netplan apply
-  fi
+  # TODO: try to set correctly directly through vagrant net config
+  netplan set ethernets.eth1.dhcp4=false
+  netplan apply
 
   # Fix eth1 if the IP isn't set correctly
   ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
@@ -381,7 +375,7 @@ install_zeek() {
   # Update APT repositories
   apt-get -qq -ym update
   # Install tools to build and configure Zeek
-  apt-get -qq -ym install zeek crudini
+  apt-get -qq -ym install zeek-lts crudini
   export PATH=$PATH:/opt/zeek/bin
   pip3 install zkg==2.1.1
   zkg refresh
