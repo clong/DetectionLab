@@ -1,5 +1,13 @@
 ---
 
+- name: Install Utilities
+  win_shell: ".\\install-utilities.ps1"
+  args:
+    chdir: 'c:\vagrant\scripts'
+  register: utilities
+  failed_when: "'Exception' in utilities.stdout"
+  ignore_errors: true
+
 - name: Downloading the Palantir WEF Configuration
   win_shell: ".\\download_palantir_wef.ps1"
   args:
@@ -53,11 +61,3 @@
   failed_when: "'Exception' in redteam.stdout"
 
 - debug: msg="{{ redteam.stdout_lines }}"
-
-- name: Install Utilities
-  win_shell: ".\\install-utilities.ps1"
-  args:
-    chdir: 'c:\vagrant\scripts'
-  register: utilities
-  failed_when: "'Exception' in utilities.stdout"
-  ignore_errors: true
