@@ -50,7 +50,7 @@
       <title>Top Suricata Network Alerts</title>
       <table>
         <search>
-          <query>index=suricata | stats values(src_ip) count by alert.signature, alert.signature_id</query>
+          <query>index=suricata | stats values(src_ip) as src_ip count by alert.signature, alert.signature_id | sort -count</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
           <sampleRatio>1</sampleRatio>

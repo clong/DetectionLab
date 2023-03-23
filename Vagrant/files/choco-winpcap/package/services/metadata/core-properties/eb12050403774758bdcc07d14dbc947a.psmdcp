@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?><coreProperties xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"><dc:creator>NetGroup, CACE Technologies</dc:creator><dc:description>WinPcap is the industry-standard tool for link-layer network access in Windows environments: it allows applications to capture and transmit network packets bypassing the protocol stack, and has additional useful features, including kernel-level packet filtering, a network statistics engine and support for remote packet capture.
+
+## Notes
+
+- This package uses an Autohotkey script for unattended as vendor removed silent installation options.</dc:description><dc:identifier>WinPcap</dc:identifier><version>4.1.3.20161116</version><keywords>driver foss packet capture network admin</keywords><dc:title>WinPcap</dc:title><lastModifiedBy>choco, Version=0.9.10.3, Culture=neutral, PublicKeyToken=79d02ea9cad655eb;Microsoft Windows NT 6.3.9600.0;.NET Framework 4</lastModifiedBy></coreProperties>
