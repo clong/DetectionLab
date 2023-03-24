@@ -105,14 +105,25 @@ fix_eth1_static_ip() {
     ip link set dev eth1 down
     ip addr flush dev eth1
     ip link set dev eth1 up
-    ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
-    if [ "$ETH1_IP" == "192.168.56.105" ]; then
-      echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.56.105"
-    else
-      echo "[$(date +%H:%M:%S)]: Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
-      echo "[$(date +%H:%M:%S)]: eth1's current IP address is $ETH1_IP"
-      exit 1
-    fi
+    counter=0
+    while :; do
+      ETH1_IP=$(ip -4 addr show eth1 | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
+      if [ "$ETH1_IP" == "192.168.56.105" ]; then
+        echo "[$(date +%H:%M:%S)]: The static IP has been fixed and set to 192.168.56.105"
+        break
+      else
+        if [ $counter -le 20 ]; then
+          let counter=counter+1
+          echo "[$(date +%H:%M:%S)]: Waiting for IP $counter/20 seconds"
+          sleep 1
+          continue
+        else
+          echo "[$(date +%H:%M:%S)]: Failed to fix the broken static IP for eth1. Exiting because this will cause problems with other VMs."
+          echo "[$(date +%H:%M:%S)]: eth1's current IP address is $ETH1_IP"
+          exit 1
+        fi
+      fi
+    done
   fi
 
   # Make sure we do have a DNS resolution
