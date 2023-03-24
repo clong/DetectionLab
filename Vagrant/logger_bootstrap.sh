@@ -466,6 +466,8 @@ install_velociraptor() {
   cp /vagrant/resources/velociraptor/server.config.yaml /opt/velociraptor
   echo "[$(date +%H:%M:%S)]: Creating Velociraptor dpkg..."
   ./velociraptor --config /opt/velociraptor/server.config.yaml debian server
+  echo "[$(date +%H:%M:%S)]: Cleanup velociraptor package building leftovers..."
+  rm -rf /opt/velociraptor/logs
   echo "[$(date +%H:%M:%S)]: Installing the dpkg..."
   if dpkg -i velociraptor_*_server.deb >/dev/null; then
     echo "[$(date +%H:%M:%S)]: Installation complete!"
