@@ -12,6 +12,9 @@ $adapters = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.I
 # Specify the DC as a WINS server to help with connectivity as well
 $adapters | ForEach-Object {if (!($_.Description).Contains("Hyper-V")) {$_.SetDNSServerSearchOrder($newDNSServers); $_.SetWINSServer($newDNSServers, "")}}
 
+# Ensure dns preference on domain interface through higher interface metrics # fix #801
+Get-NetIPAddress | Where-Object { $_.IPAddress -match "192.168.56." } | Set-NetIPInterface -ifIndex { $_.InterfaceIndex } -InterfaceMetric 10
+
 Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Now join the domain..."
 $hostname = $(hostname)
 $user = "windomain.local\vagrant"
