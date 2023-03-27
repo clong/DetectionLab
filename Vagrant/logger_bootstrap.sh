@@ -564,13 +564,13 @@ install_guacamole() {
   echo "[$(date +%H:%M:%S)]: Setting up Guacamole..."
   cd /opt || exit 1
   echo "[$(date +%H:%M:%S)]: Downloading Guacamole..."
-  wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/source/guacamole-server-1.3.0.tar.gz?action=download" -O guacamole-server-1.3.0.tar.gz
-  tar -xf guacamole-server-1.3.0.tar.gz && cd guacamole-server-1.3.0 || echo "[-] Unable to find the Guacamole folder."
+  wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.5.0/source/guacamole-server-1.5.0.tar.gz?action=download" -O guacamole-server-1.5.0.tar.gz
+  tar -xf guacamole-server-1.5.0.tar.gz && cd guacamole-server-1.5.0 || echo "[-] Unable to find the Guacamole folder."
   echo "[$(date +%H:%M:%S)]: Configuring Guacamole and running 'make' and 'make install'..."
   ./configure --with-init-dir=/etc/init.d && make --quiet &>/dev/null && make --quiet install &>/dev/null || echo "[-] An error occurred while installing Guacamole."
   ldconfig
   cd /var/lib/tomcat9/webapps || echo "[-] Unable to find the tomcat9/webapps folder."
-  wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.3.0/binary/guacamole-1.3.0.war?action=download" -O guacamole.war
+  wget --progress=bar:force "https://apache.org/dyn/closer.lua/guacamole/1.5.0/binary/guacamole-1.5.0.war?action=download" -O guacamole.war
   mkdir /etc/guacamole
   mkdir /etc/guacamole/shares
   sudo chmod 777 /etc/guacamole/shares

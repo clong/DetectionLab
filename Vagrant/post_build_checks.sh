@@ -21,7 +21,7 @@ post_build_checks() {
   FLEET_CHECK=$(curl -ks -m 2 https://192.168.56.105:8412 | grep -c 'Fleet for osquery')
   ATA_CHECK=$(curl --fail --write-out "%{http_code}" -ks https://192.168.56.103 -m 2)
   VELOCIRAPTOR_CHECK=$(curl -ks -m 2 https://192.168.56.105:9999 | grep -c 'app/index.html')
-  GUACAMOLE_CHECK=$(curl -ks -m 2 'http://192.168.56.105:8080/guacamole/#/' | grep -c 'Apache Software')
+  GUACAMOLE_CHECK=$(curl -ks -m 2 'http://192.168.56.105:8080/guacamole/#/' | grep -c 'guac-login')
   [[ $ATA_CHECK == 401 ]] && ATA_CHECK=1
   
   echo "[*] Verifying that Splunk is running and reachable..."
