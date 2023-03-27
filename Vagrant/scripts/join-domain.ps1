@@ -44,6 +44,7 @@ If (($hostname -eq "wef") -or ($hostname -eq "exchange")) {
   While ($tries -lt 3) {
     Try {
       $tries += 1
+	  . c:\vagrant\scripts\fix-failed-to-join-domain_interface-issue.ps1
       Write-Host "$('[{0:HH:mm}]' -f (Get-Date)) Try # $tries"
       Add-Computer -DomainName "windomain.local" -credential $DomainCred -OUPath "ou=Workstations,dc=windomain,dc=local"
       Break
