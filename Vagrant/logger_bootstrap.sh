@@ -455,37 +455,58 @@ install_zeek() {
 }
 
 install_velociraptor() {
+  set -x
   echo "[$(date +%H:%M:%S)]: Installing Velociraptor..."
   if [ ! -d "/opt/velociraptor" ]; then
     mkdir /opt/velociraptor || echo "Dir already exists"
   fi
+
   echo "[$(date +%H:%M:%S)]: Attempting to determine the URL for the latest release of Velociraptor"
   LATEST_VELOCIRAPTOR_LINUX_URL=$(curl -sL https://github.com/Velocidex/velociraptor/releases/ | grep linux-amd64 | grep href | head -1 | cut -d '"' -f 2 | sed 's#^#https://github.com#g')
   echo "[$(date +%H:%M:%S)]: The URL for the latest release was extracted as $LATEST_VELOCIRAPTOR_LINUX_URL"
-  echo "[$(date +%H:%M:%S)]: Attempting to download..."
+
+  echo "[$(date +%H:%M:%S)]: Attempting to download Velociraptor from $LATEST_VELOCIRAPTOR_LINUX_URL"
   wget -P /opt/velociraptor --progress=bar:force "$LATEST_VELOCIRAPTOR_LINUX_URL"
+  
   if [ "$(file /opt/velociraptor/velociraptor*linux-amd64 | grep -c 'ELF 64-bit LSB executable')" -eq 1 ]; then
     echo "[$(date +%H:%M:%S)]: Velociraptor successfully downloaded!"
   else
-    echo "[$(date +%H:%M:%S)]: Failed to download the latest version of Velociraptor. Please open a DetectionLab issue on Github."
+    echo "[$(date +%H:%M:%S)]: Failed to download the latest version of Velociraptor. Please check the URL or open a DetectionLab issue on Github."
     return
   fi
 
-  cd /opt/velociraptor || exit 1
-  mv velociraptor-*-linux-amd64 velociraptor
+  cd /opt/velociraptor || { echo "[$(date +%H:%M:%S)]: Failed to change directory to /opt/velociraptor"; exit 1; }
+  mv velociraptor-v0.72.0-linux-amd64 velociraptor
   chmod +x velociraptor
+
+  echo "[$(date +%H:%M:%S)]: Copying the configuration file"
   cp /vagrant/resources/velociraptor/server.config.yaml /opt/velociraptor
+
   echo "[$(date +%H:%M:%S)]: Creating Velociraptor dpkg..."
   ./velociraptor --config /opt/velociraptor/server.config.yaml debian server
-  echo "[$(date +%H:%M:%S)]: Cleanup velociraptor package building leftovers..."
+  
+  echo "[$(date +%H:%M:%S)]: Listing contents of /opt/velociraptor to find .deb package"
+  ls -l /opt/velociraptor
+
+  echo "[$(date +%H:%M:%S)]: Cleanup Velociraptor package building leftovers..."
   rm -rf /opt/velociraptor/logs
+
   echo "[$(date +%H:%M:%S)]: Installing the dpkg..."
-  if dpkg -i velociraptor_*_server.deb >/dev/null; then
-    echo "[$(date +%H:%M:%S)]: Installation complete!"
+  DEB_FILE=$(find /opt/velociraptor -name "velociraptor*server*.deb" -print -quit)
+  
+  if [ -n "$DEB_FILE" ]; then
+    echo "[$(date +%H:%M:%S)]: Found dpkg file: $DEB_FILE"
+    if dpkg -i "$DEB_FILE"; then
+      echo "[$(date +%H:%M:%S)]: Installation complete!"
+    else
+      echo "[$(date +%H:%M:%S)]: Failed to install the dpkg"
+      return
+    fi
   else
-    echo "[$(date +%H:%M:%S)]: Failed to install the dpkg"
+    echo "[$(date +%H:%M:%S)]: No .deb file found, installation failed"
     return
   fi
+  set +x
 }
 
 install_suricata() {
