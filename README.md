@@ -1,5 +1,5 @@
 # Detection Lab
-##This is a fork of DetectionLab with minor updates to keep it working on my machine
+## This is a fork of DetectionLab with minor updates to keep it working on my machine
 ## As of 2023-01-01, DetectionLab is no longer being actively maintained
 ![DetectionLab](./img/DetectionLab.png)
 
